@@ -1,0 +1,214 @@
+import { Router, Request, Response, NextFunction } from 'express';
+import multer from 'multer';
+import ipfsService from '../services/ipfs';
+import stacksApi from '../services/stacks';
+
+const router = Router();
+
+// Configure multer for image uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only images are allowed.'));
+    }
+  }
+});
+
+// In-memory NFT store (in production, use database)
+const nfts: Record<string, any> = {};
+let nftIdCounter = 1;
+
+/**
+ * POST /api/nfts
+ * Create new NFT with metadata
+ * Body: { name, description, imageFile, category, royaltyPercentage }
+ */
+router.post('/', upload.single('imageFile'), async (req: Request, res: Response) => {
+  try {
+    const { name, description, category, royaltyPercentage } = req.body;
+    const imageFile = req.file;
+
+    // Validate inputs
+    if (!name || !description || !imageFile) {
+      return res.status(400).json({
+        error: 'Missing required fields: name, description, imageFile'
+      });
+    }
+
+    if (isNaN(royaltyPercentage) || royaltyPercentage < 0 || royaltyPercentage > 25) {
+      return res.status(400).json({
+        error: 'Invalid royalty percentage. Must be between 0 and 25.'
+      });
+    }
+
+    // Upload image to IPFS
+    const imageHash = await ipfsService.uploadFile(imageFile.buffer, imageFile.originalname);
+    const imageUri = ipfsService.getGatewayUrl(imageHash);
+
+    // Calculate file hash for fraud detection
+    const fileHash = await ipfsService.calculateFileHash(imageFile.buffer);
+
+    // Create metadata
+    const nftMetadata = {
+      name,
+      description,
+      image: imageUri,
+      imageHash: fileHash,
+      category,
+      royaltyPercentage,
+      creator: req.headers['x-creator-address'] || 'unknown',
+      createdAt: new Date().toISOString()
+    };
+
+    // Upload metadata to IPFS
+    const metadataHash = await ipfsService.uploadMetadata(nftMetadata);
+    const metadataUri = ipfsService.getGatewayUrl(metadataHash);
+
+    // Store in local database
+    const nftId = nftIdCounter++;
+    nfts[nftId.toString()] = {
+      id: nftId,
+      ...nftMetadata,
+      metadataHash,
+      metadataUri,
+      owner: nftMetadata.creator
+    };
+
+    res.status(201).json({
+      success: true,
+      nft: nfts[nftId.toString()],
+      message: 'NFT created successfully. Ready to mint on blockchain.'
+    });
+  } catch (error: any) {
+    console.error('Error creating NFT:', error);
+    res.status(500).json({
+      error: 'Failed to create NFT',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/nfts
+ * List all NFTs with pagination and filters
+ */
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const { page = 1, limit = 20, category, sortBy = 'createdAt' } = req.query;
+    const pageNum = parseInt(page as string) || 1;
+    const limitNum = parseInt(limit as string) || 20;
+
+    let nftList = Object.values(nfts);
+
+    // Filter by category
+    if (category) {
+      nftList = nftList.filter(nft => nft.category === category);
+    }
+
+    // Sort
+    if (sortBy === 'createdAt') {
+      nftList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else if (sortBy === 'name') {
+      nftList.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    // Paginate
+    const start = (pageNum - 1) * limitNum;
+    const paginatedNfts = nftList.slice(start, start + limitNum);
+
+    res.json({
+      success: true,
+      nfts: paginatedNfts,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: nftList.length,
+        pages: Math.ceil(nftList.length / limitNum)
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to fetch NFTs',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/nfts/:id
+ * Get single NFT details
+ */
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const nft = nfts[req.params.id];
+
+    if (!nft) {
+      return res.status(404).json({ error: 'NFT not found' });
+    }
+
+    res.json({
+      success: true,
+      nft
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to fetch NFT',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/nfts/:id/history
+ * Get transaction history for NFT
+ */
+router.get('/:id/history', async (req: Request, res: Response) => {
+  try {
+    const nft = nfts[req.params.id];
+
+    if (!nft) {
+      return res.status(404).json({ error: 'NFT not found' });
+    }
+
+    // In production, fetch from blockchain or database
+    const history = [
+      {
+        type: 'created',
+        from: nft.creator,
+        to: nft.creator,
+        timestamp: nft.createdAt,
+        txHash: 'mocked-tx-hash'
+      }
+    ];
+
+    res.json({
+      success: true,
+      history
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to fetch history',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/nfts/categories
+ * Get all available categories
+ */
+router.get('/meta/categories', (req: Request, res: Response) => {
+  const categories = ['art', 'collectibles', 'sports', 'digital-items', 'music', 'video'];
+  res.json({
+    success: true,
+    categories
+  });
+});
+
+export default router;

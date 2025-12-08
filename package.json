@@ -1,0 +1,28 @@
+{
+  "name": "bitart-market",
+  "version": "1.0.0",
+  "description": "NFT Marketplace on Stacks Blockchain",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
+    "build": "npm run build --workspace backend && npm run build --workspace frontend",
+    "test": "npm run test --workspace backend && npm run test --workspace frontend",
+    "deploy-contracts": "cd contracts && npm run deploy"
+  },
+  "keywords": [
+    "nft",
+    "marketplace",
+    "stacks",
+    "blockchain",
+    "clarity"
+  ],
+  "author": "BitArt Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
