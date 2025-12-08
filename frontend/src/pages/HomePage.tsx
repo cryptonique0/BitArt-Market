@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { NFTGrid } from '../components/NFTGrid';
-import { analyticsService } from '../services/api';
+import { analyticsService, celoService } from '../services/api';
 import { MarketplaceStats } from '../types';
+import { useUserStore } from '../store';
 
 export const HomePage: React.FC = () => {
   const [stats, setStats] = useState<MarketplaceStats | null>(null);
+  const [celoHealth, setCeloHealth] = useState<string>('Loading...');
+  const [celoBalance, setCeloBalance] = useState<string | null>(null);
+  const { user } = useUserStore();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -16,8 +20,33 @@ export const HomePage: React.FC = () => {
       }
     };
 
+    const fetchCeloHealth = async () => {
+      try {
+        const data = await celoService.getHealth();
+        setCeloHealth(data.clientVersion || 'Healthy');
+      } catch (error) {
+        setCeloHealth('Unavailable');
+      }
+    };
+
     fetchStats();
+    fetchCeloHealth();
   }, []);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (user.chain === 'celo' && user.address) {
+        try {
+          const data = await celoService.getBalance(user.address);
+          setCeloBalance(data.balance);
+        } catch (error) {
+          setCeloBalance(null);
+        }
+      }
+    };
+
+    fetchBalance();
+  }, [user.chain, user.address]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -30,7 +59,7 @@ export const HomePage: React.FC = () => {
                 Digital Art, Blockchain Power
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                Discover, create, and trade unique digital artworks on the Stacks blockchain. 
+                Discover, create, and trade unique digital artworks on the Stacks and Celo blockchains.
                 Creators get royalties on every resale.
               </p>
               <div className="flex gap-4">
@@ -85,6 +114,28 @@ export const HomePage: React.FC = () => {
                   {stats.totalSales.toLocaleString()}
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 mt-2">Total Sales</p>
+              </div>
+            </div>
+
+            {/* Multi-chain status */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+              <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">Stacks Network</div>
+                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200">Ready</span>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Primary chain for NFTs and marketplace.</p>
+              </div>
+
+              <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">Celo Network</div>
+                  <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200">Multi-chain</span>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">RPC: {celoHealth}</p>
+                {user.chain === 'celo' && user.address && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Balance: {celoBalance ? `${celoBalance} CELO` : 'Loading...'}</p>
+                )}
               </div>
             </div>
           </div>

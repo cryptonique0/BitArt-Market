@@ -232,9 +232,32 @@ export const analyticsService = {
   }
 };
 
+// ============================================
+// Celo Endpoints
+// ============================================
+
+export const celoService = {
+  /**
+   * Get Celo RPC health
+   */
+  getHealth: async () => {
+    const response = await apiClient.get('/celo/health');
+    return response.data;
+  },
+
+  /**
+   * Get Celo balance for an address
+   */
+  getBalance: async (address: string) => {
+    const response = await apiClient.get(`/celo/account/${address}`);
+    return response.data;
+  }
+};
+
 export default {
   nftService,
   marketplaceService,
   userService,
-  analyticsService
+  analyticsService,
+  celoService
 };

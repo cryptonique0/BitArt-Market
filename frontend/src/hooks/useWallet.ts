@@ -5,35 +5,44 @@ import { useUserStore } from '../store';
 export const useWallet = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [chain, setChain] = useState<'stacks' | 'celo'>('stacks');
   const { user, setUser } = useUserStore();
 
   useEffect(() => {
     // Check if user is already logged in
-    if (walletService.isUserLoggedIn()) {
-      const currentUser = walletService.getCurrentUser();
-      if (currentUser) {
-        setUser({
-          address: currentUser.address,
-          username: currentUser.username,
-          avatar: null,
-          isConnected: true
-        });
+    (async () => {
+      if (walletService.isUserLoggedIn()) {
+        const currentUser = await walletService.getCurrentUser();
+        if (currentUser) {
+          setChain(currentUser.chain || 'stacks');
+          setUser({
+            address: currentUser.address,
+            username: currentUser.username,
+            avatar: null,
+            chain: currentUser.chain,
+            balance: currentUser.balance || null,
+            isConnected: true
+          });
+        }
       }
-    }
+    })();
   }, [setUser]);
 
-  const connect = async () => {
+  const connect = async (selectedChain: 'stacks' | 'celo' = chain) => {
     setLoading(true);
     setError(null);
     try {
-      const address = await walletService.connectWallet();
-      if (address) {
-        const currentUser = walletService.getCurrentUser();
+      setChain(selectedChain);
+      const connection = await walletService.connectWallet(selectedChain);
+      if (connection) {
+        const currentUser = await walletService.getCurrentUser(selectedChain);
         if (currentUser) {
           setUser({
             address: currentUser.address,
             username: currentUser.username,
             avatar: null,
+            chain: currentUser.chain,
+            balance: currentUser.balance || null,
             isConnected: true
           });
         }
@@ -45,20 +54,25 @@ export const useWallet = () => {
     }
   };
 
-  const disconnect = () => {
-    walletService.disconnectWallet();
+  const disconnect = (selectedChain: 'stacks' | 'celo' | null = null) => {
+    walletService.disconnectWallet(selectedChain);
     setUser({
       address: null,
       username: null,
       avatar: null,
+      chain: null,
+      balance: null,
       isConnected: false
     });
+    setChain('stacks');
   };
 
   return {
     user,
     loading,
     error,
+    chain,
+    setChain,
     connect,
     disconnect,
     isConnected: user.isConnected

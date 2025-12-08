@@ -28,6 +28,11 @@ A comprehensive, production-ready NFT marketplace built on the Stacks blockchain
 - **Transaction history tracking**
 - **Search and filtering** engine
 
+### Multi-Chain Support (New)
+- **Stacks**: Primary marketplace and smart contracts
+- **Celo (Alfajores by default)**: Wallet connect, RPC health, and balance visibility
+- Chain selector in the header to switch between Stacks and Celo
+
 ## 📋 Project Structure
 
 ```
@@ -77,6 +82,7 @@ NETWORK=testnet
 STACKS_API_URL=https://api.testnet.stacks.co
 IPFS_GATEWAY=https://gateway.pinata.cloud
 PINATA_JWT=your_pinata_jwt_token
+CELO_RPC_URL=https://alfajores-forno.celo-testnet.org
 ```
 
 **Frontend** (`frontend/.env.local`):
@@ -84,6 +90,11 @@ PINATA_JWT=your_pinata_jwt_token
 VITE_NETWORK=testnet
 VITE_API_URL=http://localhost:3001
 VITE_CONTRACT_ADDRESS=your_contract_address
+VITE_CELO_RPC_URL=https://alfajores-forno.celo-testnet.org
+VITE_CELO_CHAIN_ID=0xaef3
+VITE_CELO_CHAIN_NAME="Celo Alfajores Testnet"
+VITE_CELO_CURRENCY=CELO
+VITE_CELO_EXPLORER=https://alfajores-blockscout.celo-testnet.org
 ```
 
 ### 2. Deploy Smart Contracts

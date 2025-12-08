@@ -4,7 +4,7 @@ import { useWallet } from '../hooks/useWallet';
 import { ThemeToggle } from './ThemeToggle';
 
 export const Header: React.FC = () => {
-  const { user, connect, disconnect, isConnected } = useWallet();
+  const { user, connect, disconnect, isConnected, chain, setChain } = useWallet();
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
@@ -46,8 +46,21 @@ export const Header: React.FC = () => {
           <div className="flex items-center gap-4">
             <ThemeToggle />
 
+            {/* Chain selector */}
+            <select
+              value={chain}
+              onChange={(e) => setChain(e.target.value as 'stacks' | 'celo')}
+              className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="stacks">Stacks</option>
+              <option value="celo">Celo</option>
+            </select>
+
             {isConnected ? (
               <div className="flex items-center gap-3">
+                <div className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 border border-gray-200 dark:border-gray-700 rounded-lg">
+                  {user.chain === 'stacks' ? 'Stacks' : 'Celo'}
+                </div>
                 <Link
                   to={`/profile/${user.address}`}
                   className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white text-sm font-bold"
@@ -56,7 +69,7 @@ export const Header: React.FC = () => {
                   {user.address?.substring(0, 2).toUpperCase()}
                 </Link>
                 <button
-                  onClick={disconnect}
+                  onClick={() => disconnect(user.chain || null)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   Disconnect
@@ -64,10 +77,10 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <button
-                onClick={connect}
+                onClick={() => connect(chain)}
                 className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
               >
-                Connect Wallet
+                Connect {chain === 'stacks' ? 'Stacks' : 'Celo'}
               </button>
             )}
           </div>

@@ -4,6 +4,8 @@ interface User {
   address: string | null;
   username: string | null;
   avatar: string | null;
+  chain: 'stacks' | 'celo' | null;
+  balance: string | null;
   isConnected: boolean;
 }
 
@@ -28,6 +30,8 @@ export const useUserStore = create<{
     address: null,
     username: null,
     avatar: null,
+    chain: null,
+    balance: null,
     isConnected: false
   },
   setUser: (user) => set({ user }),
@@ -36,6 +40,8 @@ export const useUserStore = create<{
       address: null,
       username: null,
       avatar: null,
+      chain: null,
+      balance: null,
       isConnected: false
     }
   })
