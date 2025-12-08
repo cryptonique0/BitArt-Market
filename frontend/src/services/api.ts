@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { NFT, Listing, UserProfile, MarketplaceStats } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useUserStore, useNotificationStore } from '../store';
+import { useState } from 'react';
+import { useNotificationStore } from '../store';
 
 /**
  * Hook for managing NFT operations
@@ -9,7 +9,7 @@ export const useNFT = () => {
   const [error, setError] = useState<string | null>(null);
   const { addNotification } = useNotificationStore();
 
-  const mintNFT = async (nftData: any) => {
+  const mintNFT = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -36,7 +36,7 @@ export const useNFT = () => {
     }
   };
 
-  const transferNFT = async (nftId: number, recipient: string) => {
+  const transferNFT = async () => {
     setIsLoading(true);
     setError(null);
 

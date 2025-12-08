@@ -105,7 +105,7 @@ router.get('/:address/nfts', (req: Request, res: Response) => {
     const { page = 1, limit = 20 } = req.query;
 
     // In production, fetch from database
-    const userNfts = [
+    const userNfts: any[] = [
       // Mock data - would come from blockchain/database
     ];
 
@@ -219,7 +219,7 @@ router.get('/:address/favorites', (req: Request, res: Response) => {
     const { address } = req.params;
 
     // In production, fetch from database
-    const favorites = [];
+    const favorites: any[] = [];
 
     res.json({
       success: true,

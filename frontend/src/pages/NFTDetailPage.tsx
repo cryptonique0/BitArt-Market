@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { NFT, Listing } from '../types';
-import { nftService, marketplaceService } from '../services/api';
+import { NFT } from '../types';
+import { nftService } from '../services/api';
 import { useWallet } from '../hooks/useWallet';
 import { Button } from '../components/Button';
 import { useNotificationStore } from '../store';
@@ -12,11 +12,8 @@ export const NFTDetailPage: React.FC = () => {
   const addNotification = useNotificationStore((state) => state.addNotification);
 
   const [nft, setNft] = useState<NFT | null>(null);
-  const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<any[]>([]);
-  const [showPriceModal, setShowPriceModal] = useState(false);
-  const [newPrice, setNewPrice] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,7 +45,7 @@ export const NFTDetailPage: React.FC = () => {
   }, [id, addNotification]);
 
   const handleBuy = async () => {
-    if (!user.isConnected || !listing) {
+    if (!user.isConnected) {
       addNotification({
         type: 'error',
         title: 'Not Connected',
@@ -58,7 +55,7 @@ export const NFTDetailPage: React.FC = () => {
     }
 
     try {
-      await marketplaceService.buyNFT(listing.id, 1, user.address || '');
+      // TODO: Implement actual purchase logic
       addNotification({
         type: 'success',
         title: 'Purchase Initiated',
@@ -156,35 +153,12 @@ export const NFTDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Listing Info */}
-            {listing ? (
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 mb-8">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Price</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                  {listing.price} STX
-                </p>
-                <Button
-                  onClick={handleBuy}
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                >
-                  Buy Now
-                </Button>
-              </div>
-            ) : (
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mb-8">
-                <p className="text-gray-600 dark:text-gray-400">
-                  Not currently listed for sale
-                </p>
-              </div>
-            )}
-
-            {/* Make Offer Button */}
+            {/* Action Buttons */}
             <Button
-              variant="outline"
+              onClick={handleBuy}
+              variant="primary"
               size="lg"
-              className="w-full"
+              className="w-full mb-4"
             >
               Make an Offer
             </Button>

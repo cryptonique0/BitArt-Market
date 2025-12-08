@@ -16,8 +16,8 @@ export const useWallet = () => {
         if (currentUser) {
           setChain(currentUser.chain || 'stacks');
           setUser({
-            address: currentUser.address,
-            username: currentUser.username,
+            address: currentUser.address || null,
+            username: currentUser.username || null,
             avatar: null,
             chain: currentUser.chain,
             balance: currentUser.balance || null,
@@ -38,8 +38,8 @@ export const useWallet = () => {
         const currentUser = await walletService.getCurrentUser(selectedChain);
         if (currentUser) {
           setUser({
-            address: currentUser.address,
-            username: currentUser.username,
+            address: currentUser.address || null,
+            username: currentUser.username || null,
             avatar: null,
             chain: currentUser.chain,
             balance: currentUser.balance || null,

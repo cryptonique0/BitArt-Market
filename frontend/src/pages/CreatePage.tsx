@@ -70,7 +70,7 @@ export const CreatePage: React.FC = () => {
       uploadFormData.append('royaltyPercentage', formData.royaltyPercentage.toString());
       uploadFormData.append('imageFile', formData.imageFile);
 
-      const response = await nftService.create(uploadFormData, user.address || '');
+      await nftService.create(uploadFormData, user.address || '');
 
       addNotification({
         type: 'success',

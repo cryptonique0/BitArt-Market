@@ -4,7 +4,7 @@ import {
   showConnect,
   disconnect
 } from '@stacks/connect';
-import { StacksTestnet } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
 import axios from 'axios';
 
 declare global {
@@ -17,14 +17,14 @@ declare global {
 
 const appConfig = new AppConfig(['store_write', 'publish_data']);
 const userSession = new UserSession({ appConfig });
-const network = new StacksTestnet();
+const network = STACKS_TESTNET;
 
 // Celo defaults (Alfajores testnet)
-const CELO_RPC_URL = import.meta.env.VITE_CELO_RPC_URL || 'https://alfajores-forno.celo-testnet.org';
-const CELO_CHAIN_ID = import.meta.env.VITE_CELO_CHAIN_ID || '0xaef3'; // Alfajores chain id in hex
-const CELO_CHAIN_NAME = import.meta.env.VITE_CELO_CHAIN_NAME || 'Celo Alfajores Testnet';
-const CELO_CURRENCY = import.meta.env.VITE_CELO_CURRENCY || 'CELO';
-const CELO_EXPLORER = import.meta.env.VITE_CELO_EXPLORER || 'https://alfajores-blockscout.celo-testnet.org';
+const CELO_RPC_URL = (import.meta as any).env?.VITE_CELO_RPC_URL || 'https://alfajores-forno.celo-testnet.org';
+const CELO_CHAIN_ID = (import.meta as any).env?.VITE_CELO_CHAIN_ID || '0xaef3'; // Alfajores chain id in hex
+const CELO_CHAIN_NAME = (import.meta as any).env?.VITE_CELO_CHAIN_NAME || 'Celo Alfajores Testnet';
+const CELO_CURRENCY = (import.meta as any).env?.VITE_CELO_CURRENCY || 'CELO';
+const CELO_EXPLORER = (import.meta as any).env?.VITE_CELO_EXPLORER || 'https://alfajores-blockscout.celo-testnet.org';
 
 export interface StacksWalletUser {
   profile: {
@@ -32,6 +32,7 @@ export interface StacksWalletUser {
       testnet?: string;
       mainnet?: string;
     };
+    username?: string;
   };
 }
 
