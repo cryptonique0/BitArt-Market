@@ -217,18 +217,71 @@ npm run test --workspace frontend
 
 ## 🚢 Deployment
 
-### Testnet
+### Quick Start Deployment
+
+We provide deployment configurations for Render (backend) and Vercel (frontend).
+
+**See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step instructions.**
+
+#### Backend (Node.js/Express on Render)
 ```bash
-npm run deploy:testnet
+# Verify build
+npm run build --workspace backend
+
+# Push to GitHub
+git push origin main
+
+# On Render.com:
+# 1. Connect GitHub repository
+# 2. Deploy script: npm run build --workspace backend
+# 3. Start command: node backend/dist/index.js
+# 4. Set environment variables (see .env.production.backend)
 ```
 
-### Mainnet
+#### Frontend (React/Vite on Vercel)
 ```bash
-# First test on testnet!
-npm run deploy:mainnet
+# Verify build
+npm run build --workspace frontend
+
+# Option 1: Vercel CLI
+npm install -g vercel
+vercel --prod
+
+# Option 2: GitHub integration on Vercel.com
+# Connect repository and auto-deploy on push
 ```
 
-See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
+### Environment Variables
+
+**Backend (.env.production.backend)**
+```
+NODE_ENV=production
+STACKS_API_URL=https://api.mainnet.stacks.co
+STACKS_NETWORK=mainnet
+CELO_RPC_URL=https://forno.celo.org
+PINATA_API_KEY=your_key
+PINATA_SECRET_API_KEY=your_secret
+CORS_ORIGIN=https://your-frontend-domain.com
+```
+
+**Frontend (.env.production.frontend)**
+```
+VITE_API_URL=https://your-backend-api.com
+VITE_STACKS_API_URL=https://api.mainnet.stacks.co
+VITE_STACKS_NETWORK=mainnet
+VITE_CELO_RPC_URL=https://forno.celo.org
+```
+
+### Production URLs (After Deployment)
+- **Frontend**: https://bitart-market.vercel.app (example)
+- **Backend API**: https://bitart-market-api.onrender.com (example)
+
+**See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions on:**
+- Setting up Render for backend
+- Configuring Vercel for frontend
+- Environment variable management
+- Monitoring and maintenance
+- Alternative hosting options
 
 ## 🤝 Contributing
 
