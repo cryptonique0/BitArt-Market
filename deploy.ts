@@ -3,11 +3,10 @@ import {
   broadcastTransaction,
   AnchorMode 
 } from '@stacks/transactions';
-import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { readFileSync } from 'fs';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: '.env.contracts' });
 
 interface DeploymentConfig {
   contractName: string;
@@ -20,11 +19,6 @@ async function deployContract(config: DeploymentConfig) {
   try {
     console.log(`\n🚀 Deploying ${config.contractName}...`);
     
-    // Initialize network
-    const network = config.network === 'testnet' 
-      ? new StacksTestnet()
-      : new StacksMainnet();
-    
     // Read contract source
     const contractSource = readFileSync(config.filePath, 'utf-8');
     console.log(`📄 Contract source loaded (${contractSource.length} bytes)`);
@@ -34,7 +28,7 @@ async function deployContract(config: DeploymentConfig) {
       contractName: config.contractName,
       codeBody: contractSource,
       senderKey: config.privateKey,
-      network,
+      network: config.network,
       anchorMode: AnchorMode.Any,
       fee: 10000, // STX microunits for deployment
     };
@@ -43,10 +37,14 @@ async function deployContract(config: DeploymentConfig) {
     const transaction = await makeContractDeploy(txOptions);
     
     console.log('📡 Broadcasting transaction...');
-    const broadcastResponse = await broadcastTransaction(transaction, network);
+    const broadcastResponse = await broadcastTransaction(transaction, config.network);
     
-    // Extract sender address from private key
-    const senderAddress = broadcastResponse.transaction.auth.spendingCondition?.signer || 'unknown';
+    // Get sender address from transaction
+    const { getAddressFromPrivateKey, TransactionVersion } = await import('@stacks/transactions');
+    const senderAddress = getAddressFromPrivateKey(
+      config.privateKey,
+      config.network === 'testnet' ? TransactionVersion.Testnet : TransactionVersion.Mainnet
+    );
     const contractAddress = `${senderAddress}.${config.contractName}`;
     
     console.log('\n✅ Contract deployment initiated!');
