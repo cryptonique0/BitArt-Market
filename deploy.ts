@@ -1,7 +1,7 @@
 import { 
   makeContractDeploy,
   broadcastTransaction,
-  AnchorMode 
+  AnchorMode
 } from '@stacks/transactions';
 import { readFileSync } from 'fs';
 import * as dotenv from 'dotenv';
@@ -70,7 +70,7 @@ async function main() {
   const network = (process.env.STACKS_NETWORK || 'testnet') as 'testnet' | 'mainnet';
   
   if (!privateKey) {
-    console.error('❌ Error: STACKS_PRIVATE_KEY not set in .env');
+    console.error('❌ Error: STACKS_PRIVATE_KEY not set in .env.contracts');
     process.exit(1);
   }
   
