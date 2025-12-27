@@ -19,3 +19,6 @@ yarn-error.log*
 .turbo/
 coverage/
 .nyc_output/
+.env*
+.env.contracts
+.env.deployments
