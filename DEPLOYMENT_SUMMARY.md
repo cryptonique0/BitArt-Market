@@ -176,7 +176,7 @@ BitArt-Market/
 Once deployed on Remix, save these:
 
 ```
-NFT Contract Address:       0x_______________________________
+NFT Contract Address:       0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682 ✅
 Marketplace Address:        0x_______________________________
 Auction Address:            0x_______________________________
 
