@@ -39,13 +39,19 @@ Replaced all Celo testnet configuration with Base mainnet:
 
 Three production-ready EVM contracts:
 
+## Deployment Checklist
+
+- [x] ✅ **BitArtNFT** - Deployed at `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682`
+- [x] ✅ **BitArtMarketplace** - Deployed at `0x7d28443e3571faB3821d669537E45484E4A06AC9`
+- [ ] **BitArtAuction** - Pending (needs NFT contract address)
+
 #### **BitArtNFT.sol** (ERC721)
 - Token minting with metadata
 - Royalty support (EIP-2981)
 - Creator tracking
 - Admin management
 
-#### **BitArtMarketplace.sol**
+#### **BitArtMarketplace.sol** ✅ Deployed at `0x7d28443e3571faB3821d669537E45484E4A06AC9`
 - List and sell NFTs
 - Automatic royalty distribution
 - Platform fee collection (2.5% default)
