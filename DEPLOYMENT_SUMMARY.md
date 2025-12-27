@@ -177,8 +177,8 @@ Once deployed on Remix, save these:
 
 ```
 NFT Contract Address:       0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682 ✅
-Marketplace Address:        0x_______________________________
-Auction Address:            0x_______________________________
+Marketplace Address:        0x_______________________________ (pending)
+Auction Address:            0x_______________________________ (pending)
 
 Base RPC:                   https://mainnet.base.org
 Base Chain ID:              8453 (0x2105 in hex)

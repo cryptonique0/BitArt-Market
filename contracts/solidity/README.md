@@ -109,13 +109,17 @@ Auction contract for NFT bidding with reserve prices.
 
 ## Deployed Contract Addresses (Base Mainnet)
 
-After deployment via Remix, add your contract addresses here:
+Deployed via Remix on Base Mainnet:
 
 ```
-BitArtNFT: 0x...
-BitArtMarketplace: 0x...
-BitArtAuction: 0x...
+BitArtNFT:          0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682 ✅
+BitArtMarketplace:  TBD (deploy with NFT address above)
+BitArtAuction:      TBD (deploy with NFT address above)
 ```
+
+**Next Steps:**
+1. Deploy BitArtMarketplace with constructor: `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682`
+2. Deploy BitArtAuction with constructor: `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682`
 
 ## Security
 
