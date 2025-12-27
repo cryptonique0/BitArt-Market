@@ -43,7 +43,7 @@ Three production-ready EVM contracts:
 
 - [x] ✅ **BitArtNFT** - Deployed at `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682`
 - [x] ✅ **BitArtMarketplace** - Deployed at `0x7d28443e3571faB3821d669537E45484E4A06AC9`
-- [ ] **BitArtAuction** - Pending (needs NFT contract address)
+- [x] ✅ **BitArtAuction** - Deployed at `0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2`
 
 #### **BitArtNFT.sol** (ERC721)
 - Token minting with metadata

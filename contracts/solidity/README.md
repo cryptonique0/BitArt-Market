@@ -10,9 +10,12 @@ Solidity smart contracts for BitArt Market on Base Mainnet.
 - **BitArtMarketplace**: `0x7d28443e3571faB3821d669537E45484E4A06AC9`
   - Verify on [BaseScan](https://basescan.org/address/0x7d28443e3571faB3821d669537E45484E4A06AC9)
 
-### Next Step
+- **BitArtAuction**: `0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2`
+  - Verify on [BaseScan](https://basescan.org/address/0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2)
 
-Deploy **BitArtAuction** with NFT address `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682` as constructor parameter.
+### ✅ All Contracts Deployed!
+
+All three contracts are now live on Base Mainnet. You can verify and interact with them on BaseScan.
 
 ---
 
