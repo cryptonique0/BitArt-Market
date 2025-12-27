@@ -13,7 +13,7 @@ import nftRoutes from './routes/nft';
 import marketplaceRoutes from './routes/marketplace';
 import userRoutes from './routes/user';
 import analyticsRoutes from './routes/analytics';
-import celoRoutes from './routes/celo';
+import baseRoutes from './routes/base';
 
 const app: Express = express();
 const PORT = process.env.PORT || 3001;
@@ -80,12 +80,27 @@ app.get('/api/health', (req: Request, res: Response) => {
   });
 });
 
+// Root route for quick info
+app.get('/', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    message: 'BitArt Market API',
+    docs: {
+      health: '/api/health',
+      nfts: '/api/nfts',
+      marketplace: '/api/marketplace/listings',
+      users: '/api/users/{address}',
+      analytics: '/api/analytics/stats'
+    }
+  });
+});
+
 // API Routes
 app.use('/api/nfts', nftRoutes);
 app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/analytics', analyticsRoutes);
-app.use('/api/celo', celoRoutes);
+app.use('/api/base', baseRoutes);
 
 // ============================================
 // Error Handling Middleware

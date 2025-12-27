@@ -19,12 +19,12 @@ const appConfig = new AppConfig(['store_write', 'publish_data']);
 const userSession = new UserSession({ appConfig });
 const network = STACKS_TESTNET;
 
-// Celo defaults (Alfajores testnet)
-const CELO_RPC_URL = (import.meta as any).env?.VITE_CELO_RPC_URL || 'https://alfajores-forno.celo-testnet.org';
-const CELO_CHAIN_ID = (import.meta as any).env?.VITE_CELO_CHAIN_ID || '0xaef3'; // Alfajores chain id in hex
-const CELO_CHAIN_NAME = (import.meta as any).env?.VITE_CELO_CHAIN_NAME || 'Celo Alfajores Testnet';
-const CELO_CURRENCY = (import.meta as any).env?.VITE_CELO_CURRENCY || 'CELO';
-const CELO_EXPLORER = (import.meta as any).env?.VITE_CELO_EXPLORER || 'https://alfajores-blockscout.celo-testnet.org';
+// Base defaults (Mainnet)
+const BASE_RPC_URL = (import.meta as any).env?.VITE_BASE_RPC_URL || 'https://mainnet.base.org';
+const BASE_CHAIN_ID = (import.meta as any).env?.VITE_BASE_CHAIN_ID || '0x2105'; // Base mainnet chain id in hex (8453)
+const BASE_CHAIN_NAME = (import.meta as any).env?.VITE_BASE_CHAIN_NAME || 'Base Mainnet';
+const BASE_CURRENCY = (import.meta as any).env?.VITE_BASE_CURRENCY || 'ETH';
+const BASE_EXPLORER = (import.meta as any).env?.VITE_BASE_EXPLORER || 'https://basescan.org';
 
 export interface StacksWalletUser {
   profile: {
@@ -37,7 +37,7 @@ export interface StacksWalletUser {
 }
 
 class WalletService {
-  private celoSessionKey = 'bitart-celo-address';
+  private baseSessionKey = 'bitart-base-address';
 
   /**
    * Check if wallet is installed
@@ -68,33 +68,33 @@ class WalletService {
   }
 
   /**
-   * Connect to Celo wallet (Valora/MetaMask/WalletConnect via injected provider)
+   * Connect to Base wallet (MetaMask/WalletConnect via injected provider)
    */
-  async connectCeloWallet(): Promise<string | null> {
+  async connectBaseWallet(): Promise<string | null> {
     if (!window.ethereum) {
-      throw new Error('No Ethereum-compatible wallet found. Please install MetaMask or a Celo-compatible wallet.');
+      throw new Error('No Ethereum-compatible wallet found. Please install MetaMask or a Base-compatible wallet.');
     }
 
-    // Ensure Celo network is added/switch
+    // Ensure Base network is added/switch
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: CELO_CHAIN_ID }]
+        params: [{ chainId: BASE_CHAIN_ID }]
       });
     } catch (switchError: any) {
       if (switchError.code === 4902) {
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [{
-            chainId: CELO_CHAIN_ID,
-            chainName: CELO_CHAIN_NAME,
-            rpcUrls: [CELO_RPC_URL],
+            chainId: BASE_CHAIN_ID,
+            chainName: BASE_CHAIN_NAME,
+            rpcUrls: [BASE_RPC_URL],
             nativeCurrency: {
-              name: CELO_CURRENCY,
-              symbol: CELO_CURRENCY,
+              name: BASE_CURRENCY,
+              symbol: BASE_CURRENCY,
               decimals: 18
             },
-            blockExplorerUrls: [CELO_EXPLORER]
+            blockExplorerUrls: [BASE_EXPLORER]
           }]
         });
       } else {
@@ -105,7 +105,7 @@ class WalletService {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const address = accounts?.[0] || null;
     if (address) {
-      localStorage.setItem(this.celoSessionKey, address);
+      localStorage.setItem(this.baseSessionKey, address);
     }
     return address;
   }
@@ -113,30 +113,30 @@ class WalletService {
   /**
    * Disconnect wallet
    */
-  disconnectWallet(chain: 'stacks' | 'celo' | null = null): void {
+  disconnectWallet(chain: 'stacks' | 'base' | null = null): void {
     if (!chain || chain === 'stacks') {
       userSession.signUserOut();
       disconnect();
     }
 
-    if (!chain || chain === 'celo') {
-      localStorage.removeItem(this.celoSessionKey);
+    if (!chain || chain === 'base') {
+      localStorage.removeItem(this.baseSessionKey);
     }
   }
 
   /**
    * Check if user is logged in
    */
-  isUserLoggedIn(chain: 'stacks' | 'celo' | null = null): boolean {
+  isUserLoggedIn(chain: 'stacks' | 'base' | null = null): boolean {
     if (chain === 'stacks') return userSession.isUserSignedIn();
-    if (chain === 'celo') return !!localStorage.getItem(this.celoSessionKey);
-    return userSession.isUserSignedIn() || !!localStorage.getItem(this.celoSessionKey);
+    if (chain === 'base') return !!localStorage.getItem(this.baseSessionKey);
+    return userSession.isUserSignedIn() || !!localStorage.getItem(this.baseSessionKey);
   }
 
   /**
    * Get current user
    */
-  async getCurrentUser(chain: 'stacks' | 'celo' | null = null) {
+  async getCurrentUser(chain: 'stacks' | 'base' | null = null) {
     if ((chain === 'stacks' || !chain) && userSession.isUserSignedIn()) {
       const user = userSession.loadUserData() as StacksWalletUser;
       return {
@@ -147,13 +147,13 @@ class WalletService {
       };
     }
 
-    if ((chain === 'celo' || !chain) && localStorage.getItem(this.celoSessionKey)) {
-      const address = localStorage.getItem(this.celoSessionKey) as string;
-      const balance = await this.getCeloBalance(address);
+    if ((chain === 'base' || !chain) && localStorage.getItem(this.baseSessionKey)) {
+      const address = localStorage.getItem(this.baseSessionKey) as string;
+      const balance = await this.getBaseBalance(address);
       return {
         address,
         username: null,
-        chain: 'celo' as const,
+        chain: 'base' as const,
         balance
       };
     }
@@ -178,26 +178,26 @@ class WalletService {
   /**
    * Connect based on selected chain
    */
-  async connectWallet(chain: 'stacks' | 'celo' = 'stacks') {
+  async connectWallet(chain: 'stacks' | 'base' = 'stacks') {
     if (chain === 'stacks') {
       const address = await this.connectStacksWallet();
       return address ? { address, chain: 'stacks' as const } : null;
     }
 
-    if (chain === 'celo') {
-      const address = await this.connectCeloWallet();
-      return address ? { address, chain: 'celo' as const } : null;
+    if (chain === 'base') {
+      const address = await this.connectBaseWallet();
+      return address ? { address, chain: 'base' as const } : null;
     }
 
     return null;
   }
 
   /**
-   * Get Celo balance via RPC
+   * Get Base balance via RPC
    */
-  async getCeloBalance(address: string): Promise<string | null> {
+  async getBaseBalance(address: string): Promise<string | null> {
     try {
-      const response = await axios.post(CELO_RPC_URL, {
+      const response = await axios.post(BASE_RPC_URL, {
         jsonrpc: '2.0',
         id: 1,
         method: 'eth_getBalance',
@@ -209,11 +209,11 @@ class WalletService {
       const balanceHex = response.data?.result;
       if (!balanceHex) return null;
       const wei = BigInt(balanceHex);
-      // Convert to CELO with 4 decimal precision for UI
-      const celo = Number(wei) / 1e18;
-      return celo.toFixed(4);
+      // Convert to ETH with 4 decimal precision for UI
+      const eth = Number(wei) / 1e18;
+      return eth.toFixed(4);
     } catch (error) {
-      console.error('Failed to fetch Celo balance', error);
+      console.error('Failed to fetch Base balance', error);
       return null;
     }
   }

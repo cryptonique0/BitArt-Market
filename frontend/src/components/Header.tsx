@@ -49,17 +49,17 @@ export const Header: React.FC = () => {
             {/* Chain selector */}
             <select
               value={chain}
-              onChange={(e) => setChain(e.target.value as 'stacks' | 'celo')}
+              onChange={(e) => setChain(e.target.value as 'stacks' | 'base')}
               className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="stacks">Stacks</option>
-              <option value="celo">Celo</option>
+              <option value="base">Base</option>
             </select>
 
             {isConnected ? (
               <div className="flex items-center gap-3">
                 <div className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  {user.chain === 'stacks' ? 'Stacks' : 'Celo'}
+                  {user.chain === 'stacks' ? 'Stacks' : 'Base'}
                 </div>
                 <Link
                   to={`/profile/${user.address}`}
@@ -80,7 +80,7 @@ export const Header: React.FC = () => {
                 onClick={() => connect(chain)}
                 className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
               >
-                Connect {chain === 'stacks' ? 'Stacks' : 'Celo'}
+                Connect {chain === 'stacks' ? 'Stacks' : 'Base'}
               </button>
             )}
           </div>

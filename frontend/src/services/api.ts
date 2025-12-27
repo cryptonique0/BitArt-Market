@@ -232,23 +232,23 @@ export const analyticsService = {
 };
 
 // ============================================
-// Celo Endpoints
+// Base Endpoints
 // ============================================
 
-export const celoService = {
+export const baseService = {
   /**
-   * Get Celo RPC health
+   * Get Base RPC health
    */
   getHealth: async () => {
-    const response = await apiClient.get('/celo/health');
+    const response = await apiClient.get('/base/health');
     return response.data;
   },
 
   /**
-   * Get Celo balance for an address
+   * Get Base balance for an address
    */
   getBalance: async (address: string) => {
-    const response = await apiClient.get(`/celo/account/${address}`);
+    const response = await apiClient.get(`/base/account/${address}`);
     return response.data;
   }
 };
@@ -258,5 +258,5 @@ export default {
   marketplaceService,
   userService,
   analyticsService,
-  celoService
+  baseService
 };

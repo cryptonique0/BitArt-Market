@@ -2,12 +2,12 @@ import { Router, Request, Response } from 'express';
 import axios from 'axios';
 
 const router = Router();
-const CELO_RPC_URL = process.env.CELO_RPC_URL || 'https://alfajores-forno.celo-testnet.org';
+const BASE_RPC_URL = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 
-// Health check for Celo RPC
+// Health check for Base RPC
 router.get('/health', async (_req: Request, res: Response) => {
   try {
-    const response = await axios.post(CELO_RPC_URL, {
+    const response = await axios.post(BASE_RPC_URL, {
       jsonrpc: '2.0',
       id: 1,
       method: 'web3_clientVersion',
@@ -16,24 +16,24 @@ router.get('/health', async (_req: Request, res: Response) => {
 
     res.json({
       success: true,
-      rpcUrl: CELO_RPC_URL,
+      rpcUrl: BASE_RPC_URL,
       clientVersion: response.data?.result || 'unknown'
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      rpcUrl: CELO_RPC_URL,
-      error: error.message || 'Failed to reach Celo RPC'
+      rpcUrl: BASE_RPC_URL,
+      error: error.message || 'Failed to reach Base RPC'
     });
   }
 });
 
-// Get account balance on Celo
+// Get account balance on Base
 router.get('/account/:address', async (req: Request, res: Response) => {
   const { address } = req.params;
 
   try {
-    const balanceResponse = await axios.post(CELO_RPC_URL, {
+    const balanceResponse = await axios.post(BASE_RPC_URL, {
       jsonrpc: '2.0',
       id: 2,
       method: 'eth_getBalance',
@@ -46,12 +46,12 @@ router.get('/account/:address', async (req: Request, res: Response) => {
     }
 
     const wei = BigInt(balanceHex);
-    const celo = Number(wei) / 1e18;
+    const eth = Number(wei) / 1e18;
 
     res.json({
       success: true,
       address,
-      balance: celo.toFixed(4),
+      balance: eth.toFixed(4),
       balanceWei: wei.toString()
     });
   } catch (error: any) {

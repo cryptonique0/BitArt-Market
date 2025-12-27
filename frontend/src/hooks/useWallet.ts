@@ -5,7 +5,7 @@ import { useUserStore } from '../store';
 export const useWallet = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [chain, setChain] = useState<'stacks' | 'celo'>('stacks');
+  const [chain, setChain] = useState<'stacks' | 'base'>('stacks');
   const { user, setUser } = useUserStore();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export const useWallet = () => {
     })();
   }, [setUser]);
 
-  const connect = async (selectedChain: 'stacks' | 'celo' = chain) => {
+  const connect = async (selectedChain: 'stacks' | 'base' = chain) => {
     setLoading(true);
     setError(null);
     try {
@@ -54,7 +54,7 @@ export const useWallet = () => {
     }
   };
 
-  const disconnect = (selectedChain: 'stacks' | 'celo' | null = null) => {
+  const disconnect = (selectedChain: 'stacks' | 'base' | null = null) => {
     walletService.disconnectWallet(selectedChain);
     setUser({
       address: null,
