@@ -6,12 +6,12 @@
 
 ### Contract Addresses
 
-1. **NFT Contract**: `ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.bitart-nft`
-   - Status: ⏳ Pending (deploy this next)
+1. **NFT Contract**: `ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.colorful-lime-guan`
+   - Status: ✅ Deployed
    - Functions: mint-nft, transfer-nft, get-nft-metadata
 
-2. **Marketplace Contract**: `ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.bitart-marketplace`
-   - Status: ⏳ Pending (deploy this next)
+2. **Marketplace Contract**: `ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.partial-harlequin-tahr`
+   - Status: ✅ Deployed
    - Functions: list-nft, buy-nft, cancel-listing
 
 3. **Auction Contract**: `ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.better-copper-lemming`

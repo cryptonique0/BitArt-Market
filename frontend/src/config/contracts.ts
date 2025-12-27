@@ -6,8 +6,8 @@ export const STACKS_CONTRACTS = {
   network: 'testnet',
   
   // Contract addresses (deployed on Stacks testnet)
-  nft: process.env.VITE_NFT_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.bitart-nft',
-  marketplace: process.env.VITE_MARKETPLACE_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.bitart-marketplace',
+  nft: process.env.VITE_NFT_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.colorful-lime-guan',
+  marketplace: process.env.VITE_MARKETPLACE_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.partial-harlequin-tahr',
   auction: process.env.VITE_AUCTION_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.better-copper-lemming',
   
   // Explorer URLs
