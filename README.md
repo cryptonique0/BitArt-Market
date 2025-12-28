@@ -1,16 +1,27 @@
-# BitArt Market - NFT Marketplace on Stacks Blockchain
+# BitArt Market - Multi-Chain NFT Marketplace
 
-A comprehensive, production-ready NFT marketplace built on the Stacks blockchain with Clarity smart contracts, React frontend, and Node.js backend.
+A comprehensive, production-ready NFT marketplace built on **Stacks blockchain** and **Base (L2 Ethereum)** with Solidity/Clarity smart contracts, React frontend, and Node.js backend.
+
+## 🎉 **Live on Base Mainnet!**
+
+All smart contracts deployed and verified on Base Mainnet:
+- **BitArtNFT**: `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682`
+- **BitArtMarketplace**: `0x7d28443e3571faB3821d669537E45484E4A06AC9`
+- **BitArtAuction**: `0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2`
+
+🔗 [View on BaseScan](https://basescan.org)
 
 ## 🚀 Features
 
 ### Smart Contracts
-- **SFT-based NFTs** with metadata storage
+- **ERC721 NFTs** (Base) with metadata storage and royalties (EIP-2981)
+- **SFT-based NFTs** (Stacks) with metadata storage
 - **Royalty system** for creator earnings on resales
-- **Marketplace listing** with price management
-- **Post-conditions** for transaction security
+- **Marketplace listing** with price management and automatic royalty distribution
+- **Auction system** with bidding, reserve prices, and bid increments
+- **Post-conditions** for transaction security (Stacks)
 - **Admin role** for platform management
-- **Secure auction system** with bid tracking
+- **ReentrancyGuard** protection (Base)
 
 ### Frontend
 - **Responsive design** (mobile, tablet, desktop)
@@ -28,26 +39,33 @@ A comprehensive, production-ready NFT marketplace built on the Stacks blockchain
 - **Transaction history tracking**
 - **Search and filtering** engine
 
-### Multi-Chain Support (New)
-- **Stacks**: Primary marketplace and smart contracts
-- **Celo (Alfajores by default)**: Wallet connect, RPC health, and balance visibility
-- Chain selector in the header to switch between Stacks and Celo
-
+### Multi-Chain Support
+- **Base Mainnet (Primary)**: EVM-compatible L2 with low fees and fast transactions
+  - ERC721 NFT contract with royalty support
+  - Marketplace with automatic royalty distribution
+  - Auction contract with bidding mechanism
 ## 📋 Project Structure
 
 ```
-/contracts        → Clarity smart contracts
-/frontend         → React UI application
-/backend          → Node.js/Express API
+/contracts
+  /solidity       → Solidity contracts for Base (ERC721, Marketplace, Auction)
+  /clarity        → Clarity smart contracts for Stacks
+/frontend         → React UI application with multi-chain support
+/backend          → Node.js/Express API with Base RPC integration
 /config           → Network & environment configuration
 /utils            → Web3 helpers and utilities
+/docs             → Documentation and deployment guides
+```nfig           → Network & environment configuration
+/utils            → Web3 helpers and utilities
 /docs             → Documentation
-```
-
 ## ⚙️ Prerequisites
 
-- Node.js 16+
-- Stacks.js v4+
+- Node.js 18+
+- MetaMask wallet (for Base network)
+- Leather/Hiro wallet (for Stacks network)
+- Remix IDE (for Solidity deployment) or Hardhat
+- Clarinet (for Clarity contract development)
+- IPFS node or Pinata account (for image storage)
 - Clarinet (for contract development)
 - IPFS node or Pinata account (for image storage)
 
@@ -73,35 +91,47 @@ cd contracts && npm install && cd ..
 
 ### 1. Configure Environment Variables
 
-Create `.env.local` files:
-
 **Backend** (`backend/.env.local`):
-```
+```env
 PORT=3001
 NETWORK=testnet
 STACKS_API_URL=https://api.testnet.stacks.co
 IPFS_GATEWAY=https://gateway.pinata.cloud
 PINATA_JWT=your_pinata_jwt_token
-CELO_RPC_URL=https://alfajores-forno.celo-testnet.org
+BASE_RPC_URL=https://mainnet.base.org
 ```
 
 **Frontend** (`frontend/.env.local`):
-```
+```env
 VITE_NETWORK=testnet
-VITE_API_URL=http://localhost:3001
-VITE_CONTRACT_ADDRESS=your_contract_address
-VITE_CELO_RPC_URL=https://alfajores-forno.celo-testnet.org
-VITE_CELO_CHAIN_ID=0xaef3
-VITE_CELO_CHAIN_NAME="Celo Alfajores Testnet"
-VITE_CELO_CURRENCY=CELO
-VITE_CELO_EXPLORER=https://alfajores-blockscout.celo-testnet.org
-```
+VITE_API_URL=http://localhost:3001/api
 
-### 2. Deploy Smart Contracts
+# Stacks Contracts (Testnet)
+VITE_NFT_CONTRACT=ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.colorful-lime-guan
+VITE_MARKETPLACE_CONTRACT=ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.partial-harlequin-tahr
+VITE_AUCTION_CONTRACT=ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.better-copper-lemming
 
+# Base Contracts (Mainnet)
+VITE_BASE_NFT_CONTRACT=0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682
+VITE_BASE_MARKETPLACE_CONTRACT=0x7d28443e3571faB3821d669537E45484E4A06AC9
+VITE_BASE_AUCTION_CONTRACT=0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2
+### 2. Smart Contracts
+
+**Base Contracts (Already Deployed)**
+✅ All contracts are live on Base Mainnet. See [contracts/solidity/README.md](./contracts/solidity/README.md) for details.
+
+**Stacks Contracts (Optional)**
 ```bash
 cd contracts
 
+# Test Clarity contracts
+npm run test
+
+# Deploy to Stacks testnet
+npm run deploy:testnet
+```
+
+See [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) for full deployment details.
 # Test contracts
 npm run test
 
@@ -157,6 +187,10 @@ The app will be available at `http://localhost:5173`
 - **Secure wallet connection** with signing validation
 
 ## 📊 API Endpoints
+
+### Base Blockchain
+- `GET /api/base/health` - Base network health check
+- `GET /api/base/account/:address` - Get Base wallet balance
 
 ### NFTs
 - `GET /api/nfts` - List all NFTs with filters
@@ -254,22 +288,27 @@ vercel --prod
 ### Environment Variables
 
 **Backend (.env.production.backend)**
-```
+```env
 NODE_ENV=production
+PORT=3001
 STACKS_API_URL=https://api.mainnet.stacks.co
 STACKS_NETWORK=mainnet
-CELO_RPC_URL=https://forno.celo.org
+BASE_RPC_URL=https://mainnet.base.org
 PINATA_API_KEY=your_key
 PINATA_SECRET_API_KEY=your_secret
 CORS_ORIGIN=https://your-frontend-domain.com
 ```
 
 **Frontend (.env.production.frontend)**
-```
+```env
 VITE_API_URL=https://your-backend-api.com
 VITE_STACKS_API_URL=https://api.mainnet.stacks.co
 VITE_STACKS_NETWORK=mainnet
-VITE_CELO_RPC_URL=https://forno.celo.org
+VITE_BASE_RPC_URL=https://mainnet.base.org
+VITE_BASE_CHAIN_ID=0x2105
+VITE_BASE_NFT_CONTRACT=0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682
+VITE_BASE_MARKETPLACE_CONTRACT=0x7d28443e3571faB3821d669537E45484E4A06AC9
+VITE_BASE_AUCTION_CONTRACT=0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2
 ```
 
 ### Production URLs (After Deployment)
