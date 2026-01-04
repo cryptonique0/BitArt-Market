@@ -20,6 +20,9 @@ import analyticsRoutes from './routes/analytics';
 import baseRoutes from './routes/base';
 import royaltiesRoutes from './routes/royalties';
 import searchRoutes from './routes/search';
+import verificationRoutes from './routes/verification';
+import followsRoutes from './routes/follows';
+import activityRoutes from './routes/activity';
 
 const app: Express = express();
 const PORT = config.port;
@@ -109,6 +112,9 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/base', baseRoutes);
 app.use('/api/royalties', royaltiesRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/verification', verificationRoutes);
+app.use('/api/follows', followsRoutes);
+app.use('/api/activity', activityRoutes);
 
 // ============================================
 // Error Handling Middleware
