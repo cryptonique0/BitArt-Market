@@ -18,6 +18,7 @@ import marketplaceRoutes from './routes/marketplace';
 import userRoutes from './routes/user';
 import analyticsRoutes from './routes/analytics';
 import baseRoutes from './routes/base';
+import royaltiesRoutes from './routes/royalties';
 
 const app: Express = express();
 const PORT = config.port;
@@ -105,6 +106,7 @@ app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/base', baseRoutes);
+app.use('/api/royalties', royaltiesRoutes);
 
 // ============================================
 // Error Handling Middleware

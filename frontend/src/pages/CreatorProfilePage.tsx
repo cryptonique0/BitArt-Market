@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCreatorStats, CreatorStats, formatEarnings, getDaysSinceJoin } from '../services/creators';
 import { BaseScanLink } from './BaseScanLink';
+import CreatorRevenueChart from '../components/CreatorRevenueChart';
+import RoyaltyHistory from '../components/RoyaltyHistory';
 
 /**
  * Creator Profile Page
  */
 export const CreatorProfilePage: React.FC = () => {
   const { address } = useParams<{ address: string }>();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<CreatorStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -245,6 +248,30 @@ export const CreatorProfilePage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Revenue Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Chart */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+          <CreatorRevenueChart creatorAddress={address || ''} days={30} title="30-Day Revenue Trend" />
+        </div>
+
+        {/* Royalty History */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-gray-900 dark:text-white">Royalty History</h2>
+            {address && (
+              <button
+                onClick={() => navigate(`/royalties/${address}`)}
+                className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium"
+              >
+                View All →
+              </button>
+            )}
+          </div>
+          <RoyaltyHistory creatorAddress={address || ''} limit={5} />
+        </div>
+      </div>
 
       {/* Recent Sales */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">

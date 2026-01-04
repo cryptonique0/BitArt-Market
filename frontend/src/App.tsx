@@ -7,6 +7,8 @@ import { HomePage } from './pages/HomePage';
 import { CreatePage } from './pages/CreatePage';
 import { NFTDetailPage } from './pages/NFTDetailPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { CreatorProfilePage } from './pages/CreatorProfilePage';
+import RoyaltiesDashboard from './pages/RoyaltiesDashboard';
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -30,6 +32,8 @@ function App() {
             <Route path="/create" element={<CreatePage />} />
             <Route path="/nft/:id" element={<NFTDetailPage />} />
             <Route path="/profile/:address" element={<ProfilePage />} />
+            <Route path="/creator/:address" element={<CreatorProfilePage />} />
+            <Route path="/royalties/:address" element={<RoyaltiesDashboard />} />
             <Route path="/discover" element={<HomePage />} />
             <Route path="/studio" element={<ProfilePage />} />
           </Routes>
