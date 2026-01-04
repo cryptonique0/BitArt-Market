@@ -51,16 +51,12 @@ export const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">BA</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-xl text-gray-900 dark:text-white hidden sm:inline">
-                BitArt Market
-              </span>
-              <BaseNativeBadge className="hidden sm:inline-flex" />
-            </div>
+          <Link to="/" className="flex items-center gap-2">
+            <img 
+              src="/images/logo.png" 
+              alt="BitArt Market" 
+              className="h-10 w-auto object-contain"
+            />
           </Link>
 
           {/* Navigation */}

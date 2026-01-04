@@ -30,7 +30,7 @@ export const HomePage: React.FC = () => {
     {
       id: '1',
       name: 'CyberPunk Genesis #001',
-      image: 'https://via.placeholder.com/300?text=CyberPunk+001',
+      image: '/images/nfts/cyberpunk-001.svg',
       price: 0.5,
       creator: '0xArtist1',
       verified: true,
@@ -39,7 +39,7 @@ export const HomePage: React.FC = () => {
     {
       id: '2',
       name: 'Digital Dreams #042',
-      image: 'https://via.placeholder.com/300?text=Dreams+042',
+      image: '/images/nfts/digital-dreams-042.svg',
       price: 0.75,
       creator: '0xCreator2',
       verified: false,
@@ -48,7 +48,7 @@ export const HomePage: React.FC = () => {
     {
       id: '3',
       name: 'Base Builders #777',
-      image: 'https://via.placeholder.com/300?text=Builders+777',
+      image: '/images/nfts/base-builders-777.svg',
       price: 1.25,
       creator: '0xDev3',
       verified: true,
@@ -57,7 +57,7 @@ export const HomePage: React.FC = () => {
     {
       id: '4',
       name: 'Pixel Paradise #99',
-      image: 'https://via.placeholder.com/300?text=Paradise+99',
+      image: '/images/nfts/pixel-paradise-99.svg',
       price: 0.35,
       creator: '0xPixel4',
       verified: false,
@@ -136,13 +136,12 @@ export const HomePage: React.FC = () => {
             </div>
             <div className="relative h-96">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl opacity-20 blur-3xl" />
-              <div className="relative h-full bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-center">
-                <div>
-                  <svg className="w-24 h-24 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <p className="text-lg font-semibold">Your Art Here</p>
-                </div>
+              <div className="relative h-full bg-gradient-to-br from-blue-900 via-gray-900 to-black rounded-2xl flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/images/logo.png" 
+                  alt="BitArt Market" 
+                  className="w-4/5 h-auto object-contain"
+                />
               </div>
             </div>
           </div>
@@ -241,22 +240,25 @@ export const HomePage: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {mockTrendingNFTs.map((nft) => (
-              <div key={nft.id} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                  <img src={nft.image} alt={nft.name} className="w-full h-full object-cover" />
+              <div key={nft.id} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow cursor-pointer group">
+                <div className="aspect-square bg-gray-100 dark:bg-gray-900 flex items-center justify-center overflow-hidden">
+                  <img src={nft.image} alt={nft.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{nft.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{nft.creator.slice(0, 6)}...{nft.creator.slice(-4)}</p>
-                  <div className="mt-3 flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{nft.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{nft.creator.slice(0, 6)}...{nft.creator.slice(-4)}</p>
+                  <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Price</p>
                       <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{nft.price} ETH</p>
                     </div>
-                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
-                      Buy
+                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm">
+                      Buy Now
                     </button>
                   </div>
+                  {nft.floorPrice && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Floor: {nft.floorPrice} ETH</p>
+                  )}
                 </div>
               </div>
             ))}
