@@ -11,7 +11,23 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 
 🔗 [View on BaseScan](https://basescan.org)
 
-## 🚀 Base-Native Features (Latest)
+## � Feature Highlights
+
+**See [COMPLETE_FEATURE_LIST.md](./COMPLETE_FEATURE_LIST.md) for detailed breakdown of all 25+ features across 7 days of development.**
+
+### Latest: Royalty Analytics Dashboard (Day 6)
+- **Royalty Tracking** - Secondary sale earnings per NFT and creator
+- **30-Day Revenue Charts** - Visual earnings trends with daily breakdown
+- **Creator Dashboard** - Comprehensive analytics interface
+- **Top Earner NFTs** - Identify highest-performing collections
+- **Revenue Summaries** - At-a-glance metrics with trend analysis
+
+### Also Included: Creator Profiles & Marketplace Analytics (Days 4-5)
+- **Creator Profiles** - Earnings, sales history, most popular NFTs
+- **Analytics Dashboard** - 7 key marketplace metrics with trends
+- **Revenue Charts** - Visual earning trends and statistics
+
+## 🚀 Base-Native Features
 
 ✨ **Production-ready features built specifically for Base Mainnet:**
 
