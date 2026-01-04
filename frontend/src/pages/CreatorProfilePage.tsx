@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCreatorStats, CreatorStats, formatEarnings, getDaysSinceJoin } from '../services/creators';
-import { BaseScanLink } from './BaseScanLink';
+import { BaseScanLink } from '../components/BaseScanLink';
 import CreatorRevenueChart from '../components/CreatorRevenueChart';
 import RoyaltyHistory from '../components/RoyaltyHistory';
 

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { fetchRoyaltyHistory, RoyaltyChartData, formatRoyalty } from '../services/royalties';
-import { BaseScanLink } from './BaseScanLink';
 
 interface RoyaltyHistoryProps {
   creatorAddress: string;

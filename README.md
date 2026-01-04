@@ -13,19 +13,29 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 
 ## � Feature Highlights
 
-**See [COMPLETE_FEATURE_LIST.md](./COMPLETE_FEATURE_LIST.md) for detailed breakdown of all 25+ features across 7 days of development.**
+### 🎨 Latest: Royalty Analytics Dashboard (Day 6)
+- **Royalty Tracking** - Real-time secondary sale earnings per NFT and creator
+- **30-Day Revenue Charts** - Interactive visual earnings trends with daily breakdown
+- **Creator Dashboard** - Comprehensive analytics with revenue summaries
+- **Top Earner NFTs** - Identify highest-performing collections by royalties
+- **Revenue Summaries** - At-a-glance metrics with 7-day vs 7-day trend analysis
+- **Royalty History** - Detailed payment records with BaseScan transaction links
+- **Visual Charts** - Custom line and bar charts with dark mode support
 
-### Latest: Royalty Analytics Dashboard (Day 6)
-- **Royalty Tracking** - Secondary sale earnings per NFT and creator
-- **30-Day Revenue Charts** - Visual earnings trends with daily breakdown
-- **Creator Dashboard** - Comprehensive analytics interface
-- **Top Earner NFTs** - Identify highest-performing collections
-- **Revenue Summaries** - At-a-glance metrics with trend analysis
+### 📊 Creator Economy Tools (Days 4-5)
+- **Creator Profiles** - Dedicated pages showing NFTs created, total earnings, and sales history
+- **Marketplace Analytics** - 7 key metrics (volume, sales, users, listings, floor price, avg price, revenue)
+- **Revenue Charts** - 30-day visual earning trends with peak/average statistics
+- **Earnings Aggregation** - Track primary sales and royalty distributions
+- **Most Sold NFT** - Highlight best-performing pieces per creator
+- **Recent Sales Table** - Transaction history with prices and buyer addresses
 
-### Also Included: Creator Profiles & Marketplace Analytics (Days 4-5)
-- **Creator Profiles** - Earnings, sales history, most popular NFTs
-- **Analytics Dashboard** - 7 key marketplace metrics with trends
-- **Revenue Charts** - Visual earning trends and statistics
+### 🎯 Extended Wallet & Transaction UX (Day 3)
+- **Transaction Status Components** - Loading states, success/error toasts, history tracking
+- **Wallet Error Handling** - Disconnect banners, reconnection flows, error display
+- **Transaction Service** - RPC polling, status updates, confirmation tracking
+- **Session Persistence** - 7-day localStorage with automatic cleanup
+- **Disconnect Handling** - Graceful error recovery and state management
 
 ## 🚀 Base-Native Features
 
@@ -85,20 +95,27 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **ReentrancyGuard** protection (Base)
 
 ### Frontend
-- **Responsive design** (mobile, tablet, desktop)
-- **Dark/Light mode** support
-- **Real-time blockchain data** display
-- **Wallet integration** (Leather, Hiro)
+- **Responsive design** (mobile, tablet, desktop) with Tailwind CSS
+- **Dark/Light mode** support with persistent theme storage
+- **Real-time blockchain data** display with Base RPC integration
+- **Wallet integration** (MetaMask, Coinbase Wallet, Leather, Hiro)
 - **NFT discovery** with advanced filters and search
-- **Creator Studio** for artists to manage collections
-- **Smooth animations** and transitions
+- **Creator Studio** for artists to manage collections and view analytics
+- **Analytics Dashboard** - Marketplace-wide metrics with trend indicators
+- **Creator Profiles** - Dedicated pages for artist portfolios
+- **Royalty Dashboard** - Revenue tracking with visual charts
+- **Transaction Tracking** - Real-time status updates and history
+- **Smooth animations** and transitions with loading states
 
 ### Backend
-- **REST API** for metadata and analytics
-- **IPFS integration** for decentralized storage
-- **User profile management**
-- **Transaction history tracking**
-- **Search and filtering** engine
+- **REST API** with 15+ endpoints for marketplace operations
+- **IPFS integration** for decentralized storage (Pinata)
+- **User profile management** with creator stats
+- **Transaction history tracking** with blockchain sync
+- **Analytics service** - Volume, sales, revenue, user metrics
+- **Royalty tracking service** - Secondary sale earnings and distributions
+- **Creator service** - Earnings aggregation and profile data
+- **Search and filtering** engine with pagination
 
 ### Multi-Chain Support
 - **Base Mainnet (Primary)**: EVM-compatible L2 with low fees and fast transactions
@@ -251,30 +268,43 @@ The app will be available at `http://localhost:5173`
 
 ### Base Blockchain
 - `GET /api/base/health` - Base network health check
-- `GET /api/base/account/:address` - Get Base wallet balance
+- `GET /api/base/account/:address` - Get Base wallet balance and info
 
 ### NFTs
-- `GET /api/nfts` - List all NFTs with filters
-- `GET /api/nfts/:id` - Get NFT details
+- `GET /api/nfts` - List all NFTs with filters and pagination
+- `GET /api/nfts/:id` - Get NFT details with metadata
 - `POST /api/nfts` - Create NFT (authenticated)
 - `GET /api/nfts/:id/history` - Transaction history
 
 ### Marketplace
-- `GET /api/marketplace/listings` - Active listings
+- `GET /api/marketplace/listings` - Active listings with filters
 - `POST /api/marketplace/listings` - Create listing
-- `PUT /api/marketplace/listings/:id` - Update listing
+- `PUT /api/marketplace/listings/:id` - Update listing price
 - `DELETE /api/marketplace/listings/:id` - Cancel listing
 
 ### Users
-- `GET /api/users/:address` - User profile
-- `GET /api/users/:address/nfts` - User's NFTs
-- `GET /api/users/:address/collections` - User's collections
+- `GET /api/users/:address` - User profile with stats
+- `GET /api/users/:address/nfts` - User's NFT collection
+- `GET /api/users/:address/collections` - User's created collections
 - `POST /api/users/:address/avatar` - Upload avatar
 
 ### Analytics
-- `GET /api/analytics/stats` - Marketplace statistics
+- `GET /api/analytics/stats` - Marketplace statistics (volume, sales, users)
+- `GET /api/analytics/trends` - 7-day trend indicators
 - `GET /api/analytics/top-creators` - Top creators by volume
 - `GET /api/analytics/top-buyers` - Top buyers by spending
+
+### Creator Profiles
+- `GET /api/creators/:address` - Creator profile and earnings
+- `GET /api/creators/:address/stats` - Detailed creator statistics
+- `GET /api/creators/:address/sales` - Sales history
+
+### Royalties
+- `GET /api/royalties/creator/:address` - Creator royalty summary
+- `GET /api/royalties/creator/:address/history?days=30` - Royalty chart data
+- `GET /api/royalties/nft/:nftId` - NFT-specific royalty stats
+- `GET /api/royalties/top?limit=20` - Top earning NFTs by royalties
+- `POST /api/royalties/calculate` - Calculate royalties for a sale
 
 ## 🎨 UI/UX Components
 
@@ -383,6 +413,51 @@ VITE_BASE_AUCTION_CONTRACT=0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2
 - Monitoring and maintenance
 - Alternative hosting options
 
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**1. Wallet Won't Connect**
+- Ensure MetaMask/Coinbase Wallet is installed
+- Check you're on the correct network (Base Mainnet)
+- Clear browser cache and reload
+- Try switching to Base manually in wallet settings
+
+**2. Transaction Fails**
+- Verify sufficient ETH balance for gas fees
+- Check contract addresses in environment variables
+- Ensure wallet is connected to Base Mainnet (Chain ID: 8453)
+- Review BaseScan for transaction details
+
+**3. NFT Images Not Loading**
+- Check Pinata JWT token is valid
+- Verify IPFS gateway is accessible
+- Ensure image URLs use `https://` protocol
+- Try alternative IPFS gateways (ipfs.io, cloudflare-ipfs.com)
+
+**4. API Returns 500 Error**
+- Check backend environment variables
+- Verify Base RPC URL is responding
+- Review backend logs for specific errors
+- Ensure database/cache is running
+
+**5. Dark Mode Issues**
+- Clear localStorage: `localStorage.clear()`
+- Check theme toggle component
+- Verify Tailwind dark mode configuration
+
+**6. Charts Not Displaying**
+- Check royalty service is returning data
+- Verify API endpoints are accessible
+- Review browser console for JavaScript errors
+- Ensure data arrays are not empty
+
+### Getting Help
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/bitart-market/issues)
+- **Documentation**: Check [docs/](./docs) folder for detailed guides
+- **Community**: Join our Discord for support
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for guidelines.
@@ -393,10 +468,22 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ## 🔗 Resources
 
-- [Stacks Documentation](https://docs.stacks.co/)
-- [Clarity Language](https://clarity-lang.org/)
-- [Stacks.js](https://stacks.js.org/)
-- [IPFS](https://ipfs.io/)
+- **[Base Documentation](https://docs.base.org/)** - Base blockchain guides and references
+- **[BaseScan](https://basescan.org/)** - Base blockchain explorer
+- **[Coinbase Wallet](https://www.coinbase.com/wallet)** - Recommended wallet for Base
+- **[Stacks Documentation](https://docs.stacks.co/)** - Stacks blockchain guides
+- **[Clarity Language](https://clarity-lang.org/)** - Smart contract language
+- **[ethers.js](https://docs.ethers.org/)** - Ethereum JavaScript library
+- **[IPFS](https://ipfs.io/)** - Decentralized storage protocol
+- **[Pinata](https://pinata.cloud/)** - IPFS pinning service
+
+## 📈 Project Stats
+
+- **15+ API Endpoints** across 6 service categories
+- **3 Smart Contracts** deployed on Base Mainnet
+- **10+ React Components** with dark mode support
+- **7-Day Development Roadmap** completed
+- **Production-Ready** with full error handling
 - [Pinata](https://www.pinata.cloud/)
 
 ## 📧 Support

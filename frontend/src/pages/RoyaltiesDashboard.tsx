@@ -8,7 +8,7 @@ import {
   formatRoyalty,
   getEarningsTrend
 } from '../services/royalties';
-import { BaseScanLink } from './BaseScanLink';
+import { BaseScanLink } from '../components/BaseScanLink';
 
 /**
  * Simple line chart component
