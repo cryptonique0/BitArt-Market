@@ -19,6 +19,7 @@ import userRoutes from './routes/user';
 import analyticsRoutes from './routes/analytics';
 import baseRoutes from './routes/base';
 import royaltiesRoutes from './routes/royalties';
+import searchRoutes from './routes/search';
 
 const app: Express = express();
 const PORT = config.port;
@@ -107,6 +108,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/base', baseRoutes);
 app.use('/api/royalties', royaltiesRoutes);
+app.use('/api/search', searchRoutes);
 
 // ============================================
 // Error Handling Middleware

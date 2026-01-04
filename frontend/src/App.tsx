@@ -8,6 +8,7 @@ import { CreatePage } from './pages/CreatePage';
 import { NFTDetailPage } from './pages/NFTDetailPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { CreatorProfilePage } from './pages/CreatorProfilePage';
+import DiscoveryPage from './pages/DiscoveryPage';
 import RoyaltiesDashboard from './pages/RoyaltiesDashboard';
 
 function App() {
@@ -34,7 +35,8 @@ function App() {
             <Route path="/profile/:address" element={<ProfilePage />} />
             <Route path="/creator/:address" element={<CreatorProfilePage />} />
             <Route path="/royalties/:address" element={<RoyaltiesDashboard />} />
-            <Route path="/discover" element={<HomePage />} />
+            <Route path="/discover" element={<DiscoveryPage />} />
+            <Route path="/marketplace" element={<DiscoveryPage />} />
             <Route path="/studio" element={<ProfilePage />} />
           </Routes>
           <NotificationContainer />
