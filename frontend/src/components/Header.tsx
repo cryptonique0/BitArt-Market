@@ -11,25 +11,13 @@ export const Header: React.FC = () => {
     user, 
     connect, 
     disconnect, 
-    isConnected, 
-    chain, 
-    autoSwitchToBase, 
+    isConnected,
     error, 
     loading,
     disconnectError,
     clearDisconnectError
   } = useWallet();
-  const [showChainWarning, setShowChainWarning] = useState(false);
   const [isCoinbase, setIsCoinbase] = useState(false);
-
-  // Show warning if not on Base when connected
-  useEffect(() => {
-    if (isConnected && chain !== 'base') {
-      setShowChainWarning(true);
-    } else {
-      setShowChainWarning(false);
-    }
-  }, [isConnected, chain]);
 
   // Detect Coinbase Wallet
   useEffect(() => {
@@ -44,7 +32,7 @@ export const Header: React.FC = () => {
           <WalletDisconnectBanner
             error={disconnectError}
             onDismiss={clearDisconnectError}
-            onReconnect={() => connect(user.chain || 'base')}
+            onReconnect={() => connect(true)}
             isLoading={loading}
           />
         )}
@@ -58,23 +46,6 @@ export const Header: React.FC = () => {
       </div>
 
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
-        {/* Chain Warning Banner */}
-        {showChainWarning && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
-            <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8 flex items-center justify-between">
-              <span className="text-sm text-yellow-800 dark:text-yellow-200">
-                ⚠️ You're not on Base. BitArt Market is optimized for Base Mainnet.
-              </span>
-              <button
-                onClick={autoSwitchToBase}
-                disabled={loading}
-                className="ml-4 px-3 py-1 text-sm bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 text-white rounded transition-colors"
-              >
-                {loading ? 'Switching...' : 'Switch to Base'}
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Main Header */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -137,7 +108,7 @@ export const Header: React.FC = () => {
                   {user.address?.substring(0, 2).toUpperCase()}
                 </Link>
                 <button
-                  onClick={() => disconnect(user.chain || null)}
+                  onClick={() => disconnect()}
                   className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   Disconnect
@@ -145,7 +116,7 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <button
-                onClick={() => connect('base')}
+                onClick={() => connect(true)}
                 disabled={loading}
                 className={`px-4 py-2 text-white rounded-lg font-medium hover:shadow-lg disabled:opacity-50 transition-all ${
                   isCoinbase

@@ -31,7 +31,7 @@ class WalletService {
       window.ethereum.on('accountsChanged', (accounts: string[]) => {
         if (accounts.length === 0) {
           // User disconnected
-          this.disconnectWallet('base');
+          this.disconnectWallet();
           this.disconnectListeners.forEach(listener => listener());
         } else {
           // Account changed, update session
@@ -50,20 +50,10 @@ class WalletService {
     if (window.ethereum) {
       // Some wallets emit disconnect event
       window.ethereum.on('disconnect', () => {
-        this.disconnectWallet('base');
+        this.disconnectWallet();
         this.disconnectListeners.forEach(listener => listener());
       });
     }
-  }
-
-  /**
-   * Register listener for chain changes
-   */
-  onChainChange(callback: (chain: 'base' | 'stacks') => void): () => void {
-    this.chainChangeListeners.push(callback);
-    return () => {
-      this.chainChangeListeners = this.chainChangeListeners.filter(l => l !== callback);
-    };
   }
 
   /**
@@ -72,7 +62,7 @@ class WalletService {
   onAccountChange(callback: (accounts: string[]) => void): () => void {
     this.accountChangeListeners.push(callback);
     return () => {
-      this.accountChangeListeners = this.accountChangeListeners.filter(l => l !== callback);
+      this.accountChangeListeners = this.accountChangeListeners.filter((l: (accounts: string[]) => void) => l !== callback);
     };
   }
 
@@ -111,7 +101,6 @@ class WalletService {
 
     try {
       const networkConfig = getNetworkConfig(isTestnet);
-      const targetChainId = `0x${networkConfig.chainId.toString(16)}`;
       
       // Get current chain ID
       const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
@@ -234,20 +223,6 @@ class WalletService {
       this.setNetworkPreference(isTestnet ? 'testnet' : 'mainnet');
     }
     return address;
-  }
-
-  /**
-   * Disconnect wallet
-   */
-  disconnectWallet(chain: 'stacks' | 'base' | null = null): void {
-    if (!chain || chain === 'stacks') {
-      userSession.signUserOut();
-      disconnect();
-    }
-
-    if (!chain || chain === 'base') {
-      localStorage.removeItem(this.baseSessionKey);
-    }
   }
 
   /**

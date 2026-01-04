@@ -95,83 +95,82 @@ export const useWallet = () => {
       }
     })();
 
-    // Listen for chain changes in wallet
-    const unsubscribeChain = walletService.onChainChange((newChain) => {
-      setChain(newChain);
-    });
-
-    // Listen for account changes
-    const unsubscribeAccount = walletService.onAccountChange(async (nextAddress) => {
-      const address = Array.isArray(nextAddress) ? nextAddress[0] : nextAddress;
-
-      if (!address) {
-        // Account disconnected
-        disconnect();
-      } else {
-        // Account changed, update user
-        const currentChain = (await walletService.getCurrentChain()) || 'base';
-        setUser({
-          address,
-          username: user?.username || null,
-          avatar: user?.avatar || null,
-          chain: currentChain,
-          balance: user?.balance || null,
-          isConnected: true
-        });
-        saveSession(address, currentChain);
+    // Listen for account and disconnect events
+    const unsubscribeAccount = walletService.onAccountChange((accounts) => {
+      if (accounts.length > 0) {
+        // Account changed, reload user data
+        (async () => {
+          const currentUser = await walletService.getCurrentUser();
+          if (currentUser) {
+            setUser({
+              address: currentUser.address || null,
+              username: currentUser.username || null,
+              avatar: null,
+              chain: 'base',
+              balance: currentUser.balance || null,
+              isConnected: true
+            });
+            if (currentUser.address) {
+              saveSession(currentUser.address, currentUser.network as 'testnet' | 'mainnet');
+            }
+          }
+        })();
       }
     });
 
-    // Listen for wallet disconnect
     const unsubscribeDisconnect = walletService.onDisconnect(() => {
-      disconnect();
-      setDisconnectError('Wallet disconnected. Please reconnect.');
+      setUser({
+        address: null,
+        username: null,
+        avatar: null,
+        chain: null,
+        balance: null,
+        isConnected: false
+      });
+      clearSession();
     });
 
     return () => {
-      unsubscribeChain?.();
       unsubscribeAccount?.();
       unsubscribeDisconnect?.();
     };
   }, [setUser]);
 
-  const connect = async (selectedChain: 'stacks' | 'base' = chain) => {
+  const connect = async (isTestnet: boolean = true) => {
     setLoading(true);
     setError(null);
     setDisconnectError(null);
     try {
-      setChain(selectedChain);
-      const connection = await walletService.connectWallet(selectedChain);
+      const connection = await walletService.connectWallet(isTestnet);
       if (connection) {
-        const currentUser = await walletService.getCurrentUser(selectedChain);
+        const currentUser = await walletService.getCurrentUser();
         if (currentUser) {
           setUser({
             address: currentUser.address || null,
             username: currentUser.username || null,
             avatar: null,
-            chain: currentUser.chain,
+            chain: 'base',
             balance: currentUser.balance || null,
             isConnected: true
           });
           
           // Save session for persistence
           if (currentUser.address) {
-            saveSession(currentUser.address, selectedChain);
+            saveSession(currentUser.address, isTestnet ? 'testnet' : 'mainnet');
           }
         }
       }
     } catch (err: any) {
       setError(err.message || 'Failed to connect wallet');
       clearSession();
-      setChain(chain); // Revert chain on error
     } finally {
       setLoading(false);
     }
   };
 
-  const disconnect = (selectedChain: 'stacks' | 'base' | null = null) => {
+  const disconnect = () => {
     try {
-      walletService.disconnectWallet(selectedChain);
+      walletService.disconnectWallet();
       clearSession();
       setUser({
         address: null,
@@ -181,24 +180,28 @@ export const useWallet = () => {
         balance: null,
         isConnected: false
       });
-      setChain('base');
     } catch (err: any) {
       setDisconnectError(err.message || 'Failed to disconnect wallet');
     }
   };
 
-  const autoSwitchToBase = async () => {
+  const switchNetwork = async (isTestnet: boolean) => {
     setLoading(true);
     setError(null);
     try {
-      const success = await walletService.autoDetectAndSwitchToBase();
-      if (success) {
-        setChain('base');
-        if (user?.address) {
-          saveSession(user.address, 'base');
+      const success = await walletService.switchToBase(isTestnet);
+      if (success && user?.address) {
+        saveSession(user.address, isTestnet ? 'testnet' : 'mainnet');
+        // Reload user data to update balance
+        const currentUser = await walletService.getCurrentUser();
+        if (currentUser) {
+          setUser({
+            ...user,
+            balance: currentUser.balance || null
+          });
         }
-      } else {
-        setError('Failed to switch to Base network');
+      } else if (!success) {
+        setError('Failed to switch network');
       }
     } catch (err: any) {
       setError(err.message || 'Failed to switch network');
@@ -213,11 +216,10 @@ export const useWallet = () => {
     error,
     disconnectError,
     clearDisconnectError: () => setDisconnectError(null),
-    chain,
-    setChain,
+    chain: 'base' as const,
     connect,
     disconnect,
-    isConnected: user.isConnected,
-    autoSwitchToBase
+    switchNetwork,
+    isConnected: user.isConnected
   };
 };
