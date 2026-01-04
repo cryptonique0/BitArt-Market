@@ -4,7 +4,7 @@ interface User {
   address: string | null;
   username: string | null;
   avatar: string | null;
-  chain: 'stacks' | 'base' | null;
+  chain: 'base' | null;
   balance: string | null;
   isConnected: boolean;
 }

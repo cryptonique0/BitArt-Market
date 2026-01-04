@@ -1,14 +1,75 @@
 import React, { useEffect, useState } from 'react';
-import { NFTGrid } from '../components/NFTGrid';
+import { useQuery } from '@tanstack/react-query';
+import { ActivityFeed } from '../components/ActivityFeed';
+import { VerificationBadge } from '../components/VerificationBadge';
+import { getTopCreators } from '../services/follows';
 import { analyticsService, baseService } from '../services/api';
 import { MarketplaceStats } from '../types';
 import { useUserStore } from '../store';
+import { config } from '../config/env';
+
+interface MockNFT {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  creator: string;
+  verified?: boolean;
+  floorPrice?: number;
+}
 
 export const HomePage: React.FC = () => {
   const [stats, setStats] = useState<MarketplaceStats | null>(null);
   const [baseHealth, setBaseHealth] = useState<string>('Loading...');
   const [baseBalance, setBaseBalance] = useState<string | null>(null);
+  const [isTestnet, setIsTestnet] = useState(true);
   const { user } = useUserStore();
+
+  // Mock trending NFTs for Base
+  const mockTrendingNFTs: MockNFT[] = [
+    {
+      id: '1',
+      name: 'CyberPunk Genesis #001',
+      image: 'https://via.placeholder.com/300?text=CyberPunk+001',
+      price: 0.5,
+      creator: '0xArtist1',
+      verified: true,
+      floorPrice: 0.45
+    },
+    {
+      id: '2',
+      name: 'Digital Dreams #042',
+      image: 'https://via.placeholder.com/300?text=Dreams+042',
+      price: 0.75,
+      creator: '0xCreator2',
+      verified: false,
+      floorPrice: 0.6
+    },
+    {
+      id: '3',
+      name: 'Base Builders #777',
+      image: 'https://via.placeholder.com/300?text=Builders+777',
+      price: 1.25,
+      creator: '0xDev3',
+      verified: true,
+      floorPrice: 1.0
+    },
+    {
+      id: '4',
+      name: 'Pixel Paradise #99',
+      image: 'https://via.placeholder.com/300?text=Paradise+99',
+      price: 0.35,
+      creator: '0xPixel4',
+      verified: false,
+      floorPrice: 0.3
+    },
+  ];
+
+  // Top creators by followers
+  const { data: topCreators, isLoading: loadingCreators } = useQuery({
+    queryKey: ['topCreatorsHome'],
+    queryFn: () => getTopCreators(6)
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -35,7 +96,7 @@ export const HomePage: React.FC = () => {
 
   useEffect(() => {
     const fetchBalance = async () => {
-      if (user.chain === 'base' && user.address) {
+      if (user.address && user.chain === 'base') {
         try {
           const data = await baseService.getBalance(user.address);
           setBaseBalance(data.balance);
@@ -48,6 +109,8 @@ export const HomePage: React.FC = () => {
     fetchBalance();
   }, [user.chain, user.address]);
 
+  const currentNetwork = isTestnet ? config.base.testnet : config.base.mainnet;
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero Section */}
@@ -56,10 +119,10 @@ export const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-                Digital Art, Blockchain Power
+                Digital Art on Base
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                Discover, create, and trade unique digital artworks on the Stacks and Base blockchains.
+                Discover, create, and trade unique digital artworks on Base blockchain.
                 Creators get royalties on every resale.
               </p>
               <div className="flex gap-4">
@@ -105,7 +168,7 @@ export const HomePage: React.FC = () => {
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {stats.totalVolume.toFixed(2)} STX
+                  {stats.totalVolume.toFixed(2)} ETH
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 mt-2">Trading Volume</p>
               </div>
@@ -117,38 +180,145 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Multi-chain status */}
+            {/* Base Network Status */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
               <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                 <div className="flex justify-between items-center mb-2">
-                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">Stacks Network</div>
-                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200">Ready</span>
+                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    {currentNetwork.chainName}
+                  </div>
+                  <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200">
+                    {isTestnet ? 'Testnet' : 'Mainnet'}
+                  </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Primary chain for NFTs and marketplace.</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setIsTestnet(true)}
+                    disabled={isTestnet}
+                    className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+                      isTestnet
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    Sepolia
+                  </button>
+                  <button
+                    onClick={() => setIsTestnet(false)}
+                    disabled={!isTestnet}
+                    className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+                      !isTestnet
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    Mainnet
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">RPC: {baseHealth}</p>
+                {user.chain === 'base' && user.address && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Balance: {baseBalance ? `${baseBalance} ETH` : 'Loading...'}</p>
+                )}
               </div>
 
               <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                 <div className="flex justify-between items-center mb-2">
-                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">Base Network</div>
-                  <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200">Multi-chain</span>
+                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">BitArt Market</div>
+                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200">Ready</span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">RPC: {baseHealth}</p>
-                {user.chain === 'base' && user.address && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Balance: {baseBalance ? `${baseBalance} ETH` : 'Loading...'}</p>
-                )}
+                <p className="text-sm text-gray-600 dark:text-gray-400">Create, mint, and trade NFTs on Base.</p>
               </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* Trending Section */}
+      {/* Trending Section with Mock NFTs */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12">
-            Trending Now
+            Trending Now on {isTestnet ? 'Sepolia' : 'Base'}
           </h2>
-          <NFTGrid />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {mockTrendingNFTs.map((nft) => (
+              <div key={nft.id} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-lg transition-shadow">
+                <div className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <img src={nft.image} alt={nft.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{nft.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{nft.creator.slice(0, 6)}...{nft.creator.slice(-4)}</p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Price</p>
+                      <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{nft.price} ETH</p>
+                    </div>
+                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                      Buy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Top Creators Section */}
+      <section className="bg-gray-50 dark:bg-gray-800 py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Top Creators</h2>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Ranked by followers</span>
+          </div>
+
+          {loadingCreators ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-28 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : topCreators && topCreators.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {topCreators.map((creator: { address: string; followerCount: number }) => (
+                <div
+                  key={creator.address}
+                  className="p-6 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                      {creator.address.slice(2, 4).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {creator.address.slice(0, 6)}...{creator.address.slice(-4)}
+                        </p>
+                        <VerificationBadge address={creator.address} showLabel={false} size="sm" />
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {creator.followerCount.toLocaleString()} followers
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Engagement score powered by social signals</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400">No creator data yet.</p>
+          )}
+        </div>
+      </section>
+
+      {/* Marketplace Activity */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Marketplace Activity</h2>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Live events across the market</span>
+          </div>
+          <ActivityFeed limit={15} showFilters className="mt-4" />
         </div>
       </section>
 
@@ -175,7 +345,7 @@ export const HomePage: React.FC = () => {
                   <div className="mt-4 flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">Items: {100 * i}</span>
                     <span className="text-purple-600 dark:text-purple-400 font-semibold">
-                      Floor: {(i * 0.5).toFixed(2)} STX
+                      Floor: {(i * 0.5).toFixed(2)} ETH
                     </span>
                   </div>
                 </div>

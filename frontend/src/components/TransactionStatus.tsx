@@ -16,8 +16,8 @@ interface TransactionToastProps {
  */
 export const TransactionToast: React.FC<TransactionToastProps> = ({
   txHash,
-  type = 'buy',
-  description = 'Transaction',
+  type: _type = 'buy',
+  description: _description = 'Transaction',
   onStatusChange,
   autoClose = true,
   autoCloseDelay = 10000
@@ -146,7 +146,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     setTransactions(transactionService.getRecentTransactions(limit));
 
     // Update on new transactions
-    const unsubscribe = transactionService.onTransactionStatusChange('recent', (tx) => {
+    const unsubscribe = transactionService.onTransactionStatusChange('recent', (_tx) => {
       setTransactions(transactionService.getRecentTransactions(limit));
     });
 

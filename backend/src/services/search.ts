@@ -15,6 +15,14 @@ export interface NFTFilter {
   onlyListed?: boolean;
 }
 
+// Extended filter type used by routes
+export type SearchFilters = NFTFilter & {
+  sortBy?: SortOptions['field'];
+  sortOrder?: SortOptions['order'];
+  status?: string;
+  category?: string;
+};
+
 export interface SortOptions {
   field: 'popularity' | 'price' | 'date' | 'trending';
   order: 'asc' | 'desc';
@@ -34,13 +42,14 @@ export interface SearchResult {
   listed: boolean;
   rarity: string;
   relevanceScore?: number;
+  createdAt?: number;
 }
 
 /**
  * Search NFTs with advanced filters
  */
 export async function searchNFTs(
-  filters: NFTFilter,
+  filters: SearchFilters,
   sort: SortOptions = { field: 'popularity', order: 'desc' },
   page: number = 1,
   limit: number = 20
@@ -93,16 +102,24 @@ export async function searchNFTs(
     filtered = filtered.filter(nft => nft.listed);
   }
 
+  // Resolve sort from filters if provided
+  const resolvedSort: SortOptions = filters.sortBy
+    ? { field: filters.sortBy as SortOptions['field'], order: filters.sortOrder || 'desc' }
+    : sort;
+
   // Apply sorting
   filtered.sort((a, b) => {
     let comparison = 0;
 
-    switch (sort.field) {
+    switch (resolvedSort.field) {
       case 'popularity':
         comparison = b.popularity - a.popularity;
         break;
       case 'price':
         comparison = (a.price || 0) - (b.price || 0);
+        break;
+      case 'date':
+        comparison = (b as any).createdAt - (a as any).createdAt;
         break;
       case 'trending':
         if (a.trending !== b.trending) {
@@ -115,7 +132,7 @@ export async function searchNFTs(
         comparison = 0;
     }
 
-    return sort.order === 'asc' ? comparison : -comparison;
+    return resolvedSort.order === 'asc' ? comparison : -comparison;
   });
 
   // Pagination
@@ -140,6 +157,46 @@ export async function getTrendingNFTs(limit: number = 10): Promise<SearchResult[
     .filter(nft => nft.trending)
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, limit);
+}
+
+/**
+ * Get popular categories with mock counts
+ */
+export async function getPopularCategories(): Promise<Array<{ category: string; count: number }>> {
+  const categories = ['photography', 'generative', 'music', '3d', 'collectibles'];
+  return categories.map(category => ({
+    category,
+    count: Math.floor(Math.random() * 500)
+  }));
+}
+
+/**
+ * Get mock price statistics
+ */
+export async function getPriceStats(): Promise<{
+  min: number;
+  max: number;
+  average: number;
+  median: number;
+}> {
+  const prices = generateMockNFTs(50)
+    .map(nft => nft.price || 0)
+    .sort((a, b) => a - b);
+
+  const min = prices[0] || 0;
+  const max = prices[prices.length - 1] || 0;
+  const average = prices.length
+    ? prices.reduce((sum, p) => sum + p, 0) / prices.length
+    : 0;
+  const mid = Math.floor(prices.length / 2);
+  const median = prices.length % 2 === 0 ? (prices[mid - 1] + prices[mid]) / 2 : prices[mid] || 0;
+
+  return {
+    min: Number(min.toFixed(2)),
+    max: Number(max.toFixed(2)),
+    average: Number(average.toFixed(2)),
+    median: Number(median.toFixed(2))
+  };
 }
 
 /**
@@ -236,7 +293,8 @@ function generateMockNFTs(count: number): SearchResult[] {
       popularity: Math.floor(Math.random() * 100),
       trending: isTrending,
       listed: Math.random() > 0.3,
-      rarity: rarities[Math.floor(Math.random() * rarities.length)]
+      rarity: rarities[Math.floor(Math.random() * rarities.length)],
+      createdAt: Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)
     });
   }
 

@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { userService } from '../services/api';
 import { UserProfile, NFT } from '../types';
+import { useWallet } from '../hooks/useWallet';
+import { VerificationBadge } from '../components/VerificationBadge';
+import { FollowButton } from '../components/FollowButton';
+import { FollowerStats } from '../components/FollowerStats';
+import { ActivityFeed } from '../components/ActivityFeed';
 
 export const ProfilePage: React.FC = () => {
   const { address } = useParams();
+  const { user } = useWallet();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,17 +61,23 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {/* Info */}
-          <div className="pt-8 flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {profile.address}
-            </h1>
-            {profile.verified && (
-              <span className="inline-block mt-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-semibold">
-                ✓ Verified
-              </span>
-            )}
+          <div className="pt-8 flex-1 space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {profile.address}
+              </h1>
+              <VerificationBadge address={address || ''} size="sm" />
+              {user.address && user.address !== address && (
+                <FollowButton
+                  followerAddress={user.address}
+                  creatorAddress={address || ''}
+                  variant="secondary"
+                />
+              )}
+            </div>
+
             {profile.bio && (
-              <p className="text-gray-600 dark:text-gray-400 mt-4">{profile.bio}</p>
+              <p className="text-gray-600 dark:text-gray-400">{profile.bio}</p>
             )}
 
             {/* Stats */}
@@ -94,6 +106,10 @@ export const ProfilePage: React.FC = () => {
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Followers</p>
               </div>
+            </div>
+
+            <div className="mt-6">
+              <FollowerStats address={address || ''} showFollowing showRecent />
             </div>
           </div>
         </div>
@@ -202,9 +218,13 @@ export const ProfilePage: React.FC = () => {
           )}
 
           {activeTab === 'activity' && (
-            <p className="text-gray-600 dark:text-gray-400">
-              Activity history coming soon
-            </p>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <ActivityFeed
+                filters={{ creatorAddress: address || '' }}
+                limit={15}
+                showFilters
+              />
+            </div>
           )}
         </div>
       </div>

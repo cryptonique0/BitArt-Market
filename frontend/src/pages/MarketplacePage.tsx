@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Card, Input, LoadingSpinner } from '../components/UI';
+import { ActivityFeed } from '../components/ActivityFeed';
 import { marketplaceService } from '../services/api';
+import { getTrendingByActivity } from '../services/activity';
+import { useQuery } from '@tanstack/react-query';
 
 export const MarketplacePage: React.FC = () => {
   const [listings, setListings] = useState<any[]>([]);
@@ -9,6 +12,11 @@ export const MarketplacePage: React.FC = () => {
     minPrice: '',
     maxPrice: '',
     sortBy: 'price'
+  });
+
+  const { data: trendingByActivity } = useQuery({
+    queryKey: ['trendingByActivity', 12],
+    queryFn: () => getTrendingByActivity(12)
   });
 
   useEffect(() => {
@@ -81,7 +89,7 @@ export const MarketplacePage: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-semibold mb-2">NFT #{listing.nftId}</h3>
                 <div className="mb-4">
-                  <p className="text-2xl font-bold text-blue-600">{listing.price} STX</p>
+                  <p className="text-2xl font-bold text-blue-600">{listing.price} ETH</p>
                   <p className="text-sm text-gray-500">Quantity: {listing.quantity}</p>
                 </div>
                 <Button variant="primary" className="w-full">Buy Now</Button>
@@ -89,6 +97,50 @@ export const MarketplacePage: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* Trending by Activity */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Trending by Activity</h2>
+            <span className="text-sm text-gray-500">Driven by mints, bids, and sales</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(trendingByActivity || []).map((nft: {
+              contractAddress: string;
+              nftId: string;
+              activityCount: number;
+              recentPrice?: number;
+              floorPrice?: number;
+            }) => (
+              <Card key={`${nft.contractAddress}-${nft.nftId}`} className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                  #{nft.nftId}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900 dark:text-white">NFT #{nft.nftId}</p>
+                  <p className="text-sm text-gray-500">Contract: {nft.contractAddress.slice(0, 6)}...{nft.contractAddress.slice(-4)}</p>
+                  <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-300">
+                    <span className="font-semibold text-purple-600 dark:text-purple-400">{nft.activityCount} events</span>
+                    {nft.recentPrice && <span>Last: {nft.recentPrice} ETH</span>}
+                    {nft.floorPrice && <span>Floor: {nft.floorPrice} ETH</span>}
+                  </div>
+                </div>
+              </Card>
+            ))}
+            {(!trendingByActivity || trendingByActivity.length === 0) && (
+              <div className="col-span-full text-gray-600 dark:text-gray-400">No trending data yet.</div>
+            )}
+          </div>
+        </div>
+
+        {/* Live Activity Feed */}
+        <div className="mt-16">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold">Marketplace Activity</h2>
+            <span className="text-sm text-gray-500">Filter by event type</span>
+          </div>
+          <ActivityFeed limit={20} showFilters className="mt-4" />
+        </div>
       </div>
     </div>
   );

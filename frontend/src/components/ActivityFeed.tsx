@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { getActivityFeed, ActivityEvent } from '../services/activity';
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ActivityFeedProps {
@@ -8,11 +8,14 @@ interface ActivityFeedProps {
     type?: string[];
     creatorAddress?: string;
     nftId?: string;
+    timeRange?: TimeRange;
   };
   limit?: number;
   showFilters?: boolean;
   className?: string;
 }
+
+type TimeRange = '24h' | '7d' | '30d' | 'all';
 
 const ActivityTypeConfig = {
   mint: {
@@ -100,6 +103,7 @@ export const ActivityFeed: FC<ActivityFeedProps> = ({
   className = ''
 }) => {
   const [typeFilter, setTypeFilter] = useState<string[]>(filters.type || []);
+  const [timeRange, setTimeRange] = useState<TimeRange>(filters.timeRange || 'all');
 
   // Use infinite query for pagination
   const {
@@ -119,14 +123,30 @@ export const ActivityFeed: FC<ActivityFeedProps> = ({
         limit,
         page: pageParam
       }),
-    getNextPageParam: (lastPage) => {
+    getNextPageParam: (lastPage: { page: number; total: number }) => {
       const nextPage = lastPage.page + 1;
       return nextPage * limit < lastPage.total ? nextPage : undefined;
     },
     initialPageParam: 1
   });
 
-  const events = data?.pages.flatMap((page) => page.events) || [];
+  const events = data?.pages.flatMap((page: { events: ActivityEvent[] }) => page.events) || [];
+
+  const filteredEvents = events.filter((event: ActivityEvent) => {
+    if (!timeRange || timeRange === 'all') return true;
+
+    const now = Date.now();
+    const ts = new Date(event.timestamp as any).getTime();
+    const ranges: Record<string, number> = {
+      '24h': 24 * 60 * 60 * 1000,
+      '7d': 7 * 24 * 60 * 60 * 1000,
+      '30d': 30 * 24 * 60 * 60 * 1000,
+      all: Infinity
+    };
+
+    const windowMs = ranges[timeRange] || Infinity;
+    return now - ts <= windowMs;
+  });
 
   if (isLoading) {
     return (
@@ -178,12 +198,29 @@ export const ActivityFeed: FC<ActivityFeedProps> = ({
               {config.icon} {config.label}
             </button>
           ))}
+
+          {/* Time filter */}
+          <div className="flex items-center gap-2 ml-auto">
+            {(['24h', '7d', '30d', 'all'] as TimeRange[]).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                  timeRange === range
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {range === 'all' ? 'All Time' : range.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Activity List */}
       <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
-        {events.map((event) => (
+        {filteredEvents.map((event: ActivityEvent) => (
           <ActivityEventRow key={event.id} event={event} />
         ))}
       </div>

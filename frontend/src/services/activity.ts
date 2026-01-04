@@ -89,6 +89,14 @@ export async function getActivityFeed(filters?: {
     params.type = filters.type.join(',');
   }
 
+  if (filters?.creatorAddress) {
+    params.creatorAddress = filters.creatorAddress;
+  }
+
+  if (filters?.nftId) {
+    params.nftId = filters.nftId;
+  }
+
   const response = await api.get('/activity/feed', { params });
   return response.data;
 }

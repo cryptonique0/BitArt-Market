@@ -44,7 +44,9 @@ export interface CreatorStats {
   } | null;
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+import { config } from '../config/env';
+
+const API_BASE_URL = config.apiUrl;
 
 /**
  * Fetch creator profile

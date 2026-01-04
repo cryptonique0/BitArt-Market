@@ -8,6 +8,9 @@ const apiClient = axios.create({
   }
 });
 
+// Expose raw client for internal service consumers
+export const api = apiClient;
+
 // ============================================
 // NFT Endpoints
 // ============================================

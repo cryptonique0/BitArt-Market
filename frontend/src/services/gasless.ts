@@ -35,10 +35,10 @@ export interface GaslessUserOperation {
  */
 export function getGaslessConfig(): GaslessTransactionConfig {
   return {
-    paymasterUrl: process.env.REACT_APP_PAYMASTER_URL || '',
+    paymasterUrl: import.meta.env.VITE_PAYMASTER_URL || '',
     entryPointAddress: '0x0000000071727De22E5E9d109855203dDA811F26', // Standard ERC-4337 EntryPoint
     supportedChainId: 8453, // Base Mainnet
-    gaslessListingEnabled: !!process.env.REACT_APP_PAYMASTER_URL
+    gaslessListingEnabled: !!import.meta.env.VITE_PAYMASTER_URL
   };
 }
 
@@ -52,7 +52,7 @@ export function isGaslessEnabled(): boolean {
 /**
  * Check if user's wallet supports account abstraction
  */
-export async function supportsAccountAbstraction(userAddress: string): Promise<boolean> {
+export async function supportsAccountAbstraction(_userAddress: string): Promise<boolean> {
   try {
     const config = getGaslessConfig();
     if (!config.gaslessListingEnabled) return false;
@@ -98,7 +98,7 @@ export function getGaslessListingEstimate(): {
  * Check if address is eligible for gasless transactions
  * Could implement reputation system, tx count, etc.
  */
-export async function isEligibleForGasless(userAddress: string): Promise<boolean> {
+export async function isEligibleForGasless(_userAddress: string): Promise<boolean> {
   try {
     const config = getGaslessConfig();
     if (!config.gaslessListingEnabled) return false;

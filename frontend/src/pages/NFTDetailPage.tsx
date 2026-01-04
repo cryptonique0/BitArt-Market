@@ -5,6 +5,9 @@ import { nftService } from '../services/api';
 import { useWallet } from '../hooks/useWallet';
 import { Button } from '../components/Button';
 import { useNotificationStore } from '../store';
+import { VerificationBadge } from '../components/VerificationBadge';
+import { FollowButton } from '../components/FollowButton';
+import { ActivityFeed } from '../components/ActivityFeed';
 
 export const NFTDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -110,9 +113,18 @@ export const NFTDetailPage: React.FC = () => {
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 {nft.name}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                By <span className="font-semibold">{nft.creator.substring(0, 8)}...</span>
-              </p>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                <span>By</span>
+                <span className="font-semibold">{nft.creator.substring(0, 8)}...</span>
+                <VerificationBadge address={nft.creator} size="sm" />
+                {user.address && user.address !== nft.creator && (
+                  <FollowButton
+                    followerAddress={user.address}
+                    creatorAddress={nft.creator}
+                    variant="outline"
+                  />
+                )}
+              </div>
             </div>
 
             {/* Description */}
@@ -163,6 +175,16 @@ export const NFTDetailPage: React.FC = () => {
               Make an Offer
             </Button>
           </div>
+        </div>
+
+        {/* Live Activity */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Activity</h2>
+          <ActivityFeed
+            filters={{ nftId: id || undefined }}
+            limit={10}
+            showFilters={false}
+          />
         </div>
 
         {/* History */}

@@ -208,3 +208,16 @@ export async function getCreatorRankings(
     return [];
   }
 }
+
+/**
+ * Placeholder: fetch creator collections
+ */
+export async function getCreatorCollections(address: string): Promise<any[]> {
+  try {
+    // Replace with real data source
+    return [];
+  } catch (error) {
+    console.error('Error fetching creator collections:', error);
+    return [];
+  }
+}

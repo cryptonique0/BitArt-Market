@@ -3,33 +3,39 @@
 
 import { config } from './env';
 
-export const STACKS_CONTRACTS = {
+// Base Sepolia Testnet
+export const BASE_TESTNET_CONTRACTS = {
   // Network configuration
-  network: config.network,
+  chainId: config.base.testnet.chainId,
+  chainName: config.base.testnet.chainName,
+  currency: config.base.testnet.currency,
+  rpcUrl: config.base.testnet.rpcUrl,
+  explorer: config.base.testnet.explorer,
   
   // Contract addresses
-  nft: config.stacks.nftContract,
-  marketplace: config.stacks.marketplaceContract,
-  auction: config.stacks.auctionContract,
-  
-  // Explorer URLs
-  explorerUrl: 'https://explorer.stacks.co',
-  apiUrl: config.stacks.apiUrl,
+  nft: config.base.testnet.nftContract,
+  marketplace: config.base.testnet.marketplaceContract,
+  auction: config.base.testnet.auctionContract,
 } as const;
 
-export const BASE_CONTRACTS = {
+// Base Mainnet
+export const BASE_MAINNET_CONTRACTS = {
   // Network configuration
-  chainId: config.base.chainId,
-  chainName: config.base.chainName,
-  currency: config.base.currency,
-  rpcUrl: config.base.rpcUrl,
-  explorer: config.base.explorer,
+  chainId: config.base.mainnet.chainId,
+  chainName: config.base.mainnet.chainName,
+  currency: config.base.mainnet.currency,
+  rpcUrl: config.base.mainnet.rpcUrl,
+  explorer: config.base.mainnet.explorer,
   
   // Contract addresses
-  nft: config.base.nftContract,
-  marketplace: config.base.marketplaceContract,
-  auction: config.base.auctionContract,
+  nft: config.base.mainnet.nftContract,
+  marketplace: config.base.mainnet.marketplaceContract,
+  auction: config.base.mainnet.auctionContract,
 } as const;
+
+// Deprecated: kept for backwards compatibility
+export const BASE_CONTRACTS = BASE_MAINNET_CONTRACTS;
+export const STACKS_CONTRACTS = BASE_TESTNET_CONTRACTS; // fallback
 
 // Contract function names for reference
 export const CONTRACT_FUNCTIONS = {

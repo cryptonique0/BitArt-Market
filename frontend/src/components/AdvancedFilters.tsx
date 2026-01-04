@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { SearchFilters } from '../services/search';
 
 interface AdvancedFiltersProps {
@@ -29,7 +29,23 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         </label>
         <select
           value={filters.sortBy || 'popularity'}
-          onChange={(e) => handleChange('sortBy', e.target.value as SearchFilters['sortBy'])}
+          onChange={(e) => {
+            const value = e.target.value as SearchFilters['sortBy'];
+            switch (value) {
+              case 'price_asc':
+                handleChange('sortOrder', 'asc');
+                break;
+              case 'price_desc':
+                handleChange('sortOrder', 'desc');
+                break;
+              case 'oldest':
+                handleChange('sortOrder', 'asc');
+                break;
+              default:
+                handleChange('sortOrder', 'desc');
+            }
+            handleChange('sortBy', value);
+          }}
           disabled={loading}
           className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         >
@@ -74,6 +90,61 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           />
         </div>
+      </div>
+
+      {/* Category */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+          Category
+        </label>
+        <select
+          value={filters.category || ''}
+          onChange={(e) => handleChange('category', e.target.value || undefined)}
+          disabled={loading}
+          className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <option value="">All Categories</option>
+          <option value="photography">Photography</option>
+          <option value="generative">Generative</option>
+          <option value="music">Music</option>
+          <option value="3d">3D</option>
+          <option value="collectibles">Collectibles</option>
+        </select>
+      </div>
+
+      {/* Status */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+          Status
+        </label>
+        <select
+          value={filters.status || ''}
+          onChange={(e) => handleChange('status', (e.target.value || undefined) as SearchFilters['status'])}
+          disabled={loading}
+          className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <option value="">Any</option>
+          <option value="listed">Listed</option>
+          <option value="auction">Auction</option>
+          <option value="sold">Sold</option>
+        </select>
+      </div>
+
+      {/* Network */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+          Network
+        </label>
+        <select
+          value={filters.network || ''}
+          onChange={(e) => handleChange('network', (e.target.value || undefined) as SearchFilters['network'])}
+          disabled={loading}
+          className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <option value="">All Networks</option>
+          <option value="base-testnet">Base Sepolia</option>
+          <option value="base-mainnet">Base Mainnet</option>
+        </select>
       </div>
 
       {/* Verified Creator */}

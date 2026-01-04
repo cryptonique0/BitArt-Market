@@ -178,3 +178,9 @@ const stacksApi = new StacksApiService({
 });
 
 export default stacksApi;
+
+// Lightweight placeholder for Base provider integration
+export function getBaseProvider() {
+  // In production this would return an ethers.js/json-rpc provider instance
+  return null;
+}

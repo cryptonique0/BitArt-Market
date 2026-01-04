@@ -20,6 +20,8 @@ export const FollowButton: FC<FollowButtonProps> = ({
   const queryClient = useQueryClient();
   const [isOptimistic, setIsOptimistic] = useState(false);
 
+  const hasAddresses = Boolean(followerAddress && creatorAddress);
+
   // Check follow status
   const { data: following = false, isLoading } = useQuery({
     queryKey: ['isFollowing', followerAddress, creatorAddress],
@@ -54,7 +56,7 @@ export const FollowButton: FC<FollowButtonProps> = ({
         queryKey: ['creatorStats', creatorAddress]
       });
     },
-    onError: (error, variables, context) => {
+    onError: (_error: unknown, _variables: unknown, context?: { previousData?: boolean }) => {
       setIsOptimistic(false);
       // Revert optimistic update
       if (context?.previousData !== undefined) {
@@ -93,7 +95,7 @@ export const FollowButton: FC<FollowButtonProps> = ({
         queryKey: ['creatorStats', creatorAddress]
       });
     },
-    onError: (error, variables, context) => {
+    onError: (_error: unknown, _variables: unknown, context?: { previousData?: boolean }) => {
       setIsOptimistic(false);
       // Revert optimistic update
       if (context?.previousData !== undefined) {
@@ -106,10 +108,12 @@ export const FollowButton: FC<FollowButtonProps> = ({
   });
 
   const handleClick = async () => {
+    if (!hasAddresses) return;
+
     if (following) {
-      unfollowMutation.mutate();
+      unfollowMutation.mutate(undefined);
     } else {
-      followMutation.mutate();
+      followMutation.mutate(undefined);
     }
   };
 
@@ -127,9 +131,9 @@ export const FollowButton: FC<FollowButtonProps> = ({
   return (
     <button
       onClick={handleClick}
-      disabled={isLoading_}
+      disabled={isLoading_ || !hasAddresses}
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-      title={following ? 'Unfollow this creator' : 'Follow this creator'}
+      title={hasAddresses ? (following ? 'Unfollow this creator' : 'Follow this creator') : 'Connect your wallet to follow'}
     >
       {isLoading_ ? (
         <span className="inline-flex items-center gap-2">
@@ -137,6 +141,8 @@ export const FollowButton: FC<FollowButtonProps> = ({
         </span>
       ) : following ? (
         'Following'
+      ) : !hasAddresses ? (
+        'Connect to follow'
       ) : (
         'Follow'
       )}

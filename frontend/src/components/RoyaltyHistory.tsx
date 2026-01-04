@@ -12,7 +12,7 @@ interface RoyaltyHistoryProps {
  */
 export const RoyaltyHistory: React.FC<RoyaltyHistoryProps> = ({
   creatorAddress,
-  nftId,
+  nftId: _nftId,
   limit = 20
 }) => {
   const [history, setHistory] = useState<RoyaltyChartData[]>([]);
@@ -74,7 +74,7 @@ export const RoyaltyHistory: React.FC<RoyaltyHistoryProps> = ({
               {new Date(record.timestamp).toLocaleDateString()}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              {record.salesCount} {record.salesCount === 1 ? 'sale' : 'sales'} • {record.percentage}% avg
+              {record.salesCount} {record.salesCount === 1 ? 'sale' : 'sales'} • {record.averageRoyaltyPercentage}% avg
             </div>
           </div>
           <div className="text-right">

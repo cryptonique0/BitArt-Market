@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { config } from '../config/env';
 
 export interface MarketplaceStats {
   totalVolume: string;
@@ -28,7 +29,7 @@ export interface Collection {
   items: number;
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = config.apiUrl;
 
 /**
  * Fetch marketplace statistics

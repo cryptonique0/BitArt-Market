@@ -13,7 +13,11 @@ export interface SearchFilters {
   priceMax?: number;
   creator?: string;
   collection?: string;
+  category?: string;
+  status?: 'listed' | 'auction' | 'sold';
+  network?: 'base-testnet' | 'base-mainnet' | 'base';
   sortBy?: 'popularity' | 'price_asc' | 'price_desc' | 'newest' | 'oldest' | 'trending';
+  sortOrder?: 'asc' | 'desc';
   rarity?: 'common' | 'uncommon' | 'rare' | 'legendary';
   hasRoyalties?: boolean;
   verified?: boolean;
@@ -58,7 +62,24 @@ export async function searchNFTs(filters: SearchFilters): Promise<SearchResponse
     if (filters.priceMax !== undefined) params.append('priceMax', filters.priceMax.toString());
     if (filters.creator) params.append('creator', filters.creator);
     if (filters.collection) params.append('collection', filters.collection);
-    if (filters.sortBy) params.append('sort', filters.sortBy);
+    if (filters.category) params.append('category', filters.category);
+    if (filters.status) params.append('status', filters.status);
+    if (filters.network) params.append('network', filters.network);
+    // Map UI sort options to API sort fields and order
+    const sortMap: Record<string, { sortBy: string; sortOrder: 'asc' | 'desc' }> = {
+      price_asc: { sortBy: 'price', sortOrder: 'asc' },
+      price_desc: { sortBy: 'price', sortOrder: 'desc' },
+      trending: { sortBy: 'trending', sortOrder: 'desc' },
+      newest: { sortBy: 'date', sortOrder: 'desc' },
+      oldest: { sortBy: 'date', sortOrder: 'asc' },
+      popularity: { sortBy: 'popularity', sortOrder: 'desc' }
+    };
+
+    if (filters.sortBy) {
+      const mapped = sortMap[filters.sortBy] || { sortBy: 'popularity', sortOrder: 'desc' };
+      params.append('sortBy', mapped.sortBy);
+      params.append('sortOrder', filters.sortOrder || mapped.sortOrder);
+    }
     if (filters.rarity) params.append('rarity', filters.rarity);
     if (filters.hasRoyalties !== undefined) params.append('royalties', filters.hasRoyalties.toString());
     if (filters.verified !== undefined) params.append('verified', filters.verified.toString());

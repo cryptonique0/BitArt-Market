@@ -6,14 +6,14 @@ const SESSION_STORAGE_KEY = 'bitart_wallet_session';
 
 interface SessionData {
   address: string;
-  chain: 'stacks' | 'base';
+  chain: 'base';
+  network: 'testnet' | 'mainnet';
   timestamp: number;
 }
 
 export const useWallet = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [chain, setChain] = useState<'stacks' | 'base'>('base'); // Default to Base for contest
   const [disconnectError, setDisconnectError] = useState<string | null>(null);
   const { user, setUser } = useUserStore();
 
@@ -36,15 +36,14 @@ export const useWallet = () => {
         return;
       }
 
-      // Try to reconnect with saved address and chain
-      const currentUser = await walletService.getCurrentUser(session.chain);
+      // Try to reconnect with saved address
+      const currentUser = await walletService.getCurrentUser();
       if (currentUser && currentUser.address === session.address) {
-        setChain(session.chain);
         setUser({
           address: currentUser.address || null,
           username: currentUser.username || null,
           avatar: null,
-          chain: session.chain,
+          chain: 'base',
           balance: currentUser.balance || null,
           isConnected: true
         });
@@ -58,10 +57,11 @@ export const useWallet = () => {
   /**
    * Save session to localStorage
    */
-  const saveSession = (address: string, selectedChain: 'stacks' | 'base') => {
+  const saveSession = (address: string, network: 'testnet' | 'mainnet') => {
     const session: SessionData = {
       address,
-      chain: selectedChain,
+      chain: 'base',
+      network,
       timestamp: Date.now()
     };
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
@@ -78,20 +78,16 @@ export const useWallet = () => {
     // Restore session on component mount
     restoreSession();
 
-    // Check if user is already logged in and detect current chain
+    // Check if user is already logged in
     (async () => {
-      // Try to detect current chain for Base wallet users
-      const detectedChain = await walletService.getCurrentChain();
-      
       if (walletService.isUserLoggedIn()) {
         const currentUser = await walletService.getCurrentUser();
         if (currentUser) {
-          setChain(currentUser.chain || (detectedChain || 'base'));
           setUser({
             address: currentUser.address || null,
             username: currentUser.username || null,
             avatar: null,
-            chain: currentUser.chain,
+            chain: 'base',
             balance: currentUser.balance || null,
             isConnected: true
           });
@@ -105,22 +101,24 @@ export const useWallet = () => {
     });
 
     // Listen for account changes
-    const unsubscribeAccount = walletService.onAccountChange((newAddress) => {
-      if (!newAddress) {
+    const unsubscribeAccount = walletService.onAccountChange(async (nextAddress) => {
+      const address = Array.isArray(nextAddress) ? nextAddress[0] : nextAddress;
+
+      if (!address) {
         // Account disconnected
         disconnect();
       } else {
         // Account changed, update user
-        const currentChain = walletService.getCurrentChain() || 'base';
+        const currentChain = (await walletService.getCurrentChain()) || 'base';
         setUser({
-          address: newAddress,
+          address,
           username: user?.username || null,
           avatar: user?.avatar || null,
           chain: currentChain,
           balance: user?.balance || null,
           isConnected: true
         });
-        saveSession(newAddress, currentChain);
+        saveSession(address, currentChain);
       }
     });
 

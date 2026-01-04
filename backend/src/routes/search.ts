@@ -22,6 +22,7 @@ router.post('/', async (req: Request, res: Response) => {
       priceMax: req.body.priceMax ? parseFloat(req.body.priceMax) : undefined,
       status: req.body.status,
       sortBy: req.body.sortBy,
+      sortOrder: req.body.sortOrder,
       verified: req.body.verified === true,
       hasRoyalties: req.body.hasRoyalties === true
     };
@@ -36,7 +37,15 @@ router.post('/', async (req: Request, res: Response) => {
       });
     }
 
-    const results = await searchNFTs(filters, page, limit);
+    const results = await searchNFTs(
+      filters,
+      {
+        field: (filters.sortBy as any) || 'popularity',
+        order: (filters.sortOrder as any) || 'desc'
+      },
+      page,
+      limit
+    );
 
     res.json({
       success: true,

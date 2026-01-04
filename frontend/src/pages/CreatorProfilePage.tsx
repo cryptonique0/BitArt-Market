@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useWallet } from '../hooks/useWallet';
 import { fetchCreatorStats, CreatorStats, formatEarnings, getDaysSinceJoin } from '../services/creators';
 import { BaseScanLink } from '../components/BaseScanLink';
 import CreatorRevenueChart from '../components/CreatorRevenueChart';
 import RoyaltyHistory from '../components/RoyaltyHistory';
+import { VerificationBadge } from '../components/VerificationBadge';
+import { FollowButton } from '../components/FollowButton';
+import { FollowerStats } from '../components/FollowerStats';
+import { ActivityFeed } from '../components/ActivityFeed';
 
 /**
  * Creator Profile Page
@@ -11,6 +16,7 @@ import RoyaltyHistory from '../components/RoyaltyHistory';
 export const CreatorProfilePage: React.FC = () => {
   const { address } = useParams<{ address: string }>();
   const navigate = useNavigate();
+  const { user } = useWallet();
   const [stats, setStats] = useState<CreatorStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,8 +93,13 @@ export const CreatorProfilePage: React.FC = () => {
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                   {profile.username}
                 </h1>
-                {profile.verified && (
-                  <span className="text-xl">✓</span>
+                <VerificationBadge address={address || ''} size="sm" />
+                {user.address && user.address !== address && (
+                  <FollowButton
+                    followerAddress={user.address}
+                    creatorAddress={address || ''}
+                    variant="secondary"
+                  />
                 )}
               </div>
 
@@ -202,6 +213,10 @@ export const CreatorProfilePage: React.FC = () => {
         </div>
       </div>
 
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <FollowerStats address={address || ''} showFollowing showRecent />
+      </div>
+
       {/* Creator Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {/* NFTs Created */}
@@ -311,6 +326,15 @@ export const CreatorProfilePage: React.FC = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Activity Timeline */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-gray-900 dark:text-white">Creator Activity</h2>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Live events</span>
+        </div>
+        <ActivityFeed filters={{ creatorAddress: address || '' }} limit={15} showFilters />
       </div>
     </div>
   );

@@ -157,3 +157,6 @@ export const ContractLink: React.FC<ContractLinkProps> = ({
     />
   );
 };
+
+// Re-export helpers for convenience
+export { shortenTxHash, shortenAddress } from '../services/basescan';

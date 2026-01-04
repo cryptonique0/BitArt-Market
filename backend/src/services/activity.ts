@@ -102,11 +102,11 @@ export async function getActivityFeed(
   const limit = filters?.limit || 20;
   const page = filters?.page || 1;
 
-  // Mock activity events
+  // Mock activity events (generate extra to allow filtering)
   const events: ActivityEvent[] = [];
   const eventTypes: ActivityEvent['type'][] = ['mint', 'sale', 'bid', 'listing', 'follow', 'verification'];
 
-  for (let i = 0; i < limit; i++) {
+  for (let i = 0; i < limit * 2; i++) {
     const type = eventTypes[Math.floor(Math.random() * eventTypes.length)];
     const timestamp = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
 
@@ -173,7 +173,11 @@ export async function getActivityFeed(
       };
     }
 
-    if (!filters?.type || filters.type.includes(event.type)) {
+    const matchesType = !filters?.type || filters.type.includes(event.type);
+    const matchesCreator = !filters?.creatorAddress || event.actor === filters.creatorAddress || event.target === filters.creatorAddress || event.details?.creator === filters.creatorAddress;
+    const matchesNft = !filters?.nftId || event.nftId === filters.nftId;
+
+    if (matchesType && matchesCreator && matchesNft) {
       events.push(event);
     }
   }

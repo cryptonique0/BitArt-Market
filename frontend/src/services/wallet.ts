@@ -1,67 +1,26 @@
-import {
-  AppConfig,
-  UserSession,
-  showConnect,
-  disconnect
-} from '@stacks/connect';
-import { STACKS_TESTNET } from '@stacks/network';
 import axios from 'axios';
+import { config } from '../config/env';
 
 declare global {
   interface Window {
-    LeatherProvider?: unknown;
-    HiroGetStacks?: unknown;
     ethereum?: any;
   }
 }
 
-const appConfig = new AppConfig(['store_write', 'publish_data']);
-const userSession = new UserSession({ appConfig });
-const network = STACKS_TESTNET;
-
-// Base defaults (Mainnet)
-const BASE_RPC_URL = (import.meta as any).env?.VITE_BASE_RPC_URL || 'https://mainnet.base.org';
-const BASE_CHAIN_ID = (import.meta as any).env?.VITE_BASE_CHAIN_ID || '0x2105'; // Base mainnet chain id in hex (8453)
-const BASE_CHAIN_NAME = (import.meta as any).env?.VITE_BASE_CHAIN_NAME || 'Base Mainnet';
-const BASE_CURRENCY = (import.meta as any).env?.VITE_BASE_CURRENCY || 'ETH';
-const BASE_EXPLORER = (import.meta as any).env?.VITE_BASE_EXPLORER || 'https://basescan.org';
-
-export interface StacksWalletUser {
-  profile: {
-    stxAddress?: {
-      testnet?: string;
-      mainnet?: string;
-    };
-    username?: string;
-  };
-}
+// Use config for network settings
+const getNetworkConfig = (isTestnet: boolean = true) => {
+  return isTestnet ? config.base.testnet : config.base.mainnet;
+};
 
 class WalletService {
   private baseSessionKey = 'bitart-base-address';
-  private baseChainKey = 'bitart-base-chain';
-  private chainChangeListeners: ((chain: 'base' | 'stacks') => void)[] = [];
+  private networkKey = 'bitart-network'; // 'testnet' or 'mainnet'
   private accountChangeListeners: ((accounts: string[]) => void)[] = [];
   private disconnectListeners: (() => void)[] = [];
 
   constructor() {
-    this.setupChainChangeListener();
     this.setupAccountChangeListener();
     this.setupDisconnectListener();
-  }
-
-  /**
-   * Setup listener for chain changes in wallet
-   */
-  private setupChainChangeListener(): void {
-    if (window.ethereum) {
-      window.ethereum.on('chainChanged', (chainId: string) => {
-        // Base mainnet is 0x2105 (8453 in decimal)
-        const isBaseChain = chainId === BASE_CHAIN_ID || chainId === '8453' || parseInt(chainId, 16) === 8453;
-        const chain = isBaseChain ? 'base' : 'stacks';
-        localStorage.setItem(this.baseChainKey, chain);
-        this.chainChangeListeners.forEach(listener => listener(chain));
-      });
-    }
   }
 
   /**
@@ -128,25 +87,42 @@ class WalletService {
   }
 
   /**
+   * Get current network preference (testnet or mainnet)
+   */
+  getNetworkPreference(): 'testnet' | 'mainnet' {
+    return (localStorage.getItem(this.networkKey) as 'testnet' | 'mainnet') || 'testnet';
+  }
+
+  /**
+   * Set network preference
+   */
+  setNetworkPreference(network: 'testnet' | 'mainnet'): void {
+    localStorage.setItem(this.networkKey, network);
+  }
+
+  /**
    * Auto-detect current wallet chain and switch to Base if needed
    */
-  async autoDetectAndSwitchToBase(): Promise<boolean> {
+  async autoDetectAndSwitchToBase(isTestnet: boolean = true): Promise<boolean> {
     if (!window.ethereum) {
       console.warn('No Ethereum-compatible wallet found');
       return false;
     }
 
     try {
+      const networkConfig = getNetworkConfig(isTestnet);
+      const targetChainId = `0x${networkConfig.chainId.toString(16)}`;
+      
       // Get current chain ID
       const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
-      const isBaseChain = chainId === BASE_CHAIN_ID || chainId === '8453' || parseInt(chainId, 16) === 8453;
+      const isOnCorrectChain = parseInt(chainId, 16) === networkConfig.chainId;
 
-      if (!isBaseChain) {
-        // Not on Base, attempt to switch
-        return await this.switchToBase();
+      if (!isOnCorrectChain) {
+        // Not on correct Base network, attempt to switch
+        return await this.switchToBase(isTestnet);
       }
 
-      return true; // Already on Base
+      return true; // Already on correct Base network
     } catch (error) {
       console.error('Failed to auto-detect chain:', error);
       return false;
@@ -154,35 +130,45 @@ class WalletService {
   }
 
   /**
-   * Switch to Base chain
+   * Switch to Base chain (testnet or mainnet)
    */
-  async switchToBase(): Promise<boolean> {
+  async switchToBase(isTestnet: boolean = true): Promise<boolean> {
     if (!window.ethereum) return false;
 
     try {
+      const networkConfig = getNetworkConfig(isTestnet);
+      const chainIdHex = `0x${networkConfig.chainId.toString(16)}`;
+      
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: BASE_CHAIN_ID }]
+        params: [{ chainId: chainIdHex }]
       });
+      
+      this.setNetworkPreference(isTestnet ? 'testnet' : 'mainnet');
       return true;
     } catch (switchError: any) {
       if (switchError.code === 4902) {
         // Chain not added, add it
         try {
+          const networkConfig = getNetworkConfig(isTestnet);
+          const chainIdHex = `0x${networkConfig.chainId.toString(16)}`;
+          
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId: BASE_CHAIN_ID,
-              chainName: BASE_CHAIN_NAME,
-              rpcUrls: [BASE_RPC_URL],
+              chainId: chainIdHex,
+              chainName: networkConfig.chainName,
+              rpcUrls: [networkConfig.rpcUrl],
               nativeCurrency: {
-                name: BASE_CURRENCY,
-                symbol: BASE_CURRENCY,
+                name: networkConfig.currency,
+                symbol: networkConfig.currency,
                 decimals: 18
               },
-              blockExplorerUrls: [BASE_EXPLORER]
+              blockExplorerUrls: [networkConfig.explorer]
             }]
           });
+          
+          this.setNetworkPreference(isTestnet ? 'testnet' : 'mainnet');
           return true;
         } catch (addError) {
           console.error('Failed to add Base chain:', addError);
@@ -199,14 +185,21 @@ class WalletService {
   }
 
   /**
-   * Get current connected chain
+   * Get current connected chain (always 'base' now)
    */
-  async getCurrentChain(): Promise<'base' | 'stacks' | null> {
+  async getCurrentChain(): Promise<'base' | null> {
     if (!window.ethereum) return null;
 
     try {
       const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
-      return (chainId === BASE_CHAIN_ID || chainId === '8453' || parseInt(chainId, 16) === 8453) ? 'base' : 'stacks';
+      const parsedChainId = parseInt(chainId, 16);
+      
+      // Check if it's Base testnet (84532) or mainnet (8453)
+      if (parsedChainId === 84532 || parsedChainId === 8453) {
+        return 'base';
+      }
+      
+      return null; // Not on Base
     } catch (error) {
       console.error('Failed to get current chain:', error);
       return null;
@@ -217,40 +210,19 @@ class WalletService {
    * Check if wallet is installed
    */
   isWalletInstalled(): boolean {
-    return !!window.LeatherProvider || !!window.HiroGetStacks || !!window.ethereum;
+    return !!window.ethereum;
   }
 
   /**
-   * Connect to Stacks wallet
+   * Connect to Base wallet (MetaMask/Coinbase Wallet/etc)
    */
-   async connectStacksWallet(): Promise<string | null> {
-    return new Promise((resolve) => {
-      showConnect({
-        appDetails: {
-          name: 'BitArt Market',
-          icon: 'https://via.placeholder.com/128',
-        },
-        redirectTo: '/',
-        onFinish: () => {
-          const user = userSession.loadUserData() as StacksWalletUser;
-          const address = user?.profile?.stxAddress?.testnet || user?.profile?.stxAddress?.mainnet;
-          resolve(address || null);
-        },
-        onCancel: () => resolve(null),
-      });
-    });
-  }
-
-  /**
-   * Connect to Base wallet (MetaMask/WalletConnect via injected provider)
-   */
-  async connectBaseWallet(): Promise<string | null> {
+  async connectBaseWallet(isTestnet: boolean = true): Promise<string | null> {
     if (!window.ethereum) {
       throw new Error('No Ethereum-compatible wallet found. Please install MetaMask or a Base-compatible wallet.');
     }
 
     // Auto-detect and switch to Base
-    const switchedToBase = await this.autoDetectAndSwitchToBase();
+    const switchedToBase = await this.autoDetectAndSwitchToBase(isTestnet);
     if (!switchedToBase) {
       throw new Error('Failed to switch to Base network. Please switch manually in your wallet.');
     }
@@ -259,6 +231,7 @@ class WalletService {
     const address = accounts?.[0] || null;
     if (address) {
       localStorage.setItem(this.baseSessionKey, address);
+      this.setNetworkPreference(isTestnet ? 'testnet' : 'mainnet');
     }
     return address;
   }
@@ -278,71 +251,46 @@ class WalletService {
   }
 
   /**
-   * Check if user is logged in
+   * Disconnect wallet
    */
-  isUserLoggedIn(chain: 'stacks' | 'base' | null = null): boolean {
-    if (chain === 'stacks') return userSession.isUserSignedIn();
-    if (chain === 'base') return !!localStorage.getItem(this.baseSessionKey);
-    return userSession.isUserSignedIn() || !!localStorage.getItem(this.baseSessionKey);
+  disconnectWallet(): void {
+    localStorage.removeItem(this.baseSessionKey);
+    localStorage.removeItem(this.networkKey);
+    this.disconnectListeners.forEach(listener => listener());
+  }
+
+  /**
+   * Check if user is logged in (Base only)
+   */
+  isUserLoggedIn(): boolean {
+    return !!localStorage.getItem(this.baseSessionKey);
   }
 
   /**
    * Get current user
    */
-  async getCurrentUser(chain: 'stacks' | 'base' | null = null) {
-    if ((chain === 'stacks' || !chain) && userSession.isUserSignedIn()) {
-      const user = userSession.loadUserData() as StacksWalletUser;
-      return {
-        address: user?.profile?.stxAddress?.testnet || user?.profile?.stxAddress?.mainnet,
-        username: user?.profile?.username,
-        chain: 'stacks' as const,
-        balance: null
-      };
-    }
+  async getCurrentUser() {
+    const address = localStorage.getItem(this.baseSessionKey);
+    if (!address) return null;
 
-    if ((chain === 'base' || !chain) && localStorage.getItem(this.baseSessionKey)) {
-      const address = localStorage.getItem(this.baseSessionKey) as string;
-      const balance = await this.getBaseBalance(address);
-      return {
-        address,
-        username: null,
-        chain: 'base' as const,
-        balance
-      };
-    }
-
-    return null;
+    const balance = await this.getBaseBalance(address);
+    const isTestnet = this.getNetworkPreference() === 'testnet';
+    
+    return {
+      address,
+      username: null,
+      chain: 'base' as const,
+      balance,
+      network: isTestnet ? 'testnet' : 'mainnet'
+    };
   }
 
   /**
-   * Get user session
+   * Connect wallet (Base only)
    */
-  getUserSession() {
-    return userSession;
-  }
-
-  /**
-   * Get network
-   */
-  getNetwork() {
-    return network;
-  }
-
-  /**
-   * Connect based on selected chain
-   */
-  async connectWallet(chain: 'stacks' | 'base' = 'stacks') {
-    if (chain === 'stacks') {
-      const address = await this.connectStacksWallet();
-      return address ? { address, chain: 'stacks' as const } : null;
-    }
-
-    if (chain === 'base') {
-      const address = await this.connectBaseWallet();
-      return address ? { address, chain: 'base' as const } : null;
-    }
-
-    return null;
+  async connectWallet(isTestnet: boolean = true) {
+    const address = await this.connectBaseWallet(isTestnet);
+    return address ? { address, chain: 'base' as const, network: isTestnet ? 'testnet' : 'mainnet' } : null;
   }
 
   /**
@@ -350,7 +298,10 @@ class WalletService {
    */
   async getBaseBalance(address: string): Promise<string | null> {
     try {
-      const response = await axios.post(BASE_RPC_URL, {
+      const isTestnet = this.getNetworkPreference() === 'testnet';
+      const networkConfig = getNetworkConfig(isTestnet);
+      
+      const response = await axios.post(networkConfig.rpcUrl, {
         jsonrpc: '2.0',
         id: 1,
         method: 'eth_getBalance',

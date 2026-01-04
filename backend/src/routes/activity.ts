@@ -12,9 +12,13 @@ router.get('/feed', async (req: Request, res: Response) => {
     const type = req.query.type ? (req.query.type as string).split(',') as any[] : undefined;
     const limit = parseInt(req.query.limit as string) || 20;
     const page = parseInt(req.query.page as string) || 1;
+    const creatorAddress = req.query.creatorAddress as string | undefined;
+    const nftId = req.query.nftId as string | undefined;
 
     const feed = await activityService.getActivityFeed({
       type,
+      creatorAddress,
+      nftId,
       limit,
       page
     });

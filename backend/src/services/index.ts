@@ -10,8 +10,11 @@ export {
   getTrendingNFTs,
   getNFTsByCategory,
   getSearchSuggestions,
+  getPopularCategories,
+  getPriceStats,
   calculatePopularityScore,
   type NFTFilter,
+  type SearchFilters,
   type SortOptions,
   type SearchResult
 } from './search';

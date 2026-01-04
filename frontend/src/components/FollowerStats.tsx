@@ -61,7 +61,7 @@ export const FollowerStats: FC<FollowerStatsProps> = ({
       {showRecent && stats && stats.recentFollowers.length > 0 && (
         <div className="flex flex-col border-l border-gray-200 pl-4">
           <div className="flex -space-x-2">
-            {stats.recentFollowers.slice(0, 3).map((follower) => (
+            {stats.recentFollowers.slice(0, 3).map((follower: { address: string; name?: string }) => (
               <div
                 key={follower.address}
                 className="w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full border-2 border-white"

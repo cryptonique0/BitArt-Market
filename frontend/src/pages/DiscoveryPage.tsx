@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { searchNFTs, SearchFilters, SearchResult, getTrendingNFTs } from '../services/search';
+import { getTrendingByActivity } from '../services/activity';
+import { ActivityFeed } from '../components/ActivityFeed';
 import { NFTCard } from '../components/NFTCard';
 import AdvancedFilters from '../components/AdvancedFilters';
 
@@ -12,6 +15,11 @@ export const DiscoveryPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+
+  const { data: trendingByActivity } = useQuery({
+    queryKey: ['trendingByActivity', 9],
+    queryFn: () => getTrendingByActivity(9)
+  });
 
   // Load trending NFTs on mount
   useEffect(() => {
@@ -171,6 +179,51 @@ export const DiscoveryPage: React.FC = () => {
                 )}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Activity-driven Discovery */}
+        <div className="space-y-10">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Trending by Activity</h2>
+              <span className="text-sm text-gray-500">Live signal from trades and mints</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(trendingByActivity || []).map((item: {
+                contractAddress: string;
+                nftId: string;
+                activityCount: number;
+                recentPrice?: number;
+                floorPrice?: number;
+              }) => (
+                <div key={`${item.contractAddress}-${item.nftId}`} className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div className="w-12 h-12 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                    #{item.nftId}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900 dark:text-white">NFT #{item.nftId}</p>
+                    <p className="text-sm text-gray-500">{item.contractAddress.slice(0, 6)}...{item.contractAddress.slice(-4)}</p>
+                    <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 mt-1">
+                      <span className="font-semibold text-purple-600 dark:text-purple-400">{item.activityCount} events</span>
+                      {item.recentPrice && <span>Last: {item.recentPrice} ETH</span>}
+                      {item.floorPrice && <span>Floor: {item.floorPrice} ETH</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {(!trendingByActivity || trendingByActivity.length === 0) && (
+                <div className="col-span-full text-gray-600 dark:text-gray-400">No activity-driven trends yet.</div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Live Marketplace Activity</h2>
+              <span className="text-sm text-gray-500">Filter mints, bids, sales, and more</span>
+            </div>
+            <ActivityFeed limit={20} showFilters className="mt-4" />
           </div>
         </div>
       </div>
