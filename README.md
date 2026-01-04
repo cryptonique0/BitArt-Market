@@ -1,10 +1,10 @@
-# BitArt Market - Multi-Chain NFT Marketplace
+# BitArt Market - Base-First NFT Marketplace 🔵
 
-A comprehensive, production-ready NFT marketplace built on **Stacks blockchain** and **Base (L2 Ethereum)** with Solidity/Clarity smart contracts, React frontend, and Node.js backend.
+A **Base-native**, production-ready NFT marketplace optimized for **Base Mainnet** with seamless wallet integration, transparent fees, and creator-first features. Also supports **Stacks blockchain** with Solidity/Clarity smart contracts, React frontend, and Node.js backend.
 
 ## 🎉 **Live on Base Mainnet!**
 
-All smart contracts deployed and verified on Base Mainnet:
+All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **BitArtNFT**: `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682`
 - **BitArtMarketplace**: `0x7d28443e3571faB3821d669537E45484E4A06AC9`
 - **BitArtAuction**: `0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2`
