@@ -38,10 +38,15 @@ export interface StacksWalletUser {
 
 class WalletService {
   private baseSessionKey = 'bitart-base-address';
+  private baseChainKey = 'bitart-base-chain';
   private chainChangeListeners: ((chain: 'base' | 'stacks') => void)[] = [];
+  private accountChangeListeners: ((accounts: string[]) => void)[] = [];
+  private disconnectListeners: (() => void)[] = [];
 
   constructor() {
     this.setupChainChangeListener();
+    this.setupAccountChangeListener();
+    this.setupDisconnectListener();
   }
 
   /**
@@ -52,7 +57,42 @@ class WalletService {
       window.ethereum.on('chainChanged', (chainId: string) => {
         // Base mainnet is 0x2105 (8453 in decimal)
         const isBaseChain = chainId === BASE_CHAIN_ID || chainId === '8453' || parseInt(chainId, 16) === 8453;
-        this.chainChangeListeners.forEach(listener => listener(isBaseChain ? 'base' : 'stacks'));
+        const chain = isBaseChain ? 'base' : 'stacks';
+        localStorage.setItem(this.baseChainKey, chain);
+        this.chainChangeListeners.forEach(listener => listener(chain));
+      });
+    }
+  }
+
+  /**
+   * Setup listener for account changes
+   */
+  private setupAccountChangeListener(): void {
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts: string[]) => {
+        if (accounts.length === 0) {
+          // User disconnected
+          this.disconnectWallet('base');
+          this.disconnectListeners.forEach(listener => listener());
+        } else {
+          // Account changed, update session
+          const newAddress = accounts[0];
+          localStorage.setItem(this.baseSessionKey, newAddress);
+          this.accountChangeListeners.forEach(listener => listener(accounts));
+        }
+      });
+    }
+  }
+
+  /**
+   * Setup listener for wallet disconnect
+   */
+  private setupDisconnectListener(): void {
+    if (window.ethereum) {
+      // Some wallets emit disconnect event
+      window.ethereum.on('disconnect', () => {
+        this.disconnectWallet('base');
+        this.disconnectListeners.forEach(listener => listener());
       });
     }
   }
@@ -64,6 +104,26 @@ class WalletService {
     this.chainChangeListeners.push(callback);
     return () => {
       this.chainChangeListeners = this.chainChangeListeners.filter(l => l !== callback);
+    };
+  }
+
+  /**
+   * Register listener for account changes
+   */
+  onAccountChange(callback: (accounts: string[]) => void): () => void {
+    this.accountChangeListeners.push(callback);
+    return () => {
+      this.accountChangeListeners = this.accountChangeListeners.filter(l => l !== callback);
+    };
+  }
+
+  /**
+   * Register listener for wallet disconnect
+   */
+  onDisconnect(callback: () => void): () => void {
+    this.disconnectListeners.push(callback);
+    return () => {
+      this.disconnectListeners = this.disconnectListeners.filter(l => l !== callback);
     };
   }
 

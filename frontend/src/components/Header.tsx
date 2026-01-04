@@ -3,10 +3,22 @@ import { Link } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import { ThemeToggle } from './ThemeToggle';
 import { BaseNativeBadge } from './Badge';
+import { WalletDisconnectBanner, WalletErrorBanner } from './WalletErrors';
 import { isCoinbaseWallet } from '../services/coinbase';
 
 export const Header: React.FC = () => {
-  const { user, connect, disconnect, isConnected, chain, autoSwitchToBase, error, loading } = useWallet();
+  const { 
+    user, 
+    connect, 
+    disconnect, 
+    isConnected, 
+    chain, 
+    autoSwitchToBase, 
+    error, 
+    loading,
+    disconnectError,
+    clearDisconnectError
+  } = useWallet();
   const [showChainWarning, setShowChainWarning] = useState(false);
   const [isCoinbase, setIsCoinbase] = useState(false);
 
@@ -25,29 +37,49 @@ export const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
-      {/* Chain Warning Banner */}
-      {showChainWarning && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
-          <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8 flex items-center justify-between">
-            <span className="text-sm text-yellow-800 dark:text-yellow-200">
-              ⚠️ You're not on Base. BitArt Market is optimized for Base Mainnet.
-            </span>
-            <button
-              onClick={autoSwitchToBase}
-              disabled={loading}
-              className="ml-4 px-3 py-1 text-sm bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 text-white rounded transition-colors"
-            >
-              {loading ? 'Switching...' : 'Switch to Base'}
-            </button>
-          </div>
-        </div>
-      )}
+    <>
+      {/* Error Banners */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        {disconnectError && (
+          <WalletDisconnectBanner
+            error={disconnectError}
+            onDismiss={clearDisconnectError}
+            onReconnect={() => connect(user.chain || 'base')}
+            isLoading={loading}
+          />
+        )}
+        {error && !disconnectError && (
+          <WalletErrorBanner
+            error={error}
+            onDismiss={() => {}}
+            type="error"
+          />
+        )}
+      </div>
 
-      {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+        {/* Chain Warning Banner */}
+        {showChainWarning && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
+            <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6 lg:px-8 flex items-center justify-between">
+              <span className="text-sm text-yellow-800 dark:text-yellow-200">
+                ⚠️ You're not on Base. BitArt Market is optimized for Base Mainnet.
+              </span>
+              <button
+                onClick={autoSwitchToBase}
+                disabled={loading}
+                className="ml-4 px-3 py-1 text-sm bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 text-white rounded transition-colors"
+              >
+                {loading ? 'Switching...' : 'Switch to Base'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Main Header */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">BA</span>
@@ -133,5 +165,6 @@ export const Header: React.FC = () => {
         </div>
       </div>
     </header>
+    </>
   );
 };
