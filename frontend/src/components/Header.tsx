@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import { ThemeToggle } from './ThemeToggle';
+import { BaseNativeBadge } from './Badge';
 
 export const Header: React.FC = () => {
   const { user, connect, disconnect, isConnected, chain, autoSwitchToBase, error, loading } = useWallet();
@@ -40,7 +41,7 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">BA</span>
             </div>
@@ -48,7 +49,7 @@ export const Header: React.FC = () => {
               <span className="font-bold text-xl text-gray-900 dark:text-white hidden sm:inline">
                 BitArt Market
               </span>
-              <span className="text-xs text-blue-600 dark:text-blue-400 hidden sm:inline">Built on Base</span>
+              <BaseNativeBadge className="hidden sm:inline-flex" />
             </div>
           </Link>
 
@@ -81,10 +82,7 @@ export const Header: React.FC = () => {
             {isConnected ? (
               <div className="flex items-center gap-3">
                 {/* Base Badge */}
-                <div className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 px-2 py-1 border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <span className="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full"></span>
-                  Base
-                </div>
+                <BaseNativeBadge />
                 <Link
                   to={`/profile/${user.address}`}
                   className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold hover:shadow-lg transition-shadow"

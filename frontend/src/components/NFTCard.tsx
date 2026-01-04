@@ -2,15 +2,27 @@ import React from 'react';
 import { NFT } from '../types';
 import { Link } from 'react-router-dom';
 import { GasBreakdown } from './GasBreakdown';
+import { NFTBadges } from './Badge';
 
 interface NFTCardProps {
   nft: NFT;
   price?: number; // in ETH
   royaltyPercentage?: number;
   showGasEstimate?: boolean;
+  isTrending?: boolean;
+  isFeatured?: boolean;
+  isNew?: boolean;
 }
 
-export const NFTCard: React.FC<NFTCardProps> = ({ nft, price, royaltyPercentage = 0, showGasEstimate = true }) => {
+export const NFTCard: React.FC<NFTCardProps> = ({
+  nft,
+  price,
+  royaltyPercentage = 0,
+  showGasEstimate = true,
+  isTrending = false,
+  isFeatured = false,
+  isNew = false
+}) => {
   return (
     <div className="group rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-xl transition-all">
       {/* Image */}
@@ -20,15 +32,20 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft, price, royaltyPercentage 
           alt={nft.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
         />
-        <div className="absolute top-2 right-2 flex gap-2">
-          {/* Base Badge */}
-          <div className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-            Base
-          </div>
-          <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs font-medium">
-            {nft.category}
-          </div>
+        {/* Top Right Badges */}
+        <div className="absolute top-2 right-2">
+          <NFTBadges
+            isBaseNative={true}
+            isTrending={isTrending}
+            isFeatured={isFeatured}
+            isNew={isNew}
+            className="justify-end"
+          />
+        </div>
+
+        {/* Category Badge - Bottom Left */}
+        <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs font-semibold">
+          {nft.category}
         </div>
       </Link>
 
@@ -54,7 +71,7 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft, price, royaltyPercentage 
                   {price.toFixed(4)} ETH
                 </p>
               </div>
-              
+
               {/* Gas Breakdown Preview */}
               {showGasEstimate && (
                 <GasBreakdown
