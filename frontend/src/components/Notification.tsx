@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNotificationStore } from '../store';
+import { BaseScanLink, shortenTxHash } from './BaseScanLink';
 
 interface NotificationProps {
   id: string;
   title: string;
   message: string;
   type: 'success' | 'error' | 'info' | 'warning';
+  txHash?: string; // Optional transaction hash for BaseScan link
 }
 
 const NotificationItem: React.FC<NotificationProps & { onClose: (id: string) => void }> = ({
@@ -13,6 +15,7 @@ const NotificationItem: React.FC<NotificationProps & { onClose: (id: string) => 
   title,
   message,
   type,
+  txHash,
   onClose
 }) => {
   const typeStyles = {
@@ -23,10 +26,10 @@ const NotificationItem: React.FC<NotificationProps & { onClose: (id: string) => 
   };
 
   const iconStyles = {
-    success: '✓',
-    error: '✕',
-    info: 'ℹ',
-    warning: '⚠'
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️',
+    warning: '⚠️'
   };
 
   const textColorStyles = {
@@ -44,16 +47,26 @@ const NotificationItem: React.FC<NotificationProps & { onClose: (id: string) => 
   return (
     <div className={`${typeStyles[type]} border rounded-lg p-4 mb-3`}>
       <div className="flex items-start">
-        <span className={`${textColorStyles[type]} mr-3 font-bold text-lg`}>
+        <span className={`${textColorStyles[type]} mr-3 text-lg flex-shrink-0`}>
           {iconStyles[type]}
         </span>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p className={`${textColorStyles[type]} font-semibold`}>{title}</p>
           <p className={`${textColorStyles[type]} text-sm mt-1`}>{message}</p>
+          {txHash && (
+            <div className="mt-2">
+              <BaseScanLink
+                type="tx"
+                hash={txHash}
+                label={`🔍 View on BaseScan (${shortenTxHash(txHash)})`}
+                className="text-xs"
+              />
+            </div>
+          )}
         </div>
         <button
           onClick={() => onClose(id)}
-          className={`${textColorStyles[type]} ml-4 font-bold`}
+          className={`${textColorStyles[type]} ml-4 font-bold flex-shrink-0`}
         >
           ✕
         </button>
