@@ -38,6 +38,120 @@ export interface StacksWalletUser {
 
 class WalletService {
   private baseSessionKey = 'bitart-base-address';
+  private chainChangeListeners: ((chain: 'base' | 'stacks') => void)[] = [];
+
+  constructor() {
+    this.setupChainChangeListener();
+  }
+
+  /**
+   * Setup listener for chain changes in wallet
+   */
+  private setupChainChangeListener(): void {
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', (chainId: string) => {
+        // Base mainnet is 0x2105 (8453 in decimal)
+        const isBaseChain = chainId === BASE_CHAIN_ID || chainId === '8453' || parseInt(chainId, 16) === 8453;
+        this.chainChangeListeners.forEach(listener => listener(isBaseChain ? 'base' : 'stacks'));
+      });
+    }
+  }
+
+  /**
+   * Register listener for chain changes
+   */
+  onChainChange(callback: (chain: 'base' | 'stacks') => void): () => void {
+    this.chainChangeListeners.push(callback);
+    return () => {
+      this.chainChangeListeners = this.chainChangeListeners.filter(l => l !== callback);
+    };
+  }
+
+  /**
+   * Auto-detect current wallet chain and switch to Base if needed
+   */
+  async autoDetectAndSwitchToBase(): Promise<boolean> {
+    if (!window.ethereum) {
+      console.warn('No Ethereum-compatible wallet found');
+      return false;
+    }
+
+    try {
+      // Get current chain ID
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
+      const isBaseChain = chainId === BASE_CHAIN_ID || chainId === '8453' || parseInt(chainId, 16) === 8453;
+
+      if (!isBaseChain) {
+        // Not on Base, attempt to switch
+        return await this.switchToBase();
+      }
+
+      return true; // Already on Base
+    } catch (error) {
+      console.error('Failed to auto-detect chain:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Switch to Base chain
+   */
+  async switchToBase(): Promise<boolean> {
+    if (!window.ethereum) return false;
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: BASE_CHAIN_ID }]
+      });
+      return true;
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        // Chain not added, add it
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BASE_CHAIN_ID,
+              chainName: BASE_CHAIN_NAME,
+              rpcUrls: [BASE_RPC_URL],
+              nativeCurrency: {
+                name: BASE_CURRENCY,
+                symbol: BASE_CURRENCY,
+                decimals: 18
+              },
+              blockExplorerUrls: [BASE_EXPLORER]
+            }]
+          });
+          return true;
+        } catch (addError) {
+          console.error('Failed to add Base chain:', addError);
+          return false;
+        }
+      } else if (switchError.code === 4001) {
+        // User rejected
+        return false;
+      } else {
+        console.error('Failed to switch to Base:', switchError);
+        return false;
+      }
+    }
+  }
+
+  /**
+   * Get current connected chain
+   */
+  async getCurrentChain(): Promise<'base' | 'stacks' | null> {
+    if (!window.ethereum) return null;
+
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
+      return (chainId === BASE_CHAIN_ID || chainId === '8453' || parseInt(chainId, 16) === 8453) ? 'base' : 'stacks';
+    } catch (error) {
+      console.error('Failed to get current chain:', error);
+      return null;
+    }
+  }
 
   /**
    * Check if wallet is installed
@@ -75,31 +189,10 @@ class WalletService {
       throw new Error('No Ethereum-compatible wallet found. Please install MetaMask or a Base-compatible wallet.');
     }
 
-    // Ensure Base network is added/switch
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: BASE_CHAIN_ID }]
-      });
-    } catch (switchError: any) {
-      if (switchError.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: BASE_CHAIN_ID,
-            chainName: BASE_CHAIN_NAME,
-            rpcUrls: [BASE_RPC_URL],
-            nativeCurrency: {
-              name: BASE_CURRENCY,
-              symbol: BASE_CURRENCY,
-              decimals: 18
-            },
-            blockExplorerUrls: [BASE_EXPLORER]
-          }]
-        });
-      } else {
-        throw switchError;
-      }
+    // Auto-detect and switch to Base
+    const switchedToBase = await this.autoDetectAndSwitchToBase();
+    if (!switchedToBase) {
+      throw new Error('Failed to switch to Base network. Please switch manually in your wallet.');
     }
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
