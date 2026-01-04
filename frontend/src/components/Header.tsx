@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import { ThemeToggle } from './ThemeToggle';
 import { BaseNativeBadge } from './Badge';
+import { isCoinbaseWallet } from '../services/coinbase';
 
 export const Header: React.FC = () => {
   const { user, connect, disconnect, isConnected, chain, autoSwitchToBase, error, loading } = useWallet();
   const [showChainWarning, setShowChainWarning] = useState(false);
+  const [isCoinbase, setIsCoinbase] = useState(false);
 
   // Show warning if not on Base when connected
   useEffect(() => {
@@ -16,6 +18,11 @@ export const Header: React.FC = () => {
       setShowChainWarning(false);
     }
   }, [isConnected, chain]);
+
+  // Detect Coinbase Wallet
+  useEffect(() => {
+    setIsCoinbase(isCoinbaseWallet());
+  }, []);
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
@@ -79,6 +86,13 @@ export const Header: React.FC = () => {
           <div className="flex items-center gap-4">
             <ThemeToggle />
 
+            {/* Coinbase Badge */}
+            {isCoinbase && (
+              <span className="text-xs font-semibold px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full hidden sm:inline">
+                💳 Coinbase
+              </span>
+            )}
+
             {isConnected ? (
               <div className="flex items-center gap-3">
                 {/* Base Badge */}
@@ -101,9 +115,13 @@ export const Header: React.FC = () => {
               <button
                 onClick={() => connect('base')}
                 disabled={loading}
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg font-medium hover:shadow-lg disabled:opacity-50 transition-all"
+                className={`px-4 py-2 text-white rounded-lg font-medium hover:shadow-lg disabled:opacity-50 transition-all ${
+                  isCoinbase
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600'
+                }`}
               >
-                {loading ? 'Connecting...' : 'Connect Wallet'}
+                {loading ? 'Connecting...' : isCoinbase ? '💳 Connect' : 'Connect Wallet'}
               </button>
             )}
             {error && (
