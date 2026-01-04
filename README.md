@@ -13,7 +13,16 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 
 ## � Feature Highlights
 
-### 🎨 Latest: Royalty Analytics Dashboard (Day 6)
+### 🔍 Latest: Advanced Search & Discovery (Days 8-9)
+- **Advanced Filtering** - Price range, creator, rarity, verification status, listed status
+- **Smart Sorting** - Popularity, price (asc/desc), trending, newest/oldest
+- **Search Ranking** - Relevance-based ranking with popularity tiebreaker
+- **Trending NFTs** - Real-time trending collections with popularity metrics
+- **Category Browse** - Explore by rarity (common, uncommon, rare, legendary)
+- **Autocomplete** - Search suggestions with instant results
+- **Marketplace Stats** - Floor price, average price, volume, sales count
+
+### 🎨 Royalty Analytics Dashboard (Day 6)
 - **Royalty Tracking** - Real-time secondary sale earnings per NFT and creator
 - **30-Day Revenue Charts** - Interactive visual earnings trends with daily breakdown
 - **Creator Dashboard** - Comprehensive analytics with revenue summaries
@@ -108,14 +117,16 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Smooth animations** and transitions with loading states
 
 ### Backend
-- **REST API** with 15+ endpoints for marketplace operations
+- **REST API** with 20+ endpoints for marketplace operations
 - **IPFS integration** for decentralized storage (Pinata)
 - **User profile management** with creator stats
 - **Transaction history tracking** with blockchain sync
 - **Analytics service** - Volume, sales, revenue, user metrics
 - **Royalty tracking service** - Secondary sale earnings and distributions
 - **Creator service** - Earnings aggregation and profile data
-- **Search and filtering** engine with pagination
+- **Search and filtering** engine with pagination and ranking
+- **Consolidated marketplace service** - Unified listing, buying, fee calculations
+- **Service barrel exports** - Simplified and organized API
 
 ### Multi-Chain Support
 - **Base Mainnet (Primary)**: EVM-compatible L2 with low fees and fast transactions
@@ -305,6 +316,12 @@ The app will be available at `http://localhost:5173`
 - `GET /api/royalties/nft/:nftId` - NFT-specific royalty stats
 - `GET /api/royalties/top?limit=20` - Top earning NFTs by royalties
 - `POST /api/royalties/calculate` - Calculate royalties for a sale
+
+### Search & Discovery
+- `GET /api/search?q=query&sort=popularity&page=1&limit=20` - Advanced search with filters
+- `GET /api/search/trending?limit=10` - Trending NFTs
+- `GET /api/search/suggestions?q=query` - Search autocomplete
+- `GET /api/search/category/:category?page=1&limit=20` - Browse by category
 
 ## 🎨 UI/UX Components
 
