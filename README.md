@@ -11,6 +11,51 @@ All smart contracts deployed and verified on Base Mainnet:
 
 🔗 [View on BaseScan](https://basescan.org)
 
+## 🚀 Base-Native Features (Latest)
+
+✨ **Production-ready features built specifically for Base Mainnet:**
+
+### ⚡ Network Intelligence
+- **Auto-detection & auto-switch** to Base Mainnet (seamless UX)
+- **Chain change listeners** for real-time wallet updates
+- **Graceful fallback** if not on Base with prominent banner
+
+### 💰 Gas Optimization
+- **Real-time gas estimation** from Base RPC
+- **Transparent fee breakdown** (item price, platform fee, royalty, gas)
+- **"Cheap Gas" badges** when transactions < 0.01 ETH
+- **Savings indicator** showing advantage vs Ethereum mainnet
+- **Live gas price updates** in Gwei and ETH
+
+### 🔗 Explorer Integration
+- **BaseScan deep links** on every transaction
+- **Address & contract links** with copy-to-clipboard
+- **Transaction status display** with explorer navigation
+- **Shortened hashes** for readable UI while keeping full links
+
+### 🏷️ Badge System
+- **"Built on Base"** badge on all marketplace NFTs
+- **Base OG** badge for early supporters
+- **Verified creator** badges
+- **Trending & Featured** badges
+- **New listing** indicators (< 7 days)
+- **Customizable badge sizes** (sm, md, lg)
+
+### 💳 Coinbase Wallet Optimization
+- **Automatic Coinbase Wallet detection**
+- **Smart Wallet capability detection** (account abstraction)
+- **Feature indicators** (EIP-1559, batch transactions)
+- **Optimized connect button** with Coinbase branding
+- **Smart Wallet gasless hints**
+
+### ⚙️ Gasless Transactions (Optional)
+- **Paymaster integration framework** (Pimlico-ready)
+- **ERC-4337 account abstraction** support
+- **Eligibility detection** for gasless users
+- **Graceful fallback** to normal transactions
+- **Savings estimation** (up to 95% gas reduction)
+- **Promotional banners** for gasless benefits
+
 ## 🚀 Features
 
 ### Smart Contracts
