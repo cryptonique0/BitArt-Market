@@ -1,13 +1,28 @@
-// Backend Stacks Smart Contract Configuration
+// Backend Smart Contract Configuration
+import { getConfig } from './env';
+
+const config = getConfig();
 
 export const STACKS_CONTRACTS = {
-  network: process.env.NETWORK || 'testnet',
+  network: config.network,
   
   // Contract addresses
-  nft: process.env.NFT_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.colorful-lime-guan',
-  marketplace: process.env.MARKETPLACE_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.partial-harlequin-tahr',
-  auction: process.env.AUCTION_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.better-copper-lemming',
+  nft: config.stacks.nftContract,
+  marketplace: config.stacks.marketplaceContract,
+  auction: config.stacks.auctionContract,
   
   // API configuration
-  apiUrl: process.env.STACKS_API_URL || 'https://api.testnet.stacks.co',
+  apiUrl: config.stacks.apiUrl,
+};
+
+export const BASE_CONTRACTS = {
+  network: 'mainnet', // Base is always mainnet
+  
+  // Contract addresses
+  nft: config.base.nftContract,
+  marketplace: config.base.marketplaceContract,
+  auction: config.base.auctionContract,
+  
+  // RPC configuration
+  rpcUrl: config.base.rpcUrl,
 };

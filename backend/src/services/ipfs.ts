@@ -111,10 +111,13 @@ class IpfsService {
   }
 }
 
-// Initialize IPFS service
+// Initialize IPFS service with typed config
+import { getConfig } from '../config/env';
+
+const config = getConfig();
 const ipfsService = new IpfsService({
-  jwt: process.env.PINATA_JWT || '',
-  gateway: process.env.IPFS_GATEWAY || 'https://gateway.pinata.cloud'
+  jwt: config.ipfs.jwt,
+  gateway: config.ipfs.gateway
 });
 
 export default ipfsService;

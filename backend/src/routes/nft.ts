@@ -2,6 +2,12 @@ import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import ipfsService from '../services/ipfs';
 import stacksApi from '../services/stacks';
+import { 
+  CreateNFTRequest, 
+  CreateNFTResponse, 
+  GetNFTsQuery,
+  ErrorResponse 
+} from '../types/api';
 
 const router = Router();
 
@@ -29,7 +35,10 @@ let nftIdCounter = 1;
  * Create new NFT with metadata
  * Body: { name, description, imageFile, category, royaltyPercentage }
  */
-router.post('/', upload.single('imageFile'), async (req: Request, res: Response) => {
+router.post('/', upload.single('imageFile'), async (
+  req: Request<{}, CreateNFTResponse | ErrorResponse, CreateNFTRequest>, 
+  res: Response<CreateNFTResponse | ErrorResponse>
+) => {
   try {
     const { name, description, category, royaltyPercentage } = req.body;
     const imageFile = req.file;
@@ -41,7 +50,8 @@ router.post('/', upload.single('imageFile'), async (req: Request, res: Response)
       });
     }
 
-    if (isNaN(royaltyPercentage) || royaltyPercentage < 0 || royaltyPercentage > 25) {
+    const royaltyNum = Number(royaltyPercentage);
+    if (isNaN(royaltyNum) || royaltyNum < 0 || royaltyNum > 25) {
       return res.status(400).json({
         error: 'Invalid royalty percentage. Must be between 0 and 25.'
       });
@@ -61,8 +71,8 @@ router.post('/', upload.single('imageFile'), async (req: Request, res: Response)
       image: imageUri,
       imageHash: fileHash,
       category,
-      royaltyPercentage,
-      creator: req.headers['x-creator-address'] || 'unknown',
+      royaltyPercentage: royaltyNum,
+      creator: req.headers['x-creator-address'] as string || 'unknown',
       createdAt: new Date().toISOString()
     };
 
@@ -98,7 +108,10 @@ router.post('/', upload.single('imageFile'), async (req: Request, res: Response)
  * GET /api/nfts
  * List all NFTs with pagination and filters
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (
+  req: Request<{}, any, any, GetNFTsQuery>, 
+  res: Response
+) => {
   try {
     const { page = 1, limit = 20, category, sortBy = 'createdAt' } = req.query;
     const pageNum = parseInt(page as string) || 1;

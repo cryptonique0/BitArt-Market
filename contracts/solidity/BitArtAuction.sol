@@ -20,7 +20,8 @@ contract BitArtAuction is Ownable, ReentrancyGuard {
         uint256 startHeight;
         uint256 endHeight;
         bool isEnded;
-        bool claimed;
+        bool nftClaimed;
+        bool fundsClaimed;
     }
 
     // NFT contract interface
@@ -42,6 +43,8 @@ contract BitArtAuction is Ownable, ReentrancyGuard {
     // Constants
     uint256 public constant MIN_BID_INCREMENT_PERCENTAGE = 100; // 1%
     uint256 public constant MIN_BID_INCREMENT_BASIS = 10000;
+    uint256 public constant MIN_AUCTION_DURATION = 100; // ~16 minutes (100 blocks * 10s)
+    uint256 public constant MAX_AUCTION_DURATION = 40320; // ~1 week (40320 blocks * 15s avg)
 
     // State variables
     IRoyaltyInfo public nftContract;
@@ -54,6 +57,7 @@ contract BitArtAuction is Ownable, ReentrancyGuard {
     mapping(uint256 => Auction) public auctions;
     mapping(uint256 => mapping(address => uint256)) public bids;
     mapping(address => uint256) public pendingBalances;
+    mapping(uint256 => bool) public isListed; // Track if NFT is already in auction
 
     // Events
     event AuctionCreated(
@@ -109,9 +113,13 @@ contract BitArtAuction is Ownable, ReentrancyGuard {
         uint256 duration
     ) public returns (uint256) {
         require(reservePrice > 0, "Invalid reserve price");
+        require(duration >= MIN_AUCTION_DURATION, "Duration too short");
+        require(duration <= MAX_AUCTION_DURATION, "Duration too long");
         require(nftContract.ownerOf(tokenId) == msg.sender, "Not owner");
+        require(!isListed[tokenId], "Already listed");
 
         uint256 auctionId = auctionCounter++;
+        isListed[tokenId] = true;
 
         auctions[auctionId] = Auction({
             tokenId: tokenId,
@@ -122,7 +130,8 @@ contract BitArtAuction is Ownable, ReentrancyGuard {
             startHeight: block.number,
             endHeight: block.number + duration,
             isEnded: false,
-            claimed: false
+            nftClaimed: false,
+            fundsClaimed: false
         });
 
         emit AuctionCreated(auctionId, tokenId, msg.sender, reservePrice, block.number + duration);
@@ -192,19 +201,22 @@ contract BitArtAuction is Ownable, ReentrancyGuard {
         Auction storage auction = auctions[auctionId];
 
         require(auction.isEnded, "Auction not ended");
-        require(!auction.claimed, "Already claimed");
         require(
             msg.sender == auction.seller || msg.sender == auction.highestBidder,
             "Not authorized"
         );
 
-        auction.claimed = true;
-
+        // Winner claims NFT
         if (msg.sender == auction.highestBidder && auction.currentBid >= auction.reservePrice) {
-            // Winner claims NFT
+            require(!auction.nftClaimed, "NFT already claimed");
+            auction.nftClaimed = true;
             nftContract.transferFrom(auction.seller, msg.sender, auction.tokenId);
-        } else if (msg.sender == auction.seller && auction.currentBid >= auction.reservePrice) {
-            // Seller claims proceeds
+        } 
+        // Seller claims proceeds
+        else if (msg.sender == auction.seller && auction.currentBid >= auction.reservePrice) {
+            require(!auction.fundsClaimed, "Funds already claimed");
+            auction.fundsClaimed = true;
+
             (address royaltyReceiver, uint256 royaltyAmount) = nftContract
                 .royaltyInfo(auction.tokenId, auction.currentBid);
             uint256 platformFee = (auction.currentBid * platformFeePercentage) / 10000;
@@ -245,6 +257,7 @@ contract BitArtAuction is Ownable, ReentrancyGuard {
         require(auction.seller == msg.sender, "Not seller");
         require(auction.currentBid == 0, "Auction has bids");
 
+        isListed[auction.tokenId] = false;
         auction.isEnded = true;
 
         emit AuctionCanceled(auctionId);

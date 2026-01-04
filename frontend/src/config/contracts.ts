@@ -1,18 +1,34 @@
-// Stacks Smart Contract Configuration
-// Generated for BitArt Market deployment
+// Smart Contract Configuration
+// Type-safe contract addresses and configuration
+
+import { config } from './env';
 
 export const STACKS_CONTRACTS = {
   // Network configuration
-  network: 'testnet',
+  network: config.network,
   
-  // Contract addresses (deployed on Stacks testnet)
-  nft: process.env.VITE_NFT_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.colorful-lime-guan',
-  marketplace: process.env.VITE_MARKETPLACE_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.partial-harlequin-tahr',
-  auction: process.env.VITE_AUCTION_CONTRACT || 'ST1VJDKVGZ3S0G0TB0J4HG6KA8JDK33BBVADW2P4J.better-copper-lemming',
+  // Contract addresses
+  nft: config.stacks.nftContract,
+  marketplace: config.stacks.marketplaceContract,
+  auction: config.stacks.auctionContract,
   
   // Explorer URLs
   explorerUrl: 'https://explorer.stacks.co',
-  apiUrl: 'https://api.testnet.stacks.co',
+  apiUrl: config.stacks.apiUrl,
+} as const;
+
+export const BASE_CONTRACTS = {
+  // Network configuration
+  chainId: config.base.chainId,
+  chainName: config.base.chainName,
+  currency: config.base.currency,
+  rpcUrl: config.base.rpcUrl,
+  explorer: config.base.explorer,
+  
+  // Contract addresses
+  nft: config.base.nftContract,
+  marketplace: config.base.marketplaceContract,
+  auction: config.base.auctionContract,
 } as const;
 
 // Contract function names for reference

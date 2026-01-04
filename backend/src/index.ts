@@ -4,9 +4,13 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
+import { getConfig } from './config/env';
 
 // Load environment variables
 dotenv.config();
+
+// Validate environment and get typed config
+const config = getConfig();
 
 // Import routes
 import nftRoutes from './routes/nft';
@@ -16,7 +20,7 @@ import analyticsRoutes from './routes/analytics';
 import baseRoutes from './routes/base';
 
 const app: Express = express();
-const PORT = process.env.PORT || 3001;
+const PORT = config.port;
 
 // ============================================
 // Security Middleware
@@ -27,7 +31,7 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || 'http://localhost:5173',
+  origin: config.allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -35,14 +39,14 @@ app.use(cors({
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: config.rateLimit.windowMs,
+  max: config.rateLimit.maxRequests,
   message: 'Too many requests from this IP, please try again later.',
 });
 
 const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // Limit each IP to 20 uploads per hour
+  windowMs: config.rateLimit.uploadWindowMs,
+  max: config.rateLimit.uploadMaxRequests,
   message: 'Too many uploads from this IP, please try again later.',
 });
 
@@ -75,8 +79,8 @@ app.get('/api/health', (req: Request, res: Response) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    network: process.env.NETWORK || 'testnet'
+    environment: config.nodeEnv,
+    network: config.network
   });
 });
 
@@ -151,8 +155,8 @@ app.listen(PORT, () => {
 ╚═══════════════════════════════════════╝
   
   Server: http://localhost:${PORT}
-  Environment: ${process.env.NODE_ENV || 'development'}
-  Network: ${process.env.NETWORK || 'testnet'}
+  Environment: ${config.nodeEnv}
+  Network: ${config.network}
   
   API Documentation:
   - GET    /api/health                 - Health check

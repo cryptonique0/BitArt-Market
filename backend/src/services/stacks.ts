@@ -168,10 +168,13 @@ class StacksApiService {
   }
 }
 
-// Initialize Stacks API service
+// Initialize Stacks API service with typed config
+import { getConfig } from '../config/env';
+
+const config = getConfig();
 const stacksApi = new StacksApiService({
-  baseUrl: process.env.STACKS_API_URL || 'https://api.testnet.stacks.co',
-  network: process.env.NETWORK || 'testnet'
+  baseUrl: config.stacks.apiUrl,
+  network: config.network
 });
 
 export default stacksApi;
