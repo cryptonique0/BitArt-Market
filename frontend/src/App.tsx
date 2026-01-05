@@ -10,6 +10,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { CreatorProfilePage } from './pages/CreatorProfilePage';
 import DiscoveryPage from './pages/DiscoveryPage';
 import RoyaltiesDashboard from './pages/RoyaltiesDashboard';
+import { StudioPage } from './pages/StudioPage';
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -37,7 +38,7 @@ function App() {
             <Route path="/royalties/:address" element={<RoyaltiesDashboard />} />
             <Route path="/discover" element={<DiscoveryPage />} />
             <Route path="/marketplace" element={<DiscoveryPage />} />
-            <Route path="/studio" element={<ProfilePage />} />
+            <Route path="/studio" element={<StudioPage />} />
           </Routes>
           <NotificationContainer />
         </div>
