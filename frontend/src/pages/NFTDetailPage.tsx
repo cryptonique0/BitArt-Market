@@ -8,6 +8,8 @@ import { useNotificationStore } from '../store';
 import { VerificationBadge } from '../components/VerificationBadge';
 import { FollowButton } from '../components/FollowButton';
 import { ActivityFeed } from '../components/ActivityFeed';
+import { Skeleton, CommentSkeleton } from '../components/SkeletonLoader';
+import { NoCommentsFound } from '../components/EmptyState';
 
 export const NFTDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -170,11 +172,17 @@ export const NFTDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse space-y-8">
-            <div className="h-96 bg-gray-200 dark:bg-gray-800 rounded-lg" />
-            <div className="space-y-4">
-              <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-2/3" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <Skeleton className="h-96 w-full rounded-lg" />
+            <div className="space-y-6">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-24 w-full" />
+              <div className="grid grid-cols-2 gap-6">
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+              </div>
+              <Skeleton className="h-12 w-full" />
             </div>
           </div>
         </div>
@@ -308,8 +316,14 @@ export const NFTDetailPage: React.FC = () => {
                 {commentLoading ? 'Posting...' : 'Post'}
               </Button>
             </div>
-            {comments.length === 0 ? (
-              <p className="text-gray-600 dark:text-gray-400">No comments yet.</p>
+            {commentLoading ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <CommentSkeleton key={i} />
+                ))}
+              </div>
+            ) : comments.length === 0 ? (
+              <NoCommentsFound />
             ) : (
               <div className="space-y-3">
                 {comments.map((comment) => (

@@ -7,6 +7,8 @@ import { VerificationBadge } from '../components/VerificationBadge';
 import { FollowButton } from '../components/FollowButton';
 import { FollowerStats } from '../components/FollowerStats';
 import { ActivityFeed } from '../components/ActivityFeed';
+import { ProfileSkeleton } from '../components/SkeletonLoader';
+import { NoNFTsFound } from '../components/EmptyState';
 
 export const ProfilePage: React.FC = () => {
   const { address } = useParams();
@@ -38,11 +40,19 @@ export const ProfilePage: React.FC = () => {
   }, [address]);
 
   if (loading) {
-    return <div className="min-h-screen bg-white dark:bg-gray-900 py-12 px-4 animate-pulse" />;
+    return <ProfileSkeleton />;
   }
 
   if (!profile) {
-    return <div className="min-h-screen bg-white dark:bg-gray-900 py-12 px-4">Profile not found</div>;
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 py-12 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">❌</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-400">The profile you're looking for doesn't exist.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -155,9 +165,9 @@ export const ProfilePage: React.FC = () => {
           {activeTab === 'owned' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {nfts.length === 0 ? (
-                <p className="col-span-full text-gray-600 dark:text-gray-400">
-                  No NFTs owned yet
-                </p>
+                <div className="col-span-full">
+                  <NoNFTsFound />
+                </div>
               ) : (
                 nfts.map((nft) => (
                   <div
@@ -188,9 +198,9 @@ export const ProfilePage: React.FC = () => {
           {activeTab === 'created' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {nfts.filter((nft) => nft.creator === address).length === 0 ? (
-                <p className="col-span-full text-gray-600 dark:text-gray-400">
-                  No NFTs created yet
-                </p>
+                <div className="col-span-full">
+                  <NoNFTsFound />
+                </div>
               ) : (
                 nfts
                   .filter((nft) => nft.creator === address)

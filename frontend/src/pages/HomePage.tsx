@@ -7,6 +7,7 @@ import { analyticsService, baseService } from '../services/api';
 import { MarketplaceStats } from '../types';
 import { useUserStore } from '../store';
 import { config } from '../config/env';
+import { StatCardSkeleton } from '../components/SkeletonLoader';
 
 interface MockNFT {
   id: string;
@@ -23,6 +24,7 @@ export const HomePage: React.FC = () => {
   const [baseHealth, setBaseHealth] = useState<string>('Loading...');
   const [baseBalance, setBaseBalance] = useState<string | null>(null);
   const [isTestnet, setIsTestnet] = useState(true);
+  const [loadingStats, setLoadingStats] = useState(true);
   const { user } = useUserStore();
 
   // Mock trending NFTs for Base
@@ -74,10 +76,13 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        setLoadingStats(true);
         const data = await analyticsService.getStats();
         setStats(data);
       } catch (error) {
         console.error('Failed to fetch stats:', error);
+      } finally {
+        setLoadingStats(false);
       }
     };
 
@@ -149,7 +154,17 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      {stats && (
+      {loadingStats ? (
+        <section className="bg-gray-50 dark:bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[...Array(4)].map((_, i) => (
+                <StatCardSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : stats && (
         <section className="bg-gray-50 dark:bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">

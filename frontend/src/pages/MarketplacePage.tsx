@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Input, LoadingSpinner } from '../components/UI';
+import { Button, Card, Input } from '../components/UI';
 import { ActivityFeed } from '../components/ActivityFeed';
 import { marketplaceService } from '../services/api';
 import { getTrendingByActivity } from '../services/activity';
 import { useQuery } from '@tanstack/react-query';
+import { ListingGridSkeleton } from '../components/SkeletonLoader';
+import { NoListingsFound } from '../components/EmptyState';
 
 export const MarketplacePage: React.FC = () => {
   const [listings, setListings] = useState<any[]>([]);
@@ -77,9 +79,9 @@ export const MarketplacePage: React.FC = () => {
 
         {/* Listings */}
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
+          <ListingGridSkeleton count={8} />
+        ) : listings.length === 0 ? (
+          <NoListingsFound />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {listings.map((listing) => (
