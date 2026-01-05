@@ -4,6 +4,7 @@ const router = Router();
 
 // In-memory user profiles (in production, use database)
 const users: Record<string, any> = {};
+const userFavorites: Record<string, Set<number>> = {};
 
 /**
  * GET /api/users/:address
@@ -217,9 +218,7 @@ router.get('/:address/sales', (req: Request, res: Response) => {
 router.get('/:address/favorites', (req: Request, res: Response) => {
   try {
     const { address } = req.params;
-
-    // In production, fetch from database
-    const favorites: any[] = [];
+    const favorites = Array.from(userFavorites[address] || []);
 
     res.json({
       success: true,
@@ -228,6 +227,42 @@ router.get('/:address/favorites', (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       error: 'Failed to fetch favorites',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/users/:address/favorites
+ * Toggle a favorite NFT for a user
+ */
+router.post('/:address/favorites', (req: Request, res: Response) => {
+  try {
+    const { address } = req.params;
+    const { nftId } = req.body;
+
+    if (!nftId) {
+      return res.status(400).json({ error: 'nftId is required' });
+    }
+
+    const favorites = userFavorites[address] || new Set<number>();
+
+    if (favorites.has(Number(nftId))) {
+      favorites.delete(Number(nftId));
+    } else {
+      favorites.add(Number(nftId));
+    }
+
+    userFavorites[address] = favorites;
+
+    res.json({
+      success: true,
+      favorited: favorites.has(Number(nftId)),
+      favorites: Array.from(favorites)
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to update favorites',
       message: error.message
     });
   }

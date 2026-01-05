@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { NFT } from '../types';
-import { nftService } from '../services/api';
+import { Comment, NFT } from '../types';
+import { nftService, userService } from '../services/api';
 import { useWallet } from '../hooks/useWallet';
 import { Button } from '../components/Button';
 import { useNotificationStore } from '../store';
@@ -17,6 +17,12 @@ export const NFTDetailPage: React.FC = () => {
   const [nft, setNft] = useState<NFT | null>(null);
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<any[]>([]);
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +35,18 @@ export const NFTDetailPage: React.FC = () => {
 
         const historyData = await nftService.getHistory(parseInt(id));
         setHistory(historyData);
+
+        const likeData = await nftService.getLikes(parseInt(id), user.address || undefined);
+        setLikes(likeData.likes);
+        setLiked(likeData.liked);
+
+        const commentData = await nftService.getComments(parseInt(id));
+        setComments(commentData);
+
+        if (user.address) {
+          const favorites = await userService.getFavorites(user.address);
+          setIsFavorite(favorites.includes(parseInt(id)));
+        }
 
         // In a real app, would fetch from marketplace
         // For now, mock listing data
@@ -45,7 +63,7 @@ export const NFTDetailPage: React.FC = () => {
     };
 
     fetchData();
-  }, [id, addNotification]);
+  }, [id, addNotification, user.address]);
 
   const handleBuy = async () => {
     if (!user.isConnected) {
@@ -72,6 +90,81 @@ export const NFTDetailPage: React.FC = () => {
       });
     }
   };
+
+    const handleToggleLike = async () => {
+      if (!user.isConnected || !user.address || !id) {
+        addNotification({
+          type: 'error',
+          title: 'Not Connected',
+          message: 'Connect your wallet to like this NFT.'
+        });
+        return;
+      }
+
+      try {
+        const result = await nftService.toggleLike(parseInt(id), user.address);
+        setLikes(result.likes);
+        setLiked(result.liked);
+      } catch (error: any) {
+        addNotification({
+          type: 'error',
+          title: 'Action Failed',
+          message: error.message || 'Could not update like state'
+        });
+      }
+    };
+
+    const handleToggleFavorite = async () => {
+      if (!user.isConnected || !user.address || !id) {
+        addNotification({
+          type: 'error',
+          title: 'Not Connected',
+          message: 'Connect your wallet to favorite this NFT.'
+        });
+        return;
+      }
+
+      try {
+        const result = await userService.toggleFavorite(user.address, parseInt(id));
+        setIsFavorite(result.favorited);
+      } catch (error: any) {
+        addNotification({
+          type: 'error',
+          title: 'Action Failed',
+          message: error.message || 'Could not update favorites'
+        });
+      }
+    };
+
+    const handleAddComment = async () => {
+      if (!user.isConnected || !user.address || !id) {
+        addNotification({
+          type: 'error',
+          title: 'Not Connected',
+          message: 'Connect your wallet to comment.'
+        });
+        return;
+      }
+
+      if (!commentText.trim()) {
+        return;
+      }
+
+      try {
+        setCommentLoading(true);
+        const newComment = await nftService.addComment(parseInt(id), user.address, commentText.trim());
+        setComments((prev) => [newComment, ...prev]);
+        setCommentText('');
+      } catch (error: any) {
+        addNotification({
+          type: 'error',
+          title: 'Comment Failed',
+          message: error.message || 'Could not add comment'
+        });
+      } finally {
+        setCommentLoading(false);
+      }
+    };
 
   if (loading || !nft) {
     return (
@@ -174,6 +267,62 @@ export const NFTDetailPage: React.FC = () => {
             >
               Make an Offer
             </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={handleToggleLike}
+                variant={liked ? 'primary' : 'outline'}
+                size="md"
+                className="flex-1"
+              >
+                {liked ? 'Liked' : 'Like'} · {likes}
+              </Button>
+              <Button
+                onClick={handleToggleFavorite}
+                variant={isFavorite ? 'primary' : 'outline'}
+                size="md"
+                className="flex-1"
+              >
+                {isFavorite ? 'Favorited' : 'Favorite'}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Comments */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Comments</h2>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Share your thoughts"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+              <Button
+                onClick={handleAddComment}
+                disabled={commentLoading}
+                variant="primary"
+              >
+                {commentLoading ? 'Posting...' : 'Post'}
+              </Button>
+            </div>
+            {comments.length === 0 ? (
+              <p className="text-gray-600 dark:text-gray-400">No comments yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {comments.map((comment) => (
+                  <div key={comment.id} className="p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-gray-900 dark:text-white">{comment.author.substring(0, 10)}...</span>
+                      <span className="text-xs text-gray-500">{new Date(comment.createdAt).toLocaleString()}</span>
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 text-sm">{comment.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

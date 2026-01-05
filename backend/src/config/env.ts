@@ -70,11 +70,14 @@ function getOptionalEnv(key: string, defaultValue: string): string {
 export function validateEnv(): EnvConfig {
   const errors: string[] = [];
 
-  // Track missing required variables
+  // Allow relaxed validation in development to run with mock IPFS
+  const nodeEnv = getOptionalEnv('NODE_ENV', 'development');
+  const isDev = nodeEnv === 'development';
+
   const requiredVars = ['PINATA_JWT', 'PINATA_GATEWAY'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
 
-  if (missingVars.length > 0) {
+  if (missingVars.length > 0 && !isDev) {
     errors.push(`Missing required environment variables: ${missingVars.join(', ')}`);
   }
 
@@ -85,7 +88,6 @@ export function validateEnv(): EnvConfig {
   }
 
   // Validate node env
-  const nodeEnv = getOptionalEnv('NODE_ENV', 'development');
   if (!['development', 'production', 'test'].includes(nodeEnv)) {
     errors.push(`Invalid NODE_ENV value: ${nodeEnv}`);
   }
@@ -134,8 +136,8 @@ export function validateEnv(): EnvConfig {
     },
 
     ipfs: {
-      jwt: getRequiredEnv('PINATA_JWT'),
-      gateway: getRequiredEnv('PINATA_GATEWAY'),
+      jwt: getOptionalEnv('PINATA_JWT', isDev ? 'demo_jwt_token' : ''),
+      gateway: getOptionalEnv('PINATA_GATEWAY', isDev ? 'https://gateway.pinata.cloud' : ''),
     },
 
     rateLimit: {

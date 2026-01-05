@@ -69,3 +69,10 @@ export interface Transaction {
   timestamp: string;
   status: 'pending' | 'confirmed' | 'failed';
 }
+
+export interface Comment {
+  id: string;
+  author: string;
+  text: string;
+  createdAt: string;
+}

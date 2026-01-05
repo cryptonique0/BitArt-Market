@@ -61,6 +61,40 @@ export const nftService = {
   getCategories: async () => {
     const response = await apiClient.get('/nfts/meta/categories');
     return response.data.categories;
+  },
+
+  /**
+   * Get likes for an NFT
+   */
+  getLikes: async (nftId: number, viewer?: string) => {
+    const response = await apiClient.get(`/nfts/${nftId}/likes`, {
+      params: { viewer }
+    });
+    return response.data;
+  },
+
+  /**
+   * Toggle like for an NFT
+   */
+  toggleLike: async (nftId: number, address: string) => {
+    const response = await apiClient.post(`/nfts/${nftId}/like`, { address });
+    return response.data;
+  },
+
+  /**
+   * Get comments for an NFT
+   */
+  getComments: async (nftId: number) => {
+    const response = await apiClient.get(`/nfts/${nftId}/comments`);
+    return response.data.comments;
+  },
+
+  /**
+   * Add a comment to an NFT
+   */
+  addComment: async (nftId: number, author: string, text: string) => {
+    const response = await apiClient.post(`/nfts/${nftId}/comments`, { author, text });
+    return response.data.comment;
   }
 };
 
@@ -186,6 +220,14 @@ export const userService = {
   getFavorites: async (address: string) => {
     const response = await apiClient.get(`/users/${address}/favorites`);
     return response.data.favorites;
+  },
+
+  /**
+   * Toggle a favorite NFT for a user
+   */
+  toggleFavorite: async (address: string, nftId: number) => {
+    const response = await apiClient.post(`/users/${address}/favorites`, { nftId });
+    return response.data;
   }
 };
 
@@ -230,6 +272,14 @@ export const analyticsService = {
       params: { limit }
     });
     return response.data.nfts;
+  },
+
+  /**
+   * Get creator studio overview metrics
+   */
+  getCreatorOverview: async (address: string) => {
+    const response = await apiClient.get(`/analytics/creator/${address}/overview`);
+    return response.data.overview;
   }
 };
 

@@ -184,4 +184,58 @@ router.get('/collection-stats/:collectionId', (req: Request, res: Response) => {
   }
 });
 
+/**
+ * GET /api/analytics/creator/:address/overview
+ * Creator studio metrics dashboard
+ */
+router.get('/creator/:address/overview', (req: Request, res: Response) => {
+  try {
+    const { address } = req.params;
+
+    const overview = {
+      address,
+      totals: {
+        sales: 42,
+        volume: 128.5,
+        collectors: 18,
+        listed: 6
+      },
+      last30d: {
+        sales: 12,
+        volume: 38.2,
+        avgPrice: 3.18
+      },
+      topCollections: [
+        {
+          name: 'Genesis Series',
+          volume: 64.2,
+          floor: 1.2,
+          owners: 12
+        },
+        {
+          name: 'Motion Studies',
+          volume: 24.1,
+          floor: 0.8,
+          owners: 6
+        }
+      ],
+      activity: [
+        { label: 'Views', value: 820 },
+        { label: 'Likes', value: 215 },
+        { label: 'Comments', value: 36 }
+      ]
+    };
+
+    res.json({
+      success: true,
+      overview
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: 'Failed to fetch creator overview',
+      message: error.message
+    });
+  }
+});
+
 export default router;

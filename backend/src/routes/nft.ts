@@ -29,6 +29,20 @@ const upload = multer({
 // In-memory NFT store (in production, use database)
 const nfts: Record<string, any> = {};
 let nftIdCounter = 1;
+const nftLikes: Record<string, Set<string>> = {};
+const nftComments: Record<string, Array<{ id: string; author: string; text: string; createdAt: string }>> = {};
+
+/**
+ * GET /api/nfts/meta/categories
+ * Get all available categories
+ */
+router.get('/meta/categories', (req: Request, res: Response) => {
+  const categories = ['art', 'collectibles', 'sports', 'digital-items', 'music', 'video'];
+  res.json({
+    success: true,
+    categories
+  });
+});
 
 /**
  * POST /api/nfts
@@ -89,6 +103,8 @@ router.post('/', upload.single('imageFile'), async (
       metadataUri,
       owner: nftMetadata.creator
     };
+    nftLikes[nftId.toString()] = new Set();
+    nftComments[nftId.toString()] = [];
 
     res.status(201).json({
       success: true,
@@ -154,6 +170,94 @@ router.get('/', async (
 });
 
 /**
+ * GET /api/nfts/:id/likes
+ * Get like count and viewer state
+ */
+router.get('/:id/likes', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const viewer = (req.query.viewer as string) || '';
+  const likeSet = nftLikes[id] || new Set();
+
+  res.json({
+    success: true,
+    likes: likeSet.size,
+    liked: viewer ? likeSet.has(viewer) : false
+  });
+});
+
+/**
+ * POST /api/nfts/:id/like
+ * Toggle like for an address
+ */
+router.post('/:id/like', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { address } = req.body;
+
+  if (!address) {
+    return res.status(400).json({ error: 'Address is required' });
+  }
+
+  const likeSet = nftLikes[id] || new Set<string>();
+
+  if (likeSet.has(address)) {
+    likeSet.delete(address);
+  } else {
+    likeSet.add(address);
+  }
+
+  nftLikes[id] = likeSet;
+
+  res.json({
+    success: true,
+    liked: likeSet.has(address),
+    likes: likeSet.size
+  });
+});
+
+/**
+ * GET /api/nfts/:id/comments
+ * List comments for an NFT
+ */
+router.get('/:id/comments', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const comments = nftComments[id] || [];
+
+  res.json({
+    success: true,
+    comments
+  });
+});
+
+/**
+ * POST /api/nfts/:id/comments
+ * Add a new comment
+ */
+router.post('/:id/comments', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { author, text } = req.body;
+
+  if (!author || !text) {
+    return res.status(400).json({ error: 'Author and text are required' });
+  }
+
+  const comment = {
+    id: `${id}_${Date.now()}`,
+    author,
+    text,
+    createdAt: new Date().toISOString()
+  };
+
+  const comments = nftComments[id] || [];
+  comments.unshift(comment);
+  nftComments[id] = comments;
+
+  res.status(201).json({
+    success: true,
+    comment
+  });
+});
+
+/**
  * GET /api/nfts/:id
  * Get single NFT details
  */
@@ -210,18 +314,6 @@ router.get('/:id/history', async (req: Request, res: Response) => {
       message: error.message
     });
   }
-});
-
-/**
- * GET /api/nfts/categories
- * Get all available categories
- */
-router.get('/meta/categories', (req: Request, res: Response) => {
-  const categories = ['art', 'collectibles', 'sports', 'digital-items', 'music', 'video'];
-  res.json({
-    success: true,
-    categories
-  });
 });
 
 export default router;

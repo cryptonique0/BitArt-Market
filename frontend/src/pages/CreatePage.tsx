@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useWallet } from '../hooks/useWallet';
-import { nftService } from '../services/api';
+import { analyticsService, nftService } from '../services/api';
 import { useNotificationStore } from '../store';
 import { Button } from '../components/Button';
 
@@ -18,6 +18,7 @@ export const CreatePage: React.FC = () => {
   
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [overview, setOverview] = useState<any | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,6 +39,20 @@ export const CreatePage: React.FC = () => {
       [name]: name === 'royaltyPercentage' ? parseInt(value) : value
     });
   };
+
+  useEffect(() => {
+    const loadOverview = async () => {
+      if (!user.address) return;
+      try {
+        const data = await analyticsService.getCreatorOverview(user.address);
+        setOverview(data);
+      } catch {
+        // Non-blocking for creation flow
+      }
+    };
+
+    loadOverview();
+  }, [user.address]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +122,21 @@ export const CreatePage: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400 mb-12">
           Upload your artwork and set the details. You'll be able to mint it on the blockchain.
         </p>
+
+        {overview && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+            <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <p className="text-sm text-gray-500">30d Volume</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{overview.last30d.volume} ETH</p>
+              <p className="text-xs text-gray-500">{overview.last30d.sales} sales · avg {overview.last30d.avgPrice} ETH</p>
+            </div>
+            <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <p className="text-sm text-gray-500">Collectors</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{overview.totals.collectors}</p>
+              <p className="text-xs text-gray-500">Listed: {overview.totals.listed} · Volume: {overview.totals.volume} ETH</p>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Image Upload */}
