@@ -13,6 +13,13 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 
 ## � Feature Highlights
 
+### 🏆 Engagement & Growth Pack (Days 15-17)
+- **Collector XP + Badges + Leaderboard** — XP from buys/sells/mints/listings, streak multipliers, tiered badges, and a combined XP + volume leaderboard to fuel “top 10” competition.
+- **Referral & Invite Links** — Per-user invite codes with tracked clicks, signups, referred volume, ETH kickbacks, and a “top referrers” widget.
+- **Drop Calendar + Allowlist Engine** — Scheduled drops with allowlist windows, countdowns, featured drops, and notify-by-email/webhook hooks.
+- **AI-Powered Recommendations** — “Because you collected X” carousel using tag overlap + popularity fallback.
+- **Safety & Trust Pack** — Provenance and verified-creator badges, suspicious-collection warnings, and transaction preflight trust signals.
+
 ### 🔍 Latest: Advanced Search & Discovery (Days 8-9)
 - **Advanced Filtering** - Price range, creator, rarity, verification status, listed status
 - **Smart Sorting** - Popularity, price (asc/desc), trending, newest/oldest

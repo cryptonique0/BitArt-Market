@@ -23,6 +23,7 @@ import searchRoutes from './routes/search';
 import verificationRoutes from './routes/verification';
 import followsRoutes from './routes/follows';
 import activityRoutes from './routes/activity';
+import engagementRoutes from './routes/engagement';
 
 const app: Express = express();
 const PORT = config.port;
@@ -115,6 +116,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/follows', followsRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/engagement', engagementRoutes);
 
 // ============================================
 // Error Handling Middleware

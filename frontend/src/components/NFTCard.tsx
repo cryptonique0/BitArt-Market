@@ -12,6 +12,9 @@ interface NFTCardProps {
   isTrending?: boolean;
   isFeatured?: boolean;
   isNew?: boolean;
+  selectable?: boolean;
+  selected?: boolean;
+  onSelect?: (checked: boolean) => void;
 }
 
 export const NFTCard: React.FC<NFTCardProps> = ({
@@ -21,10 +24,22 @@ export const NFTCard: React.FC<NFTCardProps> = ({
   showGasEstimate = true,
   isTrending = false,
   isFeatured = false,
-  isNew = false
+  isNew = false,
+  selectable = false,
+  selected = false,
+  onSelect
 }) => {
   return (
-    <div className="group rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-xl transition-all">
+    <div className="group rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-xl transition-all relative">
+      {selectable && (
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={e => onSelect?.(e.target.checked)}
+          className="absolute top-2 left-2 z-10 w-5 h-5 accent-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+          title="Select for bulk action"
+        />
+      )}
       {/* Image */}
       <Link to={`/nft/${nft.id}`} className="block relative overflow-hidden bg-gray-200 dark:bg-gray-700 h-48">
         <img

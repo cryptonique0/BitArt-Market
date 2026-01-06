@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from '../config/env';
+import { engagementService } from './engagement';
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -310,5 +311,6 @@ export default {
   marketplaceService,
   userService,
   analyticsService,
-  baseService
+  baseService,
+  engagementService
 };
