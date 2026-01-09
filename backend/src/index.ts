@@ -29,6 +29,15 @@ import followsRoutes from './routes/follows';
 import activityRoutes from './routes/activity';
 import engagementRoutes from './routes/engagement';
 
+// Supabase Database Routes
+import usersDbRoutes from './routes/users';
+import nftsDbRoutes from './routes/nfts';
+import auctionsDbRoutes from './routes/auctions';
+import transactionsDbRoutes from './routes/transactions';
+import notificationsDbRoutes from './routes/notifications';
+import collectionsDbRoutes from './routes/collections';
+import analyticsDbRoutes from './routes/analytics-db';
+
 const app: Express = express();
 const PORT = config.port;
 
@@ -143,6 +152,16 @@ app.use('/api/verification', verificationRoutes);
 app.use('/api/follows', followsRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/engagement', engagementRoutes);
+
+// Supabase Database API Routes
+app.use('/api/db/users', usersDbRoutes);
+app.use('/api/db/nfts', nftsDbRoutes);
+app.use('/api/db/auctions', auctionsDbRoutes);
+app.use('/api/db/transactions', transactionsDbRoutes);
+app.use('/api/db/notifications', notificationsDbRoutes);
+app.use('/api/db/collections', collectionsDbRoutes);
+app.use('/api/db/analytics', analyticsDbRoutes);
+
 // 404 Handler (must be after all routes)
 app.use(notFoundHandler);
 
