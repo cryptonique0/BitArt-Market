@@ -69,3 +69,13 @@ export {
   listNFTs,
   type NFTMetadata
 } from './nft';
+// Supabase Database Services
+export { UserService } from './user.service';
+export { NFTService } from './nft.service';
+export { TransactionService } from './transaction.service';
+export { AuctionService } from './auction.service';
+export { OfferService } from './offer.service';
+export { FollowService } from './follow.service';
+export { NotificationService } from './notification.service';
+export { CollectionService } from './collection.service';
+export { AnalyticsService } from './analytics.service';
