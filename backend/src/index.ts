@@ -8,6 +8,7 @@ import { getConfig } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 import { performanceMonitor, performanceHealthCheck } from './middleware/performance';
+import { securityHeaders, addCSRFToken } from './middleware/security';
 
 // Load environment variables
 dotenv.config();
@@ -38,12 +39,18 @@ const PORT = config.port;
 // Helmet for security headers
 app.use(helmet());
 
+// Additional security headers
+app.use(securityHeaders);
+
+// CSRF protection
+app.use(addCSRFToken);
+
 // CORS configuration
 app.use(cors({
   origin: config.allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token']
 }));
 
 // Rate limiting
@@ -101,6 +108,11 @@ app.get('/api/health', (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
     network: config.network
+  });
+});
+
+// Performance metrics
+app.get('/api/health/performance', performanceHealthCheck);
   });
 });
 
