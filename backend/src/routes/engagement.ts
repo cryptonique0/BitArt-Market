@@ -3,65 +3,51 @@ import { Router, Request, Response } from 'express';
 const router = Router();
 
 // Mocked XP + badge data (would be persisted in DB in production)
+// Mocked quest data
+const quests = [
+  {
+    id: 'quest-unique-creators',
+    title: 'Diversity Collector',
+    description: 'Buy from 3 unique creators in 48h',
+    rewardXp: 500,
+    badge: 'Diversity Champ',
+    expiresAt: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
+    progress: 2,
+    target: 3
+  },
+  {
+    id: 'quest-streak',
+    title: 'Streak Starter',
+    description: 'Buy or sell every day for 5 days',
+    rewardXp: 800,
+    badge: 'Streaker',
+    expiresAt: new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString(),
+    progress: 1,
+    target: 5
+  }
+];
+
+// Mocked social proof events
+const socialProof = [
+  { user: '0xA1ce9d...', action: 'bought', nft: 'Base Builders #777', time: '2m ago' },
+  { user: '0xB2c0ff...', action: 'minted', nft: 'Astro Bloom', time: '5m ago' },
+  { user: '0xC3a11f...', action: 'listed', nft: 'Pixel Paradise #99', time: '8m ago' }
+];
+
+// Mocked portfolio health
+const portfolioHealth = {
+  address: '0xYourAddress',
+  diversityScore: 78,
+  verifiedCollections: 4,
+  unrealizedPnL: 1.7,
+  tips: [
+    'Collect from more creators to boost your diversity score',
+    'List at least 1 NFT from a verified collection for a bonus',
+    'Sell an NFT above mint price to realize PnL'
+  ]
+};
+
 const leaderboard = [
-  // Mocked quest data
-  const quests = [
-    {
-      id: 'quest-unique-creators',
-      title: 'Diversity Collector',
-      description: 'Buy from 3 unique creators in 48h',
-      rewardXp: 500,
-      badge: 'Diversity Champ',
-      expiresAt: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
-      progress: 2,
-      target: 3
-    },
-    {
-      id: 'quest-streak',
-      title: 'Streak Starter',
-      description: 'Buy or sell every day for 5 days',
-      rewardXp: 800,
-      badge: 'Streaker',
-      expiresAt: new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString(),
-      progress: 1,
-      target: 5
-    }
-  ];
-
-  // Mocked social proof events
-  const socialProof = [
-    { user: '0xA1ce9d...', action: 'bought', nft: 'Base Builders #777', time: '2m ago' },
-    { user: '0xB2c0ff...', action: 'minted', nft: 'Astro Bloom', time: '5m ago' },
-    { user: '0xC3a11f...', action: 'listed', nft: 'Pixel Paradise #99', time: '8m ago' }
-  ];
-
-  // Mocked portfolio health
-  const portfolioHealth = {
-    address: '0xYourAddress',
-    diversityScore: 78,
-    verifiedCollections: 4,
-    unrealizedPnL: 1.7,
-    tips: [
-      'Collect from more creators to boost your diversity score',
-      'List at least 1 NFT from a verified collection for a bonus',
-      'Sell an NFT above mint price to realize PnL'
-    ]
-  };
-  // Quests endpoint
-  router.get('/quests', (_req: Request, res: Response) => {
-    res.json({ success: true, quests });
-  });
-
-  // Social proof events endpoint
-  router.get('/social-proof', (_req: Request, res: Response) => {
-    res.json({ success: true, events: socialProof });
-  });
-
-  // Portfolio health endpoint
-  router.get('/portfolio-health', (req: Request, res: Response) => {
-    // In real use, would use req.query.address
-    res.json({ success: true, health: portfolioHealth });
-  });
   {
     address: '0xA1ce9d8bF43c1F9d91B7cE45d7e6a12f3cA1b001',
     username: 'BaseWhale',

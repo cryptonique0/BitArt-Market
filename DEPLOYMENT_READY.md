@@ -1,4 +1,4 @@
-# 🚀 BitArt Market - Deployment Ready
+# BitArt Market - Deployment Ready
 
 ## Project Status: ✅ READY FOR PRODUCTION
 
@@ -48,7 +48,7 @@ BitArt Market/
 
 ---
 
-## 🎯 Deployment Steps (Next)
+## Deployment Steps (Next)
 
 ### STEP 1: Deploy Backend (Render)
 **Time: ~5-10 minutes**
@@ -144,7 +144,7 @@ VITE_API_URL=https://bitart-market-api.onrender.com  (update with actual URL)
 
 ---
 
-## 📦 Build Output Specifications
+## Build Output Specifications
 
 ### Backend
 ```
@@ -166,7 +166,7 @@ Dependencies: 10 production packages
 
 ---
 
-## 🔑 Required API Keys/Secrets
+## Required API Keys/Secrets
 
 You'll need to gather these before deployment:
 
@@ -186,7 +186,7 @@ You'll need to gather these before deployment:
 
 ---
 
-## 💾 Backup & Recovery
+## Backup & Recovery
 
 Before deployment, ensure:
 - [ ] All code is committed to GitHub
@@ -196,7 +196,7 @@ Before deployment, ensure:
 
 ---
 
-## 📊 Deployment Architecture
+## Deployment Architecture
 
 ```
 ┌─────────────────────────────────────────────┐
