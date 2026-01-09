@@ -23,7 +23,6 @@ export const LazyImage: React.FC<LazyImageProps> = ({
 }) => {
   const [imageSrc, setImageSrc] = useState(placeholder);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -56,7 +55,6 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   };
 
   const handleError = () => {
-    setHasError(true);
     setImageSrc(placeholder);
     onError?.();
   };
@@ -88,24 +86,19 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
   src,
   alt,
   className = '',
-  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  sizes,
   srcSet,
 }) => {
-  const defaultSrcSet = srcSet || `
-    ${src.replace('.', '-320w.')} 320w,
-    ${src.replace('.', '-640w.')} 640w,
-    ${src.replace('.', '-768w.')} 768w,
-    ${src.replace('.', '-1024w.')} 1024w,
-    ${src.replace('.', '-1280w.')} 1280w,
-    ${src.replace('.', '-1920w.')} 1920w
-  `;
-
+  // Note: This is a simplified version. In production, use proper srcSet
   return (
-    <LazyImage
-      src={src}
-      alt={alt}
-      className={className}
-    />
+    <picture>
+      {srcSet && <source srcSet={srcSet} sizes={sizes} />}
+      <LazyImage
+        src={src}
+        alt={alt}
+        className={className}
+      />
+    </picture>
   );
 };
 

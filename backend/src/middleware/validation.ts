@@ -15,7 +15,7 @@ export const validate = (schema: AnyZodObject) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const errors = error.errors.map(err => ({
+        const errors = error.errors.map((err: any) => ({
           field: err.path.join('.'),
           message: err.message,
         }));
@@ -44,7 +44,7 @@ export const validateBody = (schema: AnyZodObject) => {
         return res.status(400).json({
           success: false,
           error: 'Invalid request body',
-          details: error.errors.map(err => ({
+          details: error.errors.map((err: any) => ({
             field: err.path.join('.'),
             message: err.message,
           })),
@@ -68,7 +68,7 @@ export const validateQuery = (schema: AnyZodObject) => {
         return res.status(400).json({
           success: false,
           error: 'Invalid query parameters',
-          details: error.errors.map(err => ({
+          details: error.errors.map((err: any) => ({
             field: err.path.join('.'),
             message: err.message,
           })),
