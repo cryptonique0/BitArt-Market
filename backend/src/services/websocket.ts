@@ -16,7 +16,7 @@ class WebSocketService {
   initialize(server: http.Server) {
     this.wss = new WebSocket.Server({ server, path: '/ws' });
 
-    this.wss.on('connection', (ws: WebSocket, req) => {
+    this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
       const clientId = this.generateClientId();
       
       const client: Client = {
@@ -49,7 +49,7 @@ class WebSocketService {
         logger.info(`WebSocket client disconnected: ${clientId}`);
       });
 
-      ws.on('error', (error) => {
+      ws.on('error', (error: Error) => {
         logger.error(`WebSocket error for client ${clientId}:`, error);
       });
     });
