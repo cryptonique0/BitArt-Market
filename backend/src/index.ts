@@ -5,6 +5,8 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
 import { getConfig } from './config/env';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { logger } from './utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -71,8 +73,13 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // ============================================
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] ${req.method} ${req.path}`);
+  const startTime = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    logger.http(req, res, duration);
+  });
+  
   next();
 });
 
@@ -117,39 +124,11 @@ app.use('/api/verification', verificationRoutes);
 app.use('/api/follows', followsRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/engagement', engagementRoutes);
+// 404 Handler (must be after all routes)
+app.use(notFoundHandler);
 
-// ============================================
-// Error Handling Middleware
-// ============================================
-
-interface ErrorResponse {
-  error: string;
-  status: number;
-  message?: string;
-  timestamp: string;
-}
-
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  const timestamp = new Date().toISOString();
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
-
-  const errorResponse: ErrorResponse = {
-    error: err.name || 'Error',
-    status,
-    message,
-    timestamp
-  };
-
-  console.error(`[${timestamp}] Error: ${message}`, err);
-
-  res.status(status).json(errorResponse);
-});
-
-// 404 Handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    error: 'Not Found',
+// Global error handler (must be last)
+app.use(errorHandler   error: 'Not Found',
     status: 404,
     message: `Route ${req.method} ${req.path} not found`,
     timestamp: new Date().toISOString()

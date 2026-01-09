@@ -11,7 +11,11 @@
     "dev": "concurrently \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
     "build": "npm run build --workspace backend && npm run build --workspace frontend",
     "test": "npm run test --workspace backend && npm run test --workspace frontend",
-    "deploy-contracts": "cd contracts && npm run deploy"
+    "deploy-contracts": "cd contracts && npm run deploy",
+    "lint": "npm run lint --workspace backend && npm run lint --workspace frontend",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prepare": "husky install"
   },
   "keywords": [
     "nft",
@@ -23,7 +27,12 @@
   "author": "BitArt Team",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "concurrently": "^7.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1"
   },
   "dependencies": {}
 }
