@@ -7,6 +7,7 @@ import path from 'path';
 import { getConfig } from './config/env';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
+import { performanceMonitor, performanceHealthCheck } from './middleware/performance';
 
 // Load environment variables
 dotenv.config();
@@ -67,6 +68,12 @@ app.use('/api/upload/', uploadLimiter);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// ============================================
+// Performance Monitoring
+// ============================================
+
+app.use(performanceMonitor);
 
 // ============================================
 // Request Logging Middleware
