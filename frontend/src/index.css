@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Accessibility utilities */
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
+/* Focus visible improvements */
+@layer base {
+  *:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  }
+
+  /* Skip link styles */
+  .skip-link:focus {
+    @apply fixed top-4 left-4 z-50 bg-blue-600 text-white px-4 py-2 rounded shadow-lg;
+  }
+}
+
 * {
   @apply transition-colors duration-200;
 }
