@@ -72,6 +72,7 @@ import eventsRoutes from './routes/events';
 
 // Advanced Search Routes
 import searchAdvancedRoutes from './routes/search-advanced';
+import gamificationRoutes from './routes/gamification';
 
 // Event listener service
 import { eventListenerService } from './services/event-listener.service';
@@ -253,6 +254,7 @@ app.use('/api/db/analytics', analyticsDbRoutes);
 
 // Advanced Analytics Routes
 app.use('/api/advanced-analytics', advancedAnalyticsRoutes);
+app.use('/api/gamification', gamificationRoutes);
 
 // Admin Routes (protected with admin role)
 app.use('/api/admin', adminRoutes);
