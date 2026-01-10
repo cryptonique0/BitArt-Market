@@ -33,6 +33,7 @@ import followsRoutes from './routes/follows';
 import activityRoutes from './routes/activity';
 import engagementRoutes from './routes/engagement';
 import authRoutes from './routes/auth';
+import profileRoutes from './routes/profile';
 
 // Supabase Database Routes
 import usersDbRoutes from './routes/users';
@@ -198,6 +199,7 @@ app.use('/api/base', baseRoutes);
 app.use('/api/royalties', royaltiesRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/verification', verificationRoutes);
+app.use('/api/profile', profileRoutes);
 app.use('/api/follows', followsRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/engagement', engagementRoutes);
