@@ -53,6 +53,9 @@ import adminRoutes from './routes/admin';
 import mintingRoutes from './routes/minting';
 import eventsRoutes from './routes/events';
 
+// Advanced Search Routes
+import searchAdvancedRoutes from './routes/search-advanced';
+
 // Event listener service
 import { eventListenerService } from './services/event-listener.service';
 
@@ -218,6 +221,9 @@ app.use('/api/admin', adminRoutes);
 // Blockchain Routes
 app.use('/api/minting', mintingRoutes);
 app.use('/api/events', eventsRoutes);
+
+// Advanced Search Routes
+app.use('/api/search-advanced', searchAdvancedRoutes);
 
 // 404 Handler (must be after all routes)
 app.use(notFoundHandler);
