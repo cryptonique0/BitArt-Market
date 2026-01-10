@@ -42,6 +42,9 @@ import analyticsDbRoutes from './routes/analytics-db';
 // Advanced Analytics Routes
 import advancedAnalyticsRoutes from './routes/advanced-analytics';
 
+// Admin Routes
+import adminRoutes from './routes/admin';
+
 const app: Express = express();
 const PORT = config.port;
 
@@ -167,6 +170,9 @@ app.use('/api/db/analytics', analyticsDbRoutes);
 
 // Advanced Analytics Routes
 app.use('/api/advanced-analytics', advancedAnalyticsRoutes);
+
+// Admin Routes (protected with admin role)
+app.use('/api/admin', adminRoutes);
 
 // 404 Handler (must be after all routes)
 app.use(notFoundHandler);

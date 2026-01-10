@@ -14,6 +14,7 @@ import RoyaltiesDashboard from './pages/RoyaltiesDashboard';
 import { StudioPage } from './pages/StudioPage';
 import AuthPage from './pages/Auth';
 import AnalyticsPage from './pages/Analytics';
+import AdminDashboard from './pages/Admin';
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -45,6 +46,7 @@ function App() {
               <Route path="/studio" element={<StudioPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/admin" element={<AdminDashboard />} />
             </Routes>
             <NotificationContainer />
           </div>

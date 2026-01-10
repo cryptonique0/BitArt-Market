@@ -82,3 +82,6 @@ export { AnalyticsService } from './analytics.service';
 
 // Advanced Analytics Service
 export { AdvancedAnalyticsService } from './advanced-analytics.service';
+
+// Admin Service
+export { AdminService } from './admin.service';
