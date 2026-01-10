@@ -10,6 +10,9 @@ import { FollowButton } from '../components/FollowButton';
 import { ActivityFeed } from '../components/ActivityFeed';
 import { Skeleton, CommentSkeleton } from '../components/SkeletonLoader';
 import { NoCommentsFound } from '../components/EmptyState';
+import WishlistButton from '../components/wishlist/WishlistButton';
+import CollectionsManager from '../components/collections/CollectionsManager';
+import PriceAlertForm from '../components/alerts/PriceAlertForm';
 
 export const NFTDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -284,14 +287,16 @@ export const NFTDetailPage: React.FC = () => {
               >
                 {liked ? 'Liked' : 'Like'} · {likes}
               </Button>
-              <Button
-                onClick={handleToggleFavorite}
-                variant={isFavorite ? 'primary' : 'outline'}
-                size="md"
-                className="flex-1"
-              >
-                {isFavorite ? 'Favorited' : 'Favorite'}
-              </Button>
+              <WishlistButton nftId={id || ''} nftName={nft.name} nftImage={nft.image} />
+            </div>
+
+            <div className="mt-6 space-y-6">
+              <PriceAlertForm nftId={id || ''} />
+              <CollectionsManager
+                initialNftId={id || ''}
+                initialNftName={nft.name}
+                initialNftImage={nft.image}
+              />
             </div>
           </div>
         </div>
