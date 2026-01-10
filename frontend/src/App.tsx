@@ -15,6 +15,9 @@ import { StudioPage } from './pages/StudioPage';
 import AuthPage from './pages/Auth';
 import AnalyticsPage from './pages/Analytics';
 import AdminDashboard from './pages/Admin';
+import { MintNFT } from './components/MintNFT';
+import { AuctionSystem } from './components/AuctionSystem';
+import { TransactionTracker } from './components/TransactionTracker';
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -47,6 +50,9 @@ function App() {
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/mint" element={<MintNFT />} />
+              <Route path="/auctions" element={<AuctionSystem />} />
+              <Route path="/transactions" element={<TransactionTracker />} />
             </Routes>
             <NotificationContainer />
           </div>

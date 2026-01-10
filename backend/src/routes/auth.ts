@@ -12,8 +12,43 @@ import { logger } from '../utils/logger';
 const router = Router();
 
 /**
- * GET /api/auth/nonce?address=0x...
- * Generate nonce for wallet signature
+ * @swagger
+ * /api/auth/nonce:
+ *   get:
+ *     tags:
+ *       - Authentication
+ *     summary: Generate nonce for wallet signature
+ *     description: Request a nonce to sign with MetaMask for wallet authentication
+ *     parameters:
+ *       - in: query
+ *         name: address
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Wallet address (0x...)
+ *         example: "0x1234567890123456789012345678901234567890"
+ *     responses:
+ *       200:
+ *         description: Nonce generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 address:
+ *                   type: string
+ *                 nonce:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 address: "0x1234567890123456789012345678901234567890"
+ *                 nonce: "abc123def456"
+ *                 message: "Sign in to BitArt Market\n\nNonce: abc123def456"
+ *       400:
+ *         description: Missing wallet address
+ *       500:
+ *         description: Server error
  */
 router.get('/nonce', async (req: Request, res: Response) => {
   try {
@@ -33,8 +68,52 @@ router.get('/nonce', async (req: Request, res: Response) => {
 });
 
 /**
- * POST /api/auth/verify
- * Verify signature and issue app JWT
+ * @swagger
+ * /api/auth/verify:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Verify wallet signature and issue JWT
+ *     description: Submit signed message to get app JWT token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - address
+ *               - signature
+ *             properties:
+ *               address:
+ *                 type: string
+ *                 description: Wallet address
+ *               signature:
+ *                 type: string
+ *                 description: Signed message from MetaMask
+ *           example:
+ *             address: "0x1234567890123456789012345678901234567890"
+ *             signature: "0x7f7c6b5a..."
+ *     responses:
+ *       200:
+ *         description: Signature verified, JWT issued
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for authenticated requests
+ *                 userId:
+ *                   type: string
+ *                   format: uuid
+ *       400:
+ *         description: Missing address or signature
+ *       401:
+ *         description: Invalid signature
+ *       500:
+ *         description: Server error
  */
 router.post('/verify', async (req: Request, res: Response) => {
   try {
@@ -54,8 +133,28 @@ router.post('/verify', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/auth/me
- * Return current user via App JWT or Supabase JWT
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     tags:
+ *       - Authentication
+ *     summary: Get current user (App JWT)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get('/me', requireAppJWT, async (req: Request, res: Response) => {
   try {
@@ -67,8 +166,28 @@ router.get('/me', requireAppJWT, async (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/auth/me/supabase
- * Return current user via Supabase JWT
+ * @swagger
+ * /api/auth/me/supabase:
+ *   get:
+ *     tags:
+ *       - Authentication
+ *     summary: Get current user (Supabase JWT)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user profile from Supabase
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get('/me/supabase', requireSupabaseAuth, async (req: Request, res: Response) => {
   try {

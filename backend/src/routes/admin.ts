@@ -14,8 +14,42 @@ const router = Router();
 router.use(requireAppJWT, requireRole(['admin']));
 
 /**
- * GET /api/admin/stats
- * Get admin dashboard statistics
+ * @swagger
+ * /api/admin/stats:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get admin dashboard statistics
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Admin stats
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalUsers:
+ *                   type: number
+ *                 bannedUsers:
+ *                   type: number
+ *                 suspendedUsers:
+ *                   type: number
+ *                 moderationCases:
+ *                   type: number
+ *                 totalAdminActions:
+ *                   type: number
+ *               example:
+ *                 totalUsers: 1250
+ *                 bannedUsers: 15
+ *                 suspendedUsers: 8
+ *                 moderationCases: 23
+ *                 totalAdminActions: 156
+ *       401:
+ *         description: Unauthorized (not admin)
+ *       500:
+ *         description: Server error
  */
 router.get('/stats', async (req: Request, res: Response) => {
   try {
@@ -28,8 +62,38 @@ router.get('/stats', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/admin/users
- * Get all users with status
+ * @swagger
+ * /api/admin/users:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get all users with status
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *           default: 50
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: number
+ *           default: 0
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get('/users', async (req: Request, res: Response) => {
   try {

@@ -296,4 +296,78 @@ export class AuctionService {
       return [];
     }
   }
+
+  /**
+   * Settle auction after end time with on-chain settlement
+   */
+  static async settleAuctionWithBlockchain(
+    auctionId: string,
+    settlementTxHash: string
+  ): Promise<Auction | null> {
+    try {
+      const { data, error } = await supabase
+        .from('auctions')
+        .update({
+          status: 'settled',
+          settlement_tx_hash: settlementTxHash,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', auctionId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      logger.info(`Settled auction ${auctionId} with tx ${settlementTxHash}`);
+      return data;
+    } catch (error) {
+      logger.error('Error settling auction:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get auction statistics for dashboard
+   */
+  static async getAuctionStats(): Promise<{
+    activeAuctions: number;
+    totalAuctions: number;
+    totalBids: number;
+    settlementRate: string;
+  }> {
+    try {
+      const [active, total, bids] = await Promise.all([
+        supabase
+          .from('auctions')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'active'),
+        supabase
+          .from('auctions')
+          .select('id', { count: 'exact', head: true }),
+        supabase
+          .from('bids')
+          .select('id', { count: 'exact', head: true }),
+      ]);
+
+      const activeCount = active.count || 0;
+      const totalCount = total.count || 0;
+      const settlementRate = totalCount > 0 
+        ? ((activeCount / totalCount) * 100).toFixed(2)
+        : '0';
+
+      return {
+        activeAuctions: activeCount,
+        totalAuctions: totalCount,
+        totalBids: bids.count || 0,
+        settlementRate,
+      };
+    } catch (error) {
+      logger.error('Error getting auction stats:', error);
+      return {
+        activeAuctions: 0,
+        totalAuctions: 0,
+        totalBids: 0,
+        settlementRate: '0',
+      };
+    }
+  }
 }

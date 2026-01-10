@@ -4,7 +4,9 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
+import swaggerUi from 'swagger-ui-express';
 import { getConfig } from './config/env';
+import { swaggerSpec } from './config/swagger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 import { performanceMonitor, performanceHealthCheck } from './middleware/performance';
@@ -44,6 +46,9 @@ import advancedAnalyticsRoutes from './routes/advanced-analytics';
 
 // Admin Routes
 import adminRoutes from './routes/admin';
+
+// Blockchain Routes
+import mintingRoutes from './routes/minting';
 
 const app: Express = express();
 const PORT = config.port;
@@ -130,6 +135,27 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Performance metrics
 app.get('/api/health/performance', performanceHealthCheck);
 
+// ============================================
+// Swagger/OpenAPI Documentation
+// ============================================
+
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
+  swaggerOptions: {
+    url: '/api-docs.json',
+    defaultModelsExpandDepth: 1,
+    defaultModelExpandDepth: 1,
+    docExpansion: 'list',
+    filter: true,
+    showRequestHeaders: true,
+  }
+}));
+
+app.get('/api-docs.json', (req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // Root route for quick info
 app.get('/', (_req: Request, res: Response) => {
   res.json({
@@ -173,6 +199,9 @@ app.use('/api/advanced-analytics', advancedAnalyticsRoutes);
 
 // Admin Routes (protected with admin role)
 app.use('/api/admin', adminRoutes);
+
+// Blockchain Routes
+app.use('/api/minting', mintingRoutes);
 
 // 404 Handler (must be after all routes)
 app.use(notFoundHandler);

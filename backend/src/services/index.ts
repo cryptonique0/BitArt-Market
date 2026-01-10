@@ -85,3 +85,8 @@ export { AdvancedAnalyticsService } from './advanced-analytics.service';
 
 // Admin Service
 export { AdminService } from './admin.service';
+
+// Blockchain Services
+export { BlockchainService } from './blockchain.service';
+export { TransactionTrackerService } from './transaction-tracker.service';
+export { NFTMintingService } from './minting.service';

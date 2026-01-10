@@ -164,4 +164,183 @@ router.get('/stats/user/:userId', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/transactions/track:
+ *   post:
+ *     summary: Track a new blockchain transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               hash:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *                 enum: [mint, bid, buy, sell, list]
+ *               relatedId:
+ *                 type: string
+ *               amount:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Transaction created
+ */
+router.post('/track', async (req: Request, res: Response) => {
+  try {
+    const { hash, type, relatedId, amount } = req.body;
+    const userId = (req as any).user?.id;
+
+    if (!hash || !type) {
+      return res.status(400).json({ error: 'Missing hash or type' });
+    }
+
+    // Import here to avoid circular dependency
+    const { TransactionTrackerService } = await import('../services/transaction-tracker.service');
+    const trackerService = new TransactionTrackerService();
+
+    const transaction = await trackerService.createTransaction({
+      hash,
+      userId,
+      type,
+      relatedId,
+      amount,
+      status: 'pending',
+    });
+
+    // Start polling in background
+    trackerService.watchTransaction(hash).catch((err) => {
+      logger.error('Watch transaction error:', err);
+    });
+
+    res.status(201).json(transaction);
+  } catch (error) {
+    logger.error('Track transaction error:', error);
+    res.status(500).json({ error: 'Failed to track transaction' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/transactions/:hash/status:
+ *   get:
+ *     summary: Get blockchain transaction status
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: hash
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Transaction details
+ */
+router.get('/:hash/status', async (req: Request, res: Response) => {
+  try {
+    const { hash } = req.params;
+
+    // Import here to avoid circular dependency
+    const { TransactionTrackerService } = await import('../services/transaction-tracker.service');
+    const trackerService = new TransactionTrackerService();
+
+    const transaction = await trackerService.getTransaction(hash);
+
+    if (!transaction) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    res.json(transaction);
+  } catch (error) {
+    logger.error('Get transaction error:', error);
+    res.status(500).json({ error: 'Failed to fetch transaction' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/transactions/user/:userId/blockchain:
+ *   get:
+ *     summary: Get user's blockchain transactions
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *           default: 50
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: number
+ *           default: 0
+ *     responses:
+ *       200:
+ *         description: User blockchain transactions
+ */
+router.get('/user/:userId/blockchain', async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { limit = 50, offset = 0 } = req.query;
+
+    // Import here to avoid circular dependency
+    const { TransactionTrackerService } = await import('../services/transaction-tracker.service');
+    const trackerService = new TransactionTrackerService();
+
+    const transactions = await trackerService.getUserTransactions(
+      userId,
+      Number(limit),
+      Number(offset)
+    );
+
+    res.json(transactions);
+  } catch (error) {
+    logger.error('User transactions error:', error);
+    res.status(500).json({ error: 'Failed to fetch transactions' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/transactions/user/:userId/summary:
+ *   get:
+ *     summary: Get user blockchain transaction summary
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Transaction summary
+ */
+router.get('/user/:userId/summary', async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    // Import here to avoid circular dependency
+    const { TransactionTrackerService } = await import('../services/transaction-tracker.service');
+    const trackerService = new TransactionTrackerService();
+
+    const summary = await trackerService.getTransactionSummary(userId);
+    res.json(summary);
+  } catch (error) {
+    logger.error('Summary error:', error);
+    res.status(500).json({ error: 'Failed to fetch summary' });
+  }
+});
+
 export default router;

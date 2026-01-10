@@ -12,8 +12,36 @@ import { supabase } from '../config/supabase';
 const router = Router();
 
 /**
- * GET /api/analytics/dashboard
- * Get dashboard overview metrics
+ * @swagger
+ * /api/advanced-analytics/dashboard:
+ *   get:
+ *     tags:
+ *       - Analytics
+ *     summary: Get dashboard overview metrics
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Dashboard metrics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalVolume:
+ *                   type: number
+ *                 totalTransactions:
+ *                   type: number
+ *                 totalNFTsSold:
+ *                   type: number
+ *                 averagePrice:
+ *                   type: number
+ *       500:
+ *         description: Server error
  */
 router.get('/dashboard', async (req: Request, res: Response) => {
   try {
@@ -32,8 +60,30 @@ router.get('/dashboard', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/analytics/market
- * Get market overview metrics
+ * @swagger
+ * /api/advanced-analytics/market:
+ *   get:
+ *     tags:
+ *       - Analytics
+ *     summary: Get market overview metrics
+ *     responses:
+ *       200:
+ *         description: Market metrics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 volume24h:
+ *                   type: number
+ *                 transactions24h:
+ *                   type: number
+ *                 listedNFTs:
+ *                   type: number
+ *                 totalCollections:
+ *                   type: number
+ *       500:
+ *         description: Server error
  */
 router.get('/market', async (req: Request, res: Response) => {
   try {
@@ -46,8 +96,22 @@ router.get('/market', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/analytics/volume
- * Get volume metrics for charts
+ * @swagger
+ * /api/advanced-analytics/volume:
+ *   get:
+ *     tags:
+ *       - Analytics
+ *     summary: Get volume metrics for charts
+ *     parameters:
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [daily, weekly, monthly]
+ *           default: weekly
+ *     responses:
+ *       200:
+ *         description: Volume metrics
  */
 router.get('/volume', async (req: Request, res: Response) => {
   try {
