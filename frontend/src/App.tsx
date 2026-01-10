@@ -25,6 +25,7 @@ import CollectionDetailPage from './pages/CollectionDetailPage';
 import BulkOperations from './pages/BulkOperations';
 import { UIShowcase } from './pages/UIShowcase';
 import NFTDisplayShowcase from './pages/NFTDisplayShowcase';
+import GamificationPage from './pages/GamificationPage';
 import { MintNFT } from './components/MintNFT';
 import { AuctionSystem } from './components/AuctionSystem';
 import { TransactionTracker } from './components/TransactionTracker';
