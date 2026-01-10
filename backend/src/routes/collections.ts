@@ -4,6 +4,7 @@
  */
 
 import { Router, Request, Response } from 'express';
+import { requireAppJWT, requireRole } from '../middleware/auth';
 import { CollectionService } from '../services/collection.service';
 import { logger } from '../utils/logger';
 
@@ -116,7 +117,7 @@ router.get('/creator/:creatorId', async (req: Request, res: Response) => {
  * POST /api/collections
  * Create collection
  */
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', requireAppJWT, requireRole(['creator', 'admin']), async (req: Request, res: Response) => {
   try {
     const { creatorId, name, description, imageUrl, bannerUrl } = req.body;
 
@@ -150,7 +151,7 @@ router.post('/', async (req: Request, res: Response) => {
  * PUT /api/collections/:collectionId
  * Update collection
  */
-router.put('/:collectionId', async (req: Request, res: Response) => {
+router.put('/:collectionId', requireAppJWT, requireRole(['creator', 'admin']), async (req: Request, res: Response) => {
   try {
     const { collectionId } = req.params;
     const { name, description, imageUrl, bannerUrl } = req.body;
@@ -177,7 +178,7 @@ router.put('/:collectionId', async (req: Request, res: Response) => {
  * POST /api/collections/:collectionId/refresh-stats
  * Refresh collection statistics
  */
-router.post('/:collectionId/refresh-stats', async (req: Request, res: Response) => {
+router.post('/:collectionId/refresh-stats', requireAppJWT, requireRole(['admin']), async (req: Request, res: Response) => {
   try {
     const { collectionId } = req.params;
 

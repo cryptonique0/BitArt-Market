@@ -44,6 +44,7 @@ interface EnvConfig {
 
   // Security
   apiSecretKey?: string;
+  jwtSecret: string;
 }
 
 /**
@@ -148,6 +149,7 @@ export function validateEnv(): EnvConfig {
     },
 
     apiSecretKey: process.env.API_SECRET_KEY,
+    jwtSecret: getOptionalEnv('JWT_SECRET', isDev ? 'dev_jwt_secret' : ''),
   };
 }
 

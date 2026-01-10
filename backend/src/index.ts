@@ -28,6 +28,7 @@ import verificationRoutes from './routes/verification';
 import followsRoutes from './routes/follows';
 import activityRoutes from './routes/activity';
 import engagementRoutes from './routes/engagement';
+import authRoutes from './routes/auth';
 
 // Supabase Database Routes
 import usersDbRoutes from './routes/users';
@@ -125,8 +126,6 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 // Performance metrics
 app.get('/api/health/performance', performanceHealthCheck);
-  });
-});
 
 // Root route for quick info
 app.get('/', (_req: Request, res: Response) => {
@@ -155,6 +154,7 @@ app.use('/api/verification', verificationRoutes);
 app.use('/api/follows', followsRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/engagement', engagementRoutes);
+app.use('/api/auth', authRoutes);
 
 // Supabase Database API Routes
 app.use('/api/db/users', usersDbRoutes);
@@ -172,12 +172,7 @@ app.use('/api/advanced-analytics', advancedAnalyticsRoutes);
 app.use(notFoundHandler);
 
 // Global error handler (must be last)
-app.use(errorHandler   error: 'Not Found',
-    status: 404,
-    message: `Route ${req.method} ${req.path} not found`,
-    timestamp: new Date().toISOString()
-  });
-});
+app.use(errorHandler);
 
 // ============================================
 // Server Startup

@@ -15,6 +15,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.42.0",
     "@stacks/connect": "^7.0.0",
     "@stacks/network": "^7.0.0",
     "@stacks/transactions": "^6.0.0",
@@ -25,6 +26,7 @@
     "i18next": "^23.7.6",
     "i18next-browser-languagedetector": "^7.2.0",
     "isomorphic-dompurify": "^2.9.0",
+    "nodemailer": "7.0.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet-async": "^2.0.4",
@@ -41,7 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "@vitejs/plugin-react": "^4.2.0",
-    "@vitest/ui": "^1.0.4",
+    "@vitest/ui": "^4.0.16",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -54,7 +56,7 @@
     "prettier": "^3.1.1",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.3.3",
-    "vite": "^5.0.7",
-    "vitest": "^1.0.4"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.16"
   }
 }
