@@ -16,6 +16,9 @@ import AuthPage from './pages/Auth';
 import AnalyticsPage from './pages/Analytics';
 import AdminDashboard from './pages/Admin';
 import TransactionHistoryPage from './pages/TransactionHistoryPage';
+import WishlistPage from './pages/WishlistPage';
+import CollectionsPage from './pages/CollectionsPage';
+import CollectionDetailPage from './pages/CollectionDetailPage';
 import { MintNFT } from './components/MintNFT';
 import { AuctionSystem } from './components/AuctionSystem';
 import { TransactionTracker } from './components/TransactionTracker';
@@ -53,6 +56,9 @@ function App() {
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/transaction-history" element={<TransactionHistoryPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="/collections" element={<CollectionsPage />} />
+              <Route path="/collections/:collectionId" element={<CollectionDetailPage />} />
               <Route path="/mint" element={<MintNFT />} />
               <Route path="/auctions" element={<AuctionSystem />} />
               <Route path="/transactions" element={<TransactionTracker />} />

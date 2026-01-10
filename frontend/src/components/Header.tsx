@@ -87,6 +87,22 @@ export const Header: React.FC = () => {
                 📜 History
               </Link>
             )}
+            {isConnected && (
+              <Link
+                to="/wishlist"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-1"
+              >
+                ⭐ Wishlist
+              </Link>
+            )}
+            {isConnected && (
+              <Link
+                to="/collections"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-1"
+              >
+                📁 Collections
+              </Link>
+            )}
           </nav>
 
           {/* Right side */}

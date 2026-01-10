@@ -13,6 +13,8 @@ import { NoCommentsFound } from '../components/EmptyState';
 import WishlistButton from '../components/wishlist/WishlistButton';
 import CollectionsManager from '../components/collections/CollectionsManager';
 import PriceAlertForm from '../components/alerts/PriceAlertForm';
+import OfferModal from '../components/offers/OfferModal';
+import OfferHistory from '../components/offers/OfferHistory';
 
 export const NFTDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -75,24 +77,9 @@ export const NFTDetailPage: React.FC = () => {
       addNotification({
         type: 'error',
         title: 'Not Connected',
-        message: 'Please connect your wallet to purchase'
+        message: 'Please connect your wallet to make offers'
       });
       return;
-    }
-
-    try {
-      // TODO: Implement actual purchase logic
-      addNotification({
-        type: 'success',
-        title: 'Purchase Initiated',
-        message: 'Your purchase is being processed. Check your wallet for confirmation.'
-      });
-    } catch (error: any) {
-      addNotification({
-        type: 'error',
-        title: 'Purchase Failed',
-        message: error.message
-      });
     }
   };
 
@@ -270,14 +257,7 @@ export const NFTDetailPage: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <Button
-              onClick={handleBuy}
-              variant="primary"
-              size="lg"
-              className="w-full mb-4"
-            >
-              Make an Offer
-            </Button>
+            <OfferModal nftId={id || ''} />
             <div className="flex items-center gap-3">
               <Button
                 onClick={handleToggleLike}
@@ -390,6 +370,9 @@ export const NFTDetailPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Offer History */}
+        <OfferHistory nftId={id || ''} />
       </div>
     </div>
   );

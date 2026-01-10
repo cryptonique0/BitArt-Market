@@ -38,6 +38,7 @@ import wishlistRoutes from './routes/wishlist';
 import userCollectionsRoutes from './routes/user-collections';
 import alertsRoutes from './routes/alerts';
 import transactionHistoryRoutes from './routes/transaction-history';
+import offersRoutes from './routes/offers';
 
 // Supabase Database Routes
 import usersDbRoutes from './routes/users';
@@ -213,6 +214,8 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/user-collections', userCollectionsRoutes);
 // Price Alerts
 app.use('/api/alerts', alertsRoutes);
+// Offers
+app.use('/api/offers', offersRoutes);
 
 // Transaction History Routes
 app.use('/api/transactions', transactionHistoryRoutes);
