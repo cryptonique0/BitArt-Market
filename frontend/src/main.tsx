@@ -5,6 +5,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx';
 import './index.css';
 import { analyticsService } from './services/google-analytics.service';
+import { initMonitoring } from './services/monitoring';
+import { startPerfMetrics } from './services/perf';
+import { featureFlags } from './services/featureFlags';
 
 const queryClient = new QueryClient();
 
@@ -14,6 +17,15 @@ analyticsService.init({
   measurementId: measurementId,
   debug: import.meta.env.DEV
 });
+
+// Initialize Monitoring (Sentry, LogRocket)
+initMonitoring();
+
+// Initialize Feature Flags (LaunchDarkly/Flagsmith)
+featureFlags.init();
+
+// Start Web Vitals collection
+startPerfMetrics();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
