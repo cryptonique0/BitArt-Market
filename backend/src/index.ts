@@ -34,6 +34,10 @@ import activityRoutes from './routes/activity';
 import engagementRoutes from './routes/engagement';
 import authRoutes from './routes/auth';
 import profileRoutes from './routes/profile';
+import wishlistRoutes from './routes/wishlist';
+import userCollectionsRoutes from './routes/user-collections';
+import alertsRoutes from './routes/alerts';
+import transactionHistoryRoutes from './routes/transaction-history';
 
 // Supabase Database Routes
 import usersDbRoutes from './routes/users';
@@ -204,6 +208,14 @@ app.use('/api/royalties', royaltiesRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/profile', profileRoutes);
+// Wishlist & Collections
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/user-collections', userCollectionsRoutes);
+// Price Alerts
+app.use('/api/alerts', alertsRoutes);
+
+// Transaction History Routes
+app.use('/api/transactions', transactionHistoryRoutes);
 app.use('/api/follows', followsRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/engagement', engagementRoutes);

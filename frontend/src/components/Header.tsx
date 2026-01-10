@@ -79,6 +79,14 @@ export const Header: React.FC = () => {
             >
               Studio
             </Link>
+            {isConnected && (
+              <Link
+                to="/transaction-history"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-1"
+              >
+                📜 History
+              </Link>
+            )}
           </nav>
 
           {/* Right side */}
