@@ -49,6 +49,7 @@ import advancedAnalyticsRoutes from './routes/advanced-analytics';
 
 // Admin Routes
 import adminRoutes from './routes/admin';
+import adminVerificationRoutes from './routes/admin-verification';
 
 // Blockchain Routes
 import mintingRoutes from './routes/minting';
@@ -59,6 +60,9 @@ import searchAdvancedRoutes from './routes/search-advanced';
 
 // Event listener service
 import { eventListenerService } from './services/event-listener.service';
+
+// Achievement service for auto-initialization
+import { AchievementsService } from './services/achievements.service';
 
 const app: Express = express();
 const httpServer = createServer(app);
@@ -219,6 +223,7 @@ app.use('/api/advanced-analytics', advancedAnalyticsRoutes);
 
 // Admin Routes (protected with admin role)
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin', adminVerificationRoutes);
 
 // Blockchain Routes
 app.use('/api/minting', mintingRoutes);
@@ -241,6 +246,15 @@ app.use(errorHandler);
 eventListenerService.initialize(io).catch((error) => {
   logger.error('Failed to initialize event listener service:', error);
 });
+
+// Initialize achievements (one-time setup)
+AchievementsService.initializeAchievements()
+  .then(() => {
+    logger.info('✅ Achievements initialized successfully');
+  })
+  .catch((error) => {
+    logger.warn('⚠️ Achievement initialization failed (may already be initialized):', error.message);
+  });
 
 httpServer.listen(PORT, () => {
   console.log(`

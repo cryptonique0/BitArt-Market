@@ -10,6 +10,15 @@ import { ActivityFeed } from '../components/ActivityFeed';
 import { ProfileSkeleton } from '../components/SkeletonLoader';
 import { NoNFTsFound } from '../components/EmptyState';
 
+// New Profile Enhancement Components
+import {
+  ProfileEditor,
+  PortfolioDashboard,
+  TradingStatistics,
+  AchievementsBadges,
+  VerificationRequestForm,
+} from '../components/profile';
+
 export const ProfilePage: React.FC = () => {
   const { address } = useParams();
   const { user } = useWallet();
@@ -127,6 +136,18 @@ export const ProfilePage: React.FC = () => {
         {/* Tabs */}
         <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
           <div className="flex gap-8">
+            {user.address === address && (
+              <button
+                onClick={() => setActiveTab('editor')}
+                className={`py-4 font-semibold border-b-2 transition-colors ${
+                  activeTab === 'editor'
+                    ? 'border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Edit Profile
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('owned')}
               className={`py-4 font-semibold border-b-2 transition-colors ${
@@ -148,6 +169,36 @@ export const ProfilePage: React.FC = () => {
               Created
             </button>
             <button
+              onClick={() => setActiveTab('portfolio')}
+              className={`py-4 font-semibold border-b-2 transition-colors ${
+                activeTab === 'portfolio'
+                  ? 'border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Portfolio
+            </button>
+            <button
+              onClick={() => setActiveTab('trading')}
+              className={`py-4 font-semibold border-b-2 transition-colors ${
+                activeTab === 'trading'
+                  ? 'border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Trading Stats
+            </button>
+            <button
+              onClick={() => setActiveTab('achievements')}
+              className={`py-4 font-semibold border-b-2 transition-colors ${
+                activeTab === 'achievements'
+                  ? 'border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Achievements
+            </button>
+            <button
               onClick={() => setActiveTab('activity')}
               className={`py-4 font-semibold border-b-2 transition-colors ${
                 activeTab === 'activity'
@@ -162,6 +213,38 @@ export const ProfilePage: React.FC = () => {
 
         {/* Content */}
         <div className="pb-12">
+          {activeTab === 'editor' && user.address === address && (
+            <div className="max-w-4xl mx-auto">
+              <ProfileEditor userId={address || ''} />
+              
+              {/* Verification Request Section */}
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                  Request Verification
+                </h2>
+                <VerificationRequestForm />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'portfolio' && (
+            <div className="max-w-6xl mx-auto">
+              <PortfolioDashboard userId={address || ''} />
+            </div>
+          )}
+
+          {activeTab === 'trading' && (
+            <div className="max-w-6xl mx-auto">
+              <TradingStatistics userId={address || ''} />
+            </div>
+          )}
+
+          {activeTab === 'achievements' && (
+            <div className="max-w-6xl mx-auto">
+              <AchievementsBadges userId={address || ''} />
+            </div>
+          )}
+
           {activeTab === 'owned' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {nfts.length === 0 ? (

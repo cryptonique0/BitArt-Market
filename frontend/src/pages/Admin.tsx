@@ -4,6 +4,7 @@ import UserManagement from '../components/admin/UserManagement';
 import ModerateNFT from '../components/admin/ModerateNFT';
 import TransactionMonitor from '../components/admin/TransactionMonitor';
 import SystemSettings from '../components/admin/SystemSettings';
+import VerificationManagement from '../components/admin/VerificationManagement';
 
 interface TabConfig {
   id: string;
@@ -14,6 +15,7 @@ interface TabConfig {
 const TABS: TabConfig[] = [
   { id: 'analytics', label: 'Analytics', icon: '📊' },
   { id: 'users', label: 'Users', icon: '👥' },
+  { id: 'verification', label: 'Verification', icon: '✅' },
   { id: 'moderation', label: 'Moderation', icon: '🖼️' },
   { id: 'transactions', label: 'Transactions', icon: '💰' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
@@ -89,6 +91,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'analytics' && <PlatformAnalytics />}
         {activeTab === 'users' && <UserManagement onUserAction={handleUserAction} />}
+        {activeTab === 'verification' && <VerificationManagement />}
         {activeTab === 'moderation' && <ModerateNFT onModerate={handleModerate} />}
         {activeTab === 'transactions' && <TransactionMonitor />}
         {activeTab === 'settings' && <SystemSettings />}
