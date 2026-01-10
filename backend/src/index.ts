@@ -38,6 +38,9 @@ import notificationsDbRoutes from './routes/notifications';
 import collectionsDbRoutes from './routes/collections';
 import analyticsDbRoutes from './routes/analytics-db';
 
+// Advanced Analytics Routes
+import advancedAnalyticsRoutes from './routes/advanced-analytics';
+
 const app: Express = express();
 const PORT = config.port;
 
@@ -161,6 +164,9 @@ app.use('/api/db/transactions', transactionsDbRoutes);
 app.use('/api/db/notifications', notificationsDbRoutes);
 app.use('/api/db/collections', collectionsDbRoutes);
 app.use('/api/db/analytics', analyticsDbRoutes);
+
+// Advanced Analytics Routes
+app.use('/api/advanced-analytics', advancedAnalyticsRoutes);
 
 // 404 Handler (must be after all routes)
 app.use(notFoundHandler);

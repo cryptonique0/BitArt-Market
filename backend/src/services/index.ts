@@ -79,3 +79,6 @@ export { FollowService } from './follow.service';
 export { NotificationService } from './notification.service';
 export { CollectionService } from './collection.service';
 export { AnalyticsService } from './analytics.service';
+
+// Advanced Analytics Service
+export { AdvancedAnalyticsService } from './advanced-analytics.service';
