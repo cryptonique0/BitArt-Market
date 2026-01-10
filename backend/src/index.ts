@@ -40,7 +40,9 @@ import userCollectionsRoutes from './routes/user-collections';
 import alertsRoutes from './routes/alerts';
 import transactionHistoryRoutes from './routes/transaction-history';
 import offersRoutes from './routes/offers';
+import bulkRoutes from './routes/bulk';
 import { OffersService } from './services/offers.service';
+import { RoyaltyAggregationService } from './services/royalty-aggregation.service';
 
 // Supabase Database Routes
 import usersDbRoutes from './routes/users';
@@ -219,6 +221,8 @@ app.use('/api/user-collections', userCollectionsRoutes);
 app.use('/api/alerts', alertsRoutes);
 // Offers
 app.use('/api/offers', offersRoutes);
+// Bulk Operations
+app.use('/api/bulk', bulkRoutes);
 
 // Transaction History Routes
 app.use('/api/transactions', transactionHistoryRoutes);
@@ -317,5 +321,19 @@ setInterval(async () => {
     logger.warn('Offer expiry job failed:', err.message || err);
   }
 }, OFFER_EXPIRY_INTERVAL_MS);
+
+// Aggregate royalties and process auto-payouts (daily at 00:00 UTC)
+const ROYALTY_AGGREGATION_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const runRoyaltyAggregation = async () => {
+  try {
+    await RoyaltyAggregationService.runFullCycle();
+  } catch (err: any) {
+    logger.warn('Royalty aggregation job failed:', err.message || err);
+  }
+};
+// Run immediately on startup
+runRoyaltyAggregation();
+// Then schedule daily
+setInterval(runRoyaltyAggregation, ROYALTY_AGGREGATION_INTERVAL_MS);
 
 export default app;
