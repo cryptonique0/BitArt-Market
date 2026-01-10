@@ -49,4 +49,3 @@ export const PlatformAnalytics: React.FC = () => {
 };
 
 export default PlatformAnalytics;
-scm-history-item:/home/web3joker/Documents/SAMAD%20V2/BitArt%20Market?%7B%22repositoryId%22%3A%22scm0%22%2C%22historyItemId%22%3A%2297f0c1ae6689bcb5e8d2c74f62e95cb66f5d51c5%22%2C%22historyItemParentId%22%3A%22761eb9bd50ab10ab7e5b1d3f5fc964d8e9a28b4e%22%2C%22historyItemDisplayId%22%3A%2297f0c1a%22%7D
