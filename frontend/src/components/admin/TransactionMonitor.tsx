@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTransactionSummary } from '../hooks/useAdmin';
+import { useTransactionSummary } from '../../hooks/useAdmin';
 
 export const TransactionMonitor: React.FC = () => {
   const [hours, setHours] = React.useState(24);

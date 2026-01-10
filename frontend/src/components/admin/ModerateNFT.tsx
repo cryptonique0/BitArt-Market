@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useModerationCases, useAdminActions } from '../hooks/useAdmin';
+import { useModerationCases, useAdminActions } from '../../hooks/useAdmin';
 
 interface ModerateNFTProps {
   onModerate?: (nftId: string) => void;

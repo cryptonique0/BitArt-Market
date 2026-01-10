@@ -3,7 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
-import { analyticsDataService } from '../services/analytics-data.service';
+import { analyticsDataService } from "../../services/analytics-data.service";
 
 interface CustomEventTrackingProps {
   eventName: string;

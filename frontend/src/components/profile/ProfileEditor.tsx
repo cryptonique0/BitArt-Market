@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useProfile, UserProfile, SocialLinks } from '../hooks/useProfileEnhancements';
+import { useProfile, UserProfile, SocialLinks } from '../../hooks/useProfileEnhancements';
 
 interface ProfileEditorProps {
   userId: string;

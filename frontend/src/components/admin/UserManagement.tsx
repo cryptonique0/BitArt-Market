@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAdminUsers, useUserStatus, useAdminActions } from '../hooks/useAdmin';
+import { useAdminUsers, useUserStatus, useAdminActions } from '../../hooks/useAdmin';
 
 interface UserManagementProps {
   onUserAction?: (userId: string, action: string) => void;

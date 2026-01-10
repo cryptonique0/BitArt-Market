@@ -3,8 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { initMonitoring } from './services/monitoring';
-import { sentryRequestHandler, sentryErrorHandler } from './middleware/errorMonitoring';
+// import { initMonitoring } from './services/monitoring';
+// import { sentryRequestHandler, sentryErrorHandler } from './middleware/errorMonitoring';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import { createServer } from 'http';
@@ -22,8 +22,8 @@ dotenv.config();
 // Validate environment and get typed config
 const config = getConfig();
 
-// Initialize Monitoring (Sentry, Datadog)
-initMonitoring();
+// Initialize Monitoring (Sentry, Datadog) - Commented out for now
+// initMonitoring();
 
 // Import routes
 import nftRoutes from './routes/nft';
@@ -100,7 +100,7 @@ const PORT = config.port;
 app.use(helmet());
 
 // Sentry request handler (no-op if disabled)
-app.use(sentryRequestHandler());
+// app.use(sentryRequestHandler());
 
 // Additional security headers
 app.use(securityHeaders);
@@ -272,7 +272,7 @@ app.use(notFoundHandler);
 
 // Global error handler (must be last)
 // Sentry error handler should be before app error handler to capture exceptions
-app.use(sentryErrorHandler());
+// app.use(sentryErrorHandler());
 app.use(errorHandler);
 
 // ============================================

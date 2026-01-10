@@ -3,7 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, FunnelChart, Funnel, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
 } from 'recharts';
-import { analyticsDataService } from '../services/analytics-data.service';
+import { analyticsDataService } from "../../services/analytics-data.service";
 
 interface ConversionFunnelProps {
   dateRange?: { startDate: string; endDate: string };

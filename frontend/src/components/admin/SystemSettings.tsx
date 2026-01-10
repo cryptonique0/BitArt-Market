@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAdminSettings } from '../hooks/useAdmin';
+import { useAdminSettings } from '../../hooks/useAdmin';
 
 export const SystemSettings: React.FC = () => {
   const { settings, loading, updateSetting } = useAdminSettings();

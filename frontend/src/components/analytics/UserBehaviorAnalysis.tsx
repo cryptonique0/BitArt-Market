@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Sankey, Sink, Source, Node, Link, Tooltip, ResponsiveContainer
 } from 'recharts';
-import { analyticsDataService } from '../services/analytics-data.service';
+import { analyticsDataService } from "../../services/analytics-data.service";
 
 interface UserBehaviorAnalysisProps {
   timeframe?: 'today' | 'week' | 'month';

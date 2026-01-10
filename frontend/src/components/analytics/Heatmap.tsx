@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { analyticsDataService } from '../services/analytics-data.service';
+import { analyticsDataService } from '../../services/analytics-data.service';
 
 interface HeatmapPoint {
   x: number;
