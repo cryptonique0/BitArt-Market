@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import NFT3DViewer from '../components/NFT3DViewer';
-import EnhancedMediaPlayer from '../components/EnhancedMediaPlayer';
-import ZoomableImage from '../components/ZoomableImage';
-import ARPreview from '../components/ARPreview';
+import { NFT3DViewer } from '../components/NFT3DViewer';
+import { EnhancedMediaPlayer } from '../components/EnhancedMediaPlayer';
+import { ZoomableImage } from '../components/ZoomableImage';
+import { ARPreview } from '../components/ARPreview';
 import { NFTGallery } from '../components/NFTGallery';
 
 const NFTDisplayShowcase: React.FC = () => {

@@ -11,15 +11,23 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Validate environment variables
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
 if (!supabaseUrl || !supabaseKey || !supabaseServiceKey) {
-  logger.error('Missing Supabase environment variables');
-  logger.error('Required: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY');
+  logger.warn('Missing Supabase environment variables - using placeholder values for development');
+  logger.warn('For production, set: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY');
 }
 
 /**
  * Supabase client for API requests (with Row Level Security)
  */
-export const supabase = createClient(supabaseUrl || '', supabaseKey || '', {
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseKey || 'placeholder-key', 
+  {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
@@ -29,7 +37,10 @@ export const supabase = createClient(supabaseUrl || '', supabaseKey || '', {
 /**
  * Supabase admin client (bypasses RLS - use carefully)
  */
-export const supabaseAdmin = createClient(supabaseUrl || '', supabaseServiceKey || '', {
+export const supabaseAdmin = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseServiceKey || 'placeholder-service-key', 
+  {
   auth: {
     persistSession: false,
     autoRefreshToken: false,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAdminStats } from '../hooks/useAdmin';
+import { useAdminStats } from '../../hooks/useAdmin';
 
 export const PlatformAnalytics: React.FC = () => {
   const { stats, loading } = useAdminStats();
