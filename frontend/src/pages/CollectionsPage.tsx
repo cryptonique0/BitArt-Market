@@ -10,6 +10,8 @@ export default function CollectionsPage() {
   const [collections, setCollections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [itemsByCollection, setItemsByCollection] = useState<Record<string, any[]>>({});
+  const [removing, setRemoving] = useState<{ collectionId: string; nftId: string } | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const token = localStorage.getItem('authToken');
   const addNotification = useNotificationStore((s) => s.addNotification);
 
@@ -51,6 +53,7 @@ export default function CollectionsPage() {
 
   const removeFromCollection = async (collectionId: string, nftId: string) => {
     try {
+      setRemoving({ collectionId, nftId });
       await axios.delete(`${API_URL}/api/user-collections/${collectionId}/items/${nftId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -62,7 +65,15 @@ export default function CollectionsPage() {
       addNotification({ type: 'success', title: 'Removed', message: 'Item removed from collection.' });
     } catch (err) {
       addNotification({ type: 'error', title: 'Remove Failed', message: 'Could not remove item.' });
+    } finally {
+      setRemoving(null);
+      setConfirmOpen(false);
     }
+  };
+
+  const requestRemove = (collectionId: string, nftId: string) => {
+    setRemoving({ collectionId, nftId });
+    setConfirmOpen(true);
   };
 
   return (
@@ -112,11 +123,12 @@ export default function CollectionsPage() {
                           <div key={i} className="relative group">
                             <img src={it.nft_image || it.image} alt={it.nft_name || it.name || 'NFT'} className="w-16 h-16 object-cover rounded" />
                             <button
-                              onClick={() => removeFromCollection(c.id, String(id))}
+                              onClick={() => requestRemove(c.id, String(id))}
                               className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
                               title="Remove"
+                              disabled={!!removing && removing.collectionId === c.id && removing.nftId === String(id)}
                             >
-                              ×
+                              {removing && removing.collectionId === c.id && removing.nftId === String(id) ? '…' : '×'}
                             </button>
                           </div>
                         );
@@ -129,6 +141,18 @@ export default function CollectionsPage() {
           </div>
         )}
       </div>
+      {confirmOpen && removing && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Remove Item</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Are you sure you want to remove this item from the collection?</p>
+            <div className="mt-4 flex gap-3 justify-end">
+              <button onClick={() => setConfirmOpen(false)} className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg">Cancel</button>
+              <button onClick={() => removeFromCollection(removing.collectionId, removing.nftId)} disabled={!!removing} className="px-4 py-2 bg-red-600 text-white rounded-lg disabled:opacity-50">Remove</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

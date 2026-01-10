@@ -15,6 +15,7 @@ export default function OfferHistory({ nftId }: Props) {
   const [loading, setLoading] = useState(true);
   const [counterAmount, setCounterAmount] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all'|'open'|'accepted'|'rejected'|'expired'|'countered'>('all');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const token = localStorage.getItem('authToken');
   const addNotification = useNotificationStore((s) => s.addNotification);
 
@@ -38,33 +39,42 @@ export default function OfferHistory({ nftId }: Props) {
 
   const accept = async (id: string) => {
     try {
+      setActionLoading(`accept-${id}`);
       await axios.post(`${API_URL}/api/offers/${id}/accept`, {}, { headers: { Authorization: `Bearer ${token}` } });
       fetchOffers();
       addNotification({ type: 'success', title: 'Offer Accepted', message: 'You accepted the offer.' });
     } catch (err) {
       addNotification({ type: 'error', title: 'Accept Failed', message: 'Could not accept the offer.' });
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const reject = async (id: string) => {
     try {
+      setActionLoading(`reject-${id}`);
       await axios.post(`${API_URL}/api/offers/${id}/reject`, {}, { headers: { Authorization: `Bearer ${token}` } });
       fetchOffers();
       addNotification({ type: 'success', title: 'Offer Rejected', message: 'You rejected the offer.' });
     } catch (err) {
       addNotification({ type: 'error', title: 'Reject Failed', message: 'Could not reject the offer.' });
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const counter = async (id: string) => {
     if (!counterAmount) return;
     try {
+      setActionLoading(`counter-${id}`);
       await axios.post(`${API_URL}/api/offers/${id}/counter`, { amount: Number(counterAmount) }, { headers: { Authorization: `Bearer ${token}` } });
       setCounterAmount('');
       fetchOffers();
       addNotification({ type: 'success', title: 'Counter Sent', message: 'Your counter-offer was sent.' });
     } catch (err) {
       addNotification({ type: 'error', title: 'Counter Failed', message: 'Could not send counter-offer.' });
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -111,10 +121,10 @@ export default function OfferHistory({ nftId }: Props) {
               <div className="flex items-center gap-2">
                 {user.address && o.status === 'open' && (
                   <>
-                    <button onClick={() => accept(o.id)} className="text-green-600 hover:underline text-sm">Accept</button>
-                    <button onClick={() => reject(o.id)} className="text-red-600 hover:underline text-sm">Reject</button>
+                    <button onClick={() => accept(o.id)} disabled={actionLoading === `accept-${o.id}`} className="text-green-600 hover:underline text-sm disabled:opacity-50">{actionLoading === `accept-${o.id}` ? '...' : 'Accept'}</button>
+                    <button onClick={() => reject(o.id)} disabled={actionLoading === `reject-${o.id}`} className="text-red-600 hover:underline text-sm disabled:opacity-50">{actionLoading === `reject-${o.id}` ? '...' : 'Reject'}</button>
                     <input value={counterAmount} onChange={(e) => setCounterAmount(e.target.value)} placeholder="Counter" className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded" />
-                    <button onClick={() => counter(o.id)} className="text-blue-600 hover:underline text-sm">Counter</button>
+                    <button onClick={() => counter(o.id)} disabled={actionLoading === `counter-${o.id}`} className="text-blue-600 hover:underline text-sm disabled:opacity-50">{actionLoading === `counter-${o.id}` ? '...' : 'Counter'}</button>
                   </>
                 )}
               </div>

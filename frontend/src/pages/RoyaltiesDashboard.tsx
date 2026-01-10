@@ -9,6 +9,8 @@ import {
   getEarningsTrend
 } from '../services/royalties';
 import { BaseScanLink } from '../components/BaseScanLink';
+import axios from 'axios';
+import { useNotificationStore } from '../store';
 
 /**
  * Simple line chart component
@@ -112,6 +114,11 @@ export const RoyaltiesDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [trend, setTrend] = useState(0);
+  const [payouts, setPayouts] = useState<any[]>([]);
+  const [payoutAmount, setPayoutAmount] = useState('');
+  const [payoutLoading, setPayoutLoading] = useState(false);
+  const addNotification = useNotificationStore((s) => s.addNotification);
+  const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:3001';
 
   useEffect(() => {
     if (!address) {
@@ -133,6 +140,14 @@ export const RoyaltiesDashboard: React.FC = () => {
         setRoyalties(royaltiesData);
         setHistory(historyData);
         setTrend(getEarningsTrend(historyData));
+        // Load payouts for current user
+        const token = localStorage.getItem('authToken');
+        try {
+          const res = await axios.get(`${API_URL}/api/royalties/payouts`, { headers: { Authorization: `Bearer ${token}` } });
+          setPayouts(res.data.data || []);
+        } catch {
+          setPayouts([]);
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to load royalty data');
       } finally {
@@ -320,6 +335,80 @@ export const RoyaltiesDashboard: React.FC = () => {
                 </p>
               </div>
             </>
+          )}
+        </div>
+      </div>
+
+      {/* Payout Management */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Payout Management</h2>
+
+        <div className="flex items-end gap-3">
+          <div className="flex-1">
+            <label className="text-sm text-gray-600 dark:text-gray-400">Amount (STX)</label>
+            <input value={payoutAmount} onChange={(e) => setPayoutAmount(e.target.value)} placeholder="e.g., 10.0" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+          </div>
+          <button
+            onClick={async () => {
+              if (!payoutAmount) return;
+              setPayoutLoading(true);
+              const token = localStorage.getItem('authToken');
+              try {
+                const res = await axios.post(`${API_URL}/api/royalties/payouts`, { amount: Number(payoutAmount) }, { headers: { Authorization: `Bearer ${token}` } });
+                setPayouts([res.data.data, ...payouts]);
+                setPayoutAmount('');
+                addNotification({ type: 'success', title: 'Payout Requested', message: 'Your payout request was created.' });
+              } catch {
+                addNotification({ type: 'error', title: 'Payout Failed', message: 'Could not create payout request.' });
+              } finally {
+                setPayoutLoading(false);
+              }
+            }}
+            disabled={payoutLoading}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+          >
+            {payoutLoading ? '...' : 'Request Payout'}
+          </button>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Your Payouts</h3>
+          {payouts.length === 0 ? (
+            <p className="text-gray-600 dark:text-gray-400 mt-2">No payouts yet</p>
+          ) : (
+            <div className="space-y-2 mt-2">
+              {payouts.map((p) => (
+                <div key={p.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    <span className="font-semibold">{p.amount} {p.currency}</span>
+                    <span className="ml-2">[{p.status}]</span>
+                    {p.tx_hash && (
+                      <span className="ml-2">
+                        <BaseScanLink type="tx" hash={p.tx_hash} label="Tx" className="text-xs" />
+                      </span>
+                    )}
+                    <span className="ml-2 text-gray-600 dark:text-gray-400">{new Date(p.requested_at).toLocaleString()}</span>
+                  </div>
+                  {p.status === 'pending' && (
+                    <button
+                      onClick={async () => {
+                        const token = localStorage.getItem('authToken');
+                        try {
+                          await axios.post(`${API_URL}/api/royalties/payouts/${p.id}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } });
+                          setPayouts(payouts.map((x) => x.id === p.id ? { ...x, status: 'failed', notes: 'Cancelled by user' } : x));
+                          addNotification({ type: 'success', title: 'Cancelled', message: 'Payout request cancelled.' });
+                        } catch {
+                          addNotification({ type: 'error', title: 'Cancel Failed', message: 'Could not cancel payout.' });
+                        }
+                      }}
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
