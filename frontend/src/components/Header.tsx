@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
-import { ThemeToggle } from './ThemeToggle';
+import { EnhancedThemeToggle } from './EnhancedThemeToggle';
 import { BaseNativeBadge } from './Badge';
 import { WalletDisconnectBanner, WalletErrorBanner } from './WalletErrors';
 import { isCoinbaseWallet } from '../services/coinbase';
@@ -107,7 +107,7 @@ export const Header: React.FC = () => {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            <ThemeToggle />
+            <EnhancedThemeToggle />
 
             {/* Coinbase Badge */}
             {isCoinbase && (
