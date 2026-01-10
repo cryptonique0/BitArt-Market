@@ -1,0 +1,116 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'push' || github.event_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build --workspace frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_CHAIN_ID: ${{ secrets.VITE_CHAIN_ID }}
+          VITE_NFT_CONTRACT: ${{ secrets.VITE_NFT_CONTRACT }}
+          VITE_MARKETPLACE_CONTRACT: ${{ secrets.VITE_MARKETPLACE_CONTRACT }}
+          VITE_AUCTION_CONTRACT: ${{ secrets.VITE_AUCTION_CONTRACT }}
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
+          VITE_EXPLORER_URL: ${{ secrets.VITE_EXPLORER_URL }}
+
+      - name: Deploy to Vercel
+        uses: vercel/action@v5
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./frontend
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'push' || github.event_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: npm run build --workspace backend
+
+      - name: Deploy to Render
+        uses: render-org/github-actions-deploy@v1
+        with:
+          deploy-token: ${{ secrets.RENDER_DEPLOY_KEY }}
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+
+      - name: Deploy to Railway (alternative)
+        uses: railway-app/deploy-action@v1
+        if: failure() && secrets.RAILWAY_TOKEN != ''
+        with:
+          token: ${{ secrets.RAILWAY_TOKEN }}
+          service: backend
+
+  notify-deployment:
+    needs: [deploy-frontend, deploy-backend]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check deployment status
+        run: |
+          if [ "${{ needs.deploy-frontend.result }}" == "success" ] && [ "${{ needs.deploy-backend.result }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+            echo "Frontend: https://your-frontend-url.com"
+            echo "Backend: https://your-backend-url.com"
+          else
+            echo "❌ Deployment failed - check logs"
+            exit 1
+          fi
+
+      - name: Notify Slack (optional)
+        if: always()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "BitArt Market Deployment",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Deployment Status*\nFrontend: ${{ needs.deploy-frontend.result }}\nBackend: ${{ needs.deploy-backend.result }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

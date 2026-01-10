@@ -1,5 +1,10 @@
 # BitArt Market - Base-First NFT Marketplace 🔵
 
+[![Test](https://github.com/cryptonique0/BitArt-Market/actions/workflows/test.yml/badge.svg)](https://github.com/cryptonique0/BitArt-Market/actions/workflows/test.yml)
+[![Build](https://github.com/cryptonique0/BitArt-Market/actions/workflows/build.yml/badge.svg)](https://github.com/cryptonique0/BitArt-Market/actions/workflows/build.yml)
+[![E2E Tests](https://github.com/cryptonique0/BitArt-Market/actions/workflows/e2e.yml/badge.svg)](https://github.com/cryptonique0/BitArt-Market/actions/workflows/e2e.yml)
+[![Deploy](https://github.com/cryptonique0/BitArt-Market/actions/workflows/deploy.yml/badge.svg)](https://github.com/cryptonique0/BitArt-Market/actions/workflows/deploy.yml)
+
 A **Base-native**, production-ready NFT marketplace optimized for **Base Mainnet** with seamless wallet integration, transparent fees, and creator-first features. Also supports **Stacks blockchain** with Solidity/Clarity smart contracts, React frontend, and Node.js backend.
 
 ## 🎉 **Live on Base Mainnet!**

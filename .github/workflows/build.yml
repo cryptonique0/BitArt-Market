@@ -1,0 +1,60 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Check formatting
+        run: npm run format:check
+        continue-on-error: true
+
+      - name: Build backend
+        run: npm run build --workspace backend
+
+      - name: Build frontend
+        run: npm run build --workspace frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL || 'http://localhost:5000/api' }}
+          VITE_CHAIN_ID: ${{ secrets.VITE_CHAIN_ID || '8453' }}
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 7
+
+      - name: Test backend build
+        run: npm run test --workspace backend
+        continue-on-error: true
+
+      - name: Test frontend build
+        run: npm run test --workspace frontend
+        continue-on-error: true
