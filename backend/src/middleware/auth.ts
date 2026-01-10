@@ -108,3 +108,6 @@ export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
   }
   next();
 }
+
+// Alias for backward compatibility
+export const authenticateToken = requireAppJWT;
