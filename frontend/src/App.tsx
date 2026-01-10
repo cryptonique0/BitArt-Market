@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useThemeStore } from './store';
 import { Header } from './components/Header';
+import { VariantBanner } from './components/experiments/VariantBanner';
+import { useLocation } from 'react-router-dom';
 import { NotificationContainer } from './components/Notification';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { HomePage } from './pages/HomePage';
@@ -28,6 +30,7 @@ import { EventFeed } from './components/EventFeed';
 
 function App() {
   const { isDarkMode } = useThemeStore();
+  const location = useLocation();
 
   useEffect(() => {
     // Apply theme
@@ -44,6 +47,7 @@ function App() {
         <div className={isDarkMode ? 'dark' : ''}>
           <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
             <Header />
+            {location.pathname === '/' && <VariantBanner />}
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/create" element={<CreatePage />} />
