@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import CollectionsManager from '../components/collections/CollectionsManager';
 import { Link } from 'react-router-dom';
+import { useNotificationStore } from '../store';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -10,6 +11,7 @@ export default function CollectionsPage() {
   const [loading, setLoading] = useState(true);
   const [itemsByCollection, setItemsByCollection] = useState<Record<string, any[]>>({});
   const token = localStorage.getItem('authToken');
+  const addNotification = useNotificationStore((s) => s.addNotification);
 
   const fetchCollections = async () => {
     try {
@@ -46,6 +48,22 @@ export default function CollectionsPage() {
     };
     if (collections.length > 0) fetchItems();
   }, [collections]);
+
+  const removeFromCollection = async (collectionId: string, nftId: string) => {
+    try {
+      await axios.delete(`${API_URL}/api/user-collections/${collectionId}/items/${nftId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setItemsByCollection((prev) => {
+        const cloned = { ...prev };
+        cloned[collectionId] = (cloned[collectionId] || []).filter((i: any) => (i.nft_id || i.nftId || i.id) !== nftId);
+        return cloned;
+      });
+      addNotification({ type: 'success', title: 'Removed', message: 'Item removed from collection.' });
+    } catch (err) {
+      addNotification({ type: 'error', title: 'Remove Failed', message: 'Could not remove item.' });
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-8">
@@ -88,9 +106,21 @@ export default function CollectionsPage() {
                   </div>
                   {thumbs.length > 0 && (
                     <div className="mt-3 flex gap-2">
-                      {thumbs.map((it: any, i: number) => (
-                        <img key={i} src={it.nft_image || it.image} alt={it.nft_name || it.name || 'NFT'} className="w-16 h-16 object-cover rounded" />
-                      ))}
+                      {thumbs.map((it: any, i: number) => {
+                        const id = it.nft_id || it.nftId || it.id;
+                        return (
+                          <div key={i} className="relative group">
+                            <img src={it.nft_image || it.image} alt={it.nft_name || it.name || 'NFT'} className="w-16 h-16 object-cover rounded" />
+                            <button
+                              onClick={() => removeFromCollection(c.id, String(id))}
+                              className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+                              title="Remove"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

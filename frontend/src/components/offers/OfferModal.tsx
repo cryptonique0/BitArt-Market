@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNotificationStore } from '../../store';
 
 interface Props {
   nftId: string;
@@ -14,6 +15,7 @@ export default function OfferModal({ nftId }: Props) {
   const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem('authToken');
+  const addNotification = useNotificationStore((s) => s.addNotification);
 
   const submit = async () => {
     if (!amount) return;
@@ -26,9 +28,9 @@ export default function OfferModal({ nftId }: Props) {
       }, { headers: { Authorization: `Bearer ${token}` } });
       setOpen(false);
       setAmount(''); setExpiresAt('');
-      alert('Offer submitted');
+      addNotification({ type: 'success', title: 'Offer Submitted', message: 'Your offer was created.' });
     } catch (err) {
-      alert('Failed to submit offer');
+      addNotification({ type: 'error', title: 'Offer Failed', message: 'Could not submit offer.' });
     } finally {
       setLoading(false);
     }

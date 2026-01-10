@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { supabase, supabaseAdmin } from '../config/supabase';
 
 class OffersServiceClass {
   async createOffer(nftId: string, buyerAddress: string, amount: number, expiresAt?: string, currency: string = 'STX') {
@@ -40,6 +40,22 @@ class OffersServiceClass {
     if (!offer) throw new Error('Offer not found');
     if (offer.status !== 'open') throw new Error('Offer not open');
 
+    // Seller-only guard: ensure requester is current NFT owner
+    const { data: nft } = await supabase
+      .from('nfts')
+      .select('id,owner_id')
+      .eq('id', offer.nft_id)
+      .single();
+    if (!nft) throw new Error('NFT not found');
+    const { data: owner } = await supabase
+      .from('users')
+      .select('wallet_address')
+      .eq('id', nft.owner_id)
+      .single();
+    if (!owner || (owner.wallet_address || '').toLowerCase() !== (sellerAddress || '').toLowerCase()) {
+      throw new Error('Forbidden: only current owner can accept');
+    }
+
     const { data, error } = await supabase
       .from('offers')
       .update({ status: 'accepted', seller_address: offer.seller_address || sellerAddress })
@@ -58,6 +74,22 @@ class OffersServiceClass {
       .single();
     if (!offer) throw new Error('Offer not found');
     if (offer.status !== 'open') throw new Error('Offer not open');
+
+    // Seller-only guard: ensure requester is current NFT owner
+    const { data: nft } = await supabase
+      .from('nfts')
+      .select('id,owner_id')
+      .eq('id', offer.nft_id)
+      .single();
+    if (!nft) throw new Error('NFT not found');
+    const { data: owner } = await supabase
+      .from('users')
+      .select('wallet_address')
+      .eq('id', nft.owner_id)
+      .single();
+    if (!owner || (owner.wallet_address || '').toLowerCase() !== (sellerAddress || '').toLowerCase()) {
+      throw new Error('Forbidden: only current owner can reject');
+    }
 
     const { data, error } = await supabase
       .from('offers')

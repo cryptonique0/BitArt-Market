@@ -39,6 +39,7 @@ import userCollectionsRoutes from './routes/user-collections';
 import alertsRoutes from './routes/alerts';
 import transactionHistoryRoutes from './routes/transaction-history';
 import offersRoutes from './routes/offers';
+import { OffersService } from './services/offers.service';
 
 // Supabase Database Routes
 import usersDbRoutes from './routes/users';
@@ -297,5 +298,22 @@ httpServer.listen(PORT, () => {
   Listening on port ${PORT}...
   `);
 });
+
+// ============================================
+// Scheduled Jobs
+// ============================================
+
+// Expire open offers periodically (every 10 minutes)
+const OFFER_EXPIRY_INTERVAL_MS = 10 * 60 * 1000;
+setInterval(async () => {
+  try {
+    const expired = await OffersService.expireOpenOffers();
+    if (expired > 0) {
+      logger.info(`Expired ${expired} offers`);
+    }
+  } catch (err: any) {
+    logger.warn('Offer expiry job failed:', err.message || err);
+  }
+}, OFFER_EXPIRY_INTERVAL_MS);
 
 export default app;
