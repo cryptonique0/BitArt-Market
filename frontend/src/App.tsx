@@ -71,7 +71,8 @@ function App() {
               <Route path="/collections/:collectionId" element={<CollectionDetailPage />} />
               <Route path="/bulk-operations" element={<BulkOperations />} />
               <Route path="/ui-showcase" element={<UIShowcase />} />
-                            <Route path="/nft-display" element={<NFTDisplayShowcase />} />
+              <Route path="/gamification" element={<GamificationPage />} />
+              <Route path="/nft-display" element={<NFTDisplayShowcase />} />
               <Route path="/mint" element={<MintNFT />} />
               <Route path="/auctions" element={<AuctionSystem />} />
               <Route path="/transactions" element={<TransactionTracker />} />
