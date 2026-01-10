@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken, requireRole } from '../middleware/auth';
+import { requireAppJWT, requireRole } from '../middleware/auth';
 import { RoyaltyPayoutsService } from '../services/royalty-payouts.service';
 import rateLimit from 'express-rate-limit';
 
@@ -15,7 +15,7 @@ const payoutLimiter = rateLimit({
 });
 
 // List payouts for current user
-router.get('/', authenticateToken, async (req: Request, res: Response) => {
+router.get('/', requireAppJWT, async (req: Request, res: Response) => {
   // @ts-ignore
   const user = req.user;
   try {
@@ -27,7 +27,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 });
 
 // Request payout
-router.post('/', authenticateToken, payoutLimiter, async (req: Request, res: Response) => {
+router.post('/', requireAppJWT, payoutLimiter, async (req: Request, res: Response) => {
   // @ts-ignore
   const user = req.user;
   const { amount, currency = 'STX', notes } = req.body;
@@ -44,7 +44,7 @@ router.post('/', authenticateToken, payoutLimiter, async (req: Request, res: Res
 });
 
 // Cancel payout (if pending)
-router.post('/:payoutId/cancel', authenticateToken, async (req: Request, res: Response) => {
+router.post('/:payoutId/cancel', requireAppJWT, async (req: Request, res: Response) => {
   // @ts-ignore
   const user = req.user;
   const { payoutId } = req.params;
@@ -57,7 +57,7 @@ router.post('/:payoutId/cancel', authenticateToken, async (req: Request, res: Re
 });
 
 // Admin: Mark payout as processed
-router.post('/:payoutId/process', authenticateToken, requireRole(['admin']), async (req: Request, res: Response) => {
+router.post('/:payoutId/process', requireAppJWT, requireRole(['admin']), async (req: Request, res: Response) => {
   const { payoutId } = req.params;
   const { txHash } = req.body;
   if (!txHash) return res.status(400).json({ error: 'Transaction hash required' });
