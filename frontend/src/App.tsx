@@ -25,7 +25,6 @@ import CollectionDetailPage from './pages/CollectionDetailPage';
 import BulkOperations from './pages/BulkOperations';
 import { UIShowcase } from './pages/UIShowcase';
 import NFTDisplayShowcase from './pages/NFTDisplayShowcase';
-import GamificationPage from './pages/GamificationPage';
 import { MintNFT } from './components/MintNFT';
 import { AuctionSystem } from './components/AuctionSystem';
 import { TransactionTracker } from './components/TransactionTracker';
@@ -71,8 +70,7 @@ function App() {
               <Route path="/collections/:collectionId" element={<CollectionDetailPage />} />
               <Route path="/bulk-operations" element={<BulkOperations />} />
               <Route path="/ui-showcase" element={<UIShowcase />} />
-              <Route path="/gamification" element={<GamificationPage />} />
-              <Route path="/nft-display" element={<NFTDisplayShowcase />} />
+                            <Route path="/nft-display" element={<NFTDisplayShowcase />} />
               <Route path="/mint" element={<MintNFT />} />
               <Route path="/auctions" element={<AuctionSystem />} />
               <Route path="/transactions" element={<TransactionTracker />} />
