@@ -7,7 +7,7 @@
 import { ethers } from 'ethers';
 import { Server as SocketServer } from 'socket.io';
 import { logger } from '../utils/logger';
-import { supabase } from '../config/database';
+import { supabase } from '../config/supabase';
 
 interface ContractEvent {
   eventName: string;
