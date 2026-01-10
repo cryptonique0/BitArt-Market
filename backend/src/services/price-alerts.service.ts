@@ -49,7 +49,7 @@ class PriceAlertsServiceClass {
       .eq('is_active', true);
     if (error) throw error;
 
-    const notifications: Array<{ alertId: string; nftId: string; type: string; currentPrice: number }>() = [];
+    const notifications: Array<{ alertId: string; nftId: string; type: string; currentPrice: number }> = [];
 
     for (const alert of alerts || []) {
       try {
