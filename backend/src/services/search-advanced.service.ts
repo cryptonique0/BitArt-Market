@@ -3,7 +3,7 @@
  * Full-text search, filtering, trending, and analytics
  */
 
-import { supabase } from '../config/database';
+import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 
 export interface SearchFilters {
