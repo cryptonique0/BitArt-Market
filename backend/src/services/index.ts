@@ -90,3 +90,4 @@ export { AdminService } from './admin.service';
 export { BlockchainService } from './blockchain.service';
 export { TransactionTrackerService } from './transaction-tracker.service';
 export { NFTMintingService } from './minting.service';
+export { EventListenerService } from './event-listener.service';

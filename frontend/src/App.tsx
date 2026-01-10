@@ -18,6 +18,7 @@ import AdminDashboard from './pages/Admin';
 import { MintNFT } from './components/MintNFT';
 import { AuctionSystem } from './components/AuctionSystem';
 import { TransactionTracker } from './components/TransactionTracker';
+import { EventFeed } from './components/EventFeed';
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -53,6 +54,7 @@ function App() {
               <Route path="/mint" element={<MintNFT />} />
               <Route path="/auctions" element={<AuctionSystem />} />
               <Route path="/transactions" element={<TransactionTracker />} />
+              <Route path="/events" element={<EventFeed />} />
             </Routes>
             <NotificationContainer />
           </div>

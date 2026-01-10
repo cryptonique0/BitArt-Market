@@ -5,6 +5,8 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
+import { createServer } from 'http';
+import { Server as SocketServer } from 'socket.io';
 import { getConfig } from './config/env';
 import { swaggerSpec } from './config/swagger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -49,8 +51,21 @@ import adminRoutes from './routes/admin';
 
 // Blockchain Routes
 import mintingRoutes from './routes/minting';
+import eventsRoutes from './routes/events';
+
+// Event listener service
+import { eventListenerService } from './services/event-listener.service';
 
 const app: Express = express();
+const httpServer = createServer(app);
+const io = new SocketServer(httpServer, {
+  cors: {
+    origin: config.allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
+
 const PORT = config.port;
 
 // ============================================
@@ -202,6 +217,7 @@ app.use('/api/admin', adminRoutes);
 
 // Blockchain Routes
 app.use('/api/minting', mintingRoutes);
+app.use('/api/events', eventsRoutes);
 
 // 404 Handler (must be after all routes)
 app.use(notFoundHandler);
@@ -213,7 +229,12 @@ app.use(errorHandler);
 // Server Startup
 // ============================================
 
-app.listen(PORT, () => {
+// Initialize event listener service
+eventListenerService.initialize(io).catch((error) => {
+  logger.error('Failed to initialize event listener service:', error);
+});
+
+httpServer.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════╗
 ║     BitArt Market Backend Started     ║
@@ -222,6 +243,7 @@ app.listen(PORT, () => {
   Server: http://localhost:${PORT}
   Environment: ${config.nodeEnv}
   Network: ${config.network}
+  WebSocket: Enabled for real-time events
   
   API Documentation:
   - GET    /api/health                 - Health check
@@ -232,6 +254,8 @@ app.listen(PORT, () => {
   - POST   /api/marketplace/listings   - Create listing
   - GET    /api/users/:address         - Get user profile
   - GET    /api/analytics/stats        - Get marketplace stats
+  - GET    /api/events/history         - Get blockchain events
+  - WebSocket: Real-time blockchain events
   
   Listening on port ${PORT}...
   `);
