@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import analyticsService from '../services/analyticsService';
+import { eventTrackingService } from '../services/event-tracking.service';
 
 export interface DashboardMetrics {
   totalVolume: number;
@@ -344,4 +345,69 @@ export const useExportData = () => {
   }, []);
 
   return { exportData, exportLeaderboard, exporting, error };
+};
+
+/**
+ * Hook to automatically track page views and interactions
+ */
+export const usePageTracking = (pageName: string) => {
+  useEffect(() => {
+    // Track scroll depth on page
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        if (scrollPercentage > 25) {
+          eventTrackingService.trackScrollDepth(pageName, Math.round(scrollPercentage));
+        }
+      }, 500);
+    };
+
+    // Track clicks on page
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      eventTrackingService.trackClickEvent(
+        target.tagName + (target.id ? `#${target.id}` : ''),
+        e.clientX,
+        e.clientY
+      );
+    };
+
+    // Track time on page
+    const startTime = Date.now();
+    const handleBeforeUnload = () => {
+      const duration = Math.round((Date.now() - startTime) / 1000);
+      if (duration > 1) {
+        eventTrackingService.trackTimeOnPage(pageName, duration);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('click', handleClick);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('click', handleClick);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [pageName]);
+};
+
+/**
+ * Hook to expose event tracking methods
+ */
+export const useEventTracking = () => {
+  return {
+    trackNFTView: eventTrackingService.trackNFTView.bind(eventTrackingService),
+    trackSearch: eventTrackingService.trackSearch.bind(eventTrackingService),
+    trackOfferCreated: eventTrackingService.trackOfferCreated.bind(eventTrackingService),
+    trackOfferAccepted: eventTrackingService.trackOfferAccepted.bind(eventTrackingService),
+    trackWishlistAdd: eventTrackingService.trackWishlistAdd.bind(eventTrackingService),
+    trackCollectionAdd: eventTrackingService.trackCollectionAdd.bind(eventTrackingService),
+    trackLogin: eventTrackingService.trackLogin.bind(eventTrackingService),
+    trackSignup: eventTrackingService.trackSignup.bind(eventTrackingService),
+    trackCustomEvent: eventTrackingService.trackCustomEvent.bind(eventTrackingService),
+  };
 };

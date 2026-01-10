@@ -41,6 +41,7 @@ import alertsRoutes from './routes/alerts';
 import transactionHistoryRoutes from './routes/transaction-history';
 import offersRoutes from './routes/offers';
 import bulkRoutes from './routes/bulk';
+import analyticsAdvancedRoutes from './routes/analytics-advanced';
 import { OffersService } from './services/offers.service';
 import { RoyaltyAggregationService } from './services/royalty-aggregation.service';
 
@@ -223,6 +224,8 @@ app.use('/api/alerts', alertsRoutes);
 app.use('/api/offers', offersRoutes);
 // Bulk Operations
 app.use('/api/bulk', bulkRoutes);
+// Advanced Analytics
+app.use('/api/analytics', analyticsAdvancedRoutes);
 
 // Transaction History Routes
 app.use('/api/transactions', transactionHistoryRoutes);

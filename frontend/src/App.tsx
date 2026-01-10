@@ -11,6 +11,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { CreatorProfilePage } from './pages/CreatorProfilePage';
 import DiscoveryPage from './pages/DiscoveryPage';
 import RoyaltiesDashboard from './pages/RoyaltiesDashboard';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import { StudioPage } from './pages/StudioPage';
 import AuthPage from './pages/Auth';
 import AnalyticsPage from './pages/Analytics';
@@ -55,6 +56,7 @@ function App() {
               <Route path="/studio" element={<StudioPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/analytics-dashboard" element={<AnalyticsDashboard />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/transaction-history" element={<TransactionHistoryPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
