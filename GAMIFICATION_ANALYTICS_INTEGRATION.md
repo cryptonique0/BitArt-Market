@@ -4,20 +4,21 @@
 
 ### Analytics Service Integration Status
 
-| Component | Status | Lines | Endpoints |
-|-----------|--------|-------|-----------|
-| Type Definitions | ✅ Complete | 100+ | - |
-| analyticsService.ts | ✅ Complete | 600+ | 6 methods |
-| analyticsRoutes.ts | ✅ Complete | 350+ | 8 endpoints |
-| Main Express App | ✅ Registered | 2 lines | Mounted at `/api/gamification/analytics` |
-| Frontend Components | ⏳ Pending | - | - |
-| Documentation | ✅ Complete | 400+ lines | API Docs |
+| Component           | Status        | Lines      | Endpoints                                |
+| ------------------- | ------------- | ---------- | ---------------------------------------- |
+| Type Definitions    | ✅ Complete   | 100+       | -                                        |
+| analyticsService.ts | ✅ Complete   | 600+       | 6 methods                                |
+| analyticsRoutes.ts  | ✅ Complete   | 350+       | 8 endpoints                              |
+| Main Express App    | ✅ Registered | 2 lines    | Mounted at `/api/gamification/analytics` |
+| Frontend Components | ⏳ Pending    | -          | -                                        |
+| Documentation       | ✅ Complete   | 400+ lines | API Docs                                 |
 
 ---
 
 ## API Endpoints Overview
 
 ### Base URL
+
 ```
 /api/gamification/analytics
 ```
@@ -25,22 +26,27 @@
 ### Endpoint Categories
 
 #### User Analytics (2 endpoints)
+
 - `GET /user/:userId/achievements` - Comprehensive user stats
 - `GET /user/:userId/summary` - Quick user summary
 
 #### Achievement Popularity (3 endpoints)
+
 - `GET /achievements/:achievementId/popularity` - Popularity metrics
 - `GET /achievements/:achievementId/unlock-rate` - Single achievement unlock rate
 - `GET /achievements-rates` - All achievements unlock rates
 
 #### Engagement Metrics (1 endpoint)
+
 - `GET /achievements/:achievementId/engagement` - Engagement scoring
 
 #### System Statistics (2 endpoints)
+
 - `GET /system/stats` - Comprehensive system stats
 - `GET /dashboard/overview` - Dashboard-friendly overview
 
 #### Rankings & Trending (3 endpoints)
+
 - `GET /achievements/top-unlocked` - Most unlocked achievements
 - `GET /achievements/rarest` - Least unlocked achievements
 - `GET /achievements/trending` - Trending achievements
@@ -95,6 +101,7 @@ interface DemographicStats { ... }
 ### User Statistics Calculation
 
 **UserAchievementStats** requires:
+
 - Total XP from `UserLevel` table
 - Current level calculation
 - Achievement unlock counts by status
@@ -105,6 +112,7 @@ interface DemographicStats { ... }
 ### Achievement Popularity
 
 **AchievementPopularity** requires:
+
 - Total unlock count
 - Unique user count
 - Unlock rate percentage
@@ -116,6 +124,7 @@ interface DemographicStats { ... }
 ### System-Wide Metrics
 
 **SystemwideStats** requires:
+
 - Total user count
 - Total XP distributed
 - Average metrics per user
@@ -130,26 +139,35 @@ interface DemographicStats { ... }
 All endpoints follow a consistent response format:
 
 ### Success Response
+
 ```json
 {
   "success": true,
-  "data": { /* response data */ },
+  "data": {
+    /* response data */
+  },
   "message": "Operation description"
 }
 ```
 
 ### Summary Endpoints (List Responses)
+
 ```json
 {
   "success": true,
   "count": 10,
   "total": 50,
-  "data": [{ /* items */ }],
+  "data": [
+    {
+      /* items */
+    }
+  ],
   "message": "Retrieved 10 items"
 }
 ```
 
 ### Error Response
+
 ```json
 {
   "error": "Error description"
@@ -174,25 +192,29 @@ Middleware: `authenticateToken` (from `/middleware/auth`)
 
 ### Common Query Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `limit` | number | 50 | Max results to return |
-| `sort` | string | "desc" | Sort order ("asc" or "desc") |
-| `offset` | number | 0 | Starting position (for pagination) |
+| Parameter | Type   | Default | Description                        |
+| --------- | ------ | ------- | ---------------------------------- |
+| `limit`   | number | 50      | Max results to return              |
+| `sort`    | string | "desc"  | Sort order ("asc" or "desc")       |
+| `offset`  | number | 0       | Starting position (for pagination) |
 
 ### Endpoint-Specific Parameters
 
 **`/achievements-rates`**
+
 - `sort`: "asc" or "desc" by unlock rate
 - `limit`: number of results (default 50)
 
 **`/achievements/top-unlocked`**
+
 - `limit`: number of top results (default 10)
 
 **`/achievements/rarest`**
+
 - `limit`: number of rarest results (default 10)
 
 **`/achievements/trending`**
+
 - `limit`: number of trending results (default 10)
 
 ---
@@ -201,14 +223,15 @@ Middleware: `authenticateToken` (from `/middleware/auth`)
 
 ### Common Errors
 
-| Code | Error | Cause |
-|------|-------|-------|
-| 400 | Parameter is required | Missing path parameter |
-| 401 | Unauthorized | Missing or invalid JWT |
-| 404 | Not Found | Achievement/user doesn't exist |
-| 500 | Failed to retrieve | Server error |
+| Code | Error                 | Cause                          |
+| ---- | --------------------- | ------------------------------ |
+| 400  | Parameter is required | Missing path parameter         |
+| 401  | Unauthorized          | Missing or invalid JWT         |
+| 404  | Not Found             | Achievement/user doesn't exist |
+| 500  | Failed to retrieve    | Server error                   |
 
 ### Error Response Example
+
 ```json
 {
   "error": "userId is required"
@@ -221,15 +244,16 @@ Middleware: `authenticateToken` (from `/middleware/auth`)
 
 ### Recommended Cache TTLs
 
-| Endpoint | TTL | Reason |
-|----------|-----|--------|
-| User stats | 1-5 min | User-specific, frequent updates |
-| Achievement popularity | 5 min | Changes based on new unlocks |
-| System stats | 15 min | Aggregate metrics, slower changes |
-| Trending | 10 min | Dynamic ranking |
-| Top/Rarest | 15 min | Relatively stable |
+| Endpoint               | TTL     | Reason                            |
+| ---------------------- | ------- | --------------------------------- |
+| User stats             | 1-5 min | User-specific, frequent updates   |
+| Achievement popularity | 5 min   | Changes based on new unlocks      |
+| System stats           | 15 min  | Aggregate metrics, slower changes |
+| Trending               | 10 min  | Dynamic ranking                   |
+| Top/Rarest             | 15 min  | Relatively stable                 |
 
 ### Cache Implementation Example
+
 ```typescript
 // In middleware
 app.get('/system/stats', cacheMiddleware(15 * 60), async (req, res) => {
@@ -242,6 +266,7 @@ app.get('/system/stats', cacheMiddleware(15 * 60), async (req, res) => {
 ## Frontend Integration Patterns
 
 ### 1. User Profile Stats Display
+
 ```typescript
 // Fetch user stats
 const userStats = await fetch(`/api/gamification/analytics/user/${userId}/summary`)
@@ -252,6 +277,7 @@ return <UserStatsCard stats={userStats.data} />
 ```
 
 ### 2. Dashboard Overview
+
 ```typescript
 // Fetch system overview
 const overview = await fetch('/api/gamification/analytics/dashboard/overview')
@@ -267,6 +293,7 @@ return (
 ```
 
 ### 3. Achievement Details Page
+
 ```typescript
 // Fetch achievement metrics
 const [popularity, engagement] = await Promise.all([
@@ -278,6 +305,7 @@ return <AchievementDetails popularity={popularity.data} engagement={engagement.d
 ```
 
 ### 4. Trending/Ranking Lists
+
 ```typescript
 // Fetch rankings
 const trending = await fetch('/api/gamification/analytics/achievements/trending?limit=5')
@@ -316,6 +344,7 @@ return (
 ### Frontend Optimization
 
 1. **Request Batching**
+
    ```typescript
    // Fetch multiple endpoints in parallel
    const [userStats, systemStats] = await Promise.all([
@@ -325,6 +354,7 @@ return (
    ```
 
 2. **Progressive Loading**
+
    ```typescript
    // Load summary first, full stats later
    return (
@@ -378,7 +408,7 @@ describe('GET /user/:userId/achievements', () => {
     const res = await request(app)
       .get('/api/gamification/analytics/user/user123/achievements')
       .set('Authorization', `Bearer ${token}`);
-    
+
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
   });
@@ -416,7 +446,7 @@ router.get('/analytics/status', (req, res) => {
     endpoints: {
       userStats: { requests: 1000, avgTime: 45 },
       systemStats: { requests: 500, avgTime: 120 },
-    }
+    },
   });
 });
 ```
@@ -427,16 +457,17 @@ router.get('/analytics/status', (req, res) => {
 
 ### Common Issues
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| 500 on user stats | User not found | Check userId exists in database |
-| Empty unlock rates | No achievements | Ensure achievements seeded |
-| Slow system stats | Large dataset | Implement caching |
-| 401 Unauthorized | Invalid JWT | Check token validity |
+| Issue              | Cause           | Solution                        |
+| ------------------ | --------------- | ------------------------------- |
+| 500 on user stats  | User not found  | Check userId exists in database |
+| Empty unlock rates | No achievements | Ensure achievements seeded      |
+| Slow system stats  | Large dataset   | Implement caching               |
+| 401 Unauthorized   | Invalid JWT     | Check token validity            |
 
 ### Debug Mode
 
 Enable debug logging:
+
 ```typescript
 // In analyticsService.ts
 const DEBUG = process.env.DEBUG_ANALYTICS === 'true';

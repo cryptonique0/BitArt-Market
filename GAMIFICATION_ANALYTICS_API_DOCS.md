@@ -27,9 +27,11 @@ Authorization: Bearer <your-jwt-token>
 Retrieves comprehensive achievement statistics for a specific user.
 
 **Parameters:**
+
 - `userId` (string, required) - The user ID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -78,6 +80,7 @@ Retrieves comprehensive achievement statistics for a specific user.
 ```
 
 **Error Responses:**
+
 - `400`: userId is required
 - `500`: Failed to retrieve user statistics
 
@@ -88,9 +91,11 @@ Retrieves comprehensive achievement statistics for a specific user.
 Retrieves a simplified summary of user achievement statistics.
 
 **Parameters:**
+
 - `userId` (string, required) - The user ID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -122,9 +127,11 @@ Retrieves a simplified summary of user achievement statistics.
 Retrieves popularity metrics for a specific achievement.
 
 **Parameters:**
+
 - `achievementId` (string, required) - The achievement ID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -148,6 +155,7 @@ Retrieves popularity metrics for a specific achievement.
 ```
 
 **Error Responses:**
+
 - `400`: achievementId is required
 - `500`: Failed to retrieve achievement popularity
 
@@ -158,9 +166,11 @@ Retrieves popularity metrics for a specific achievement.
 Retrieves the unlock rate for a specific achievement.
 
 **Parameters:**
+
 - `achievementId` (string, required) - The achievement ID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -178,6 +188,7 @@ Retrieves the unlock rate for a specific achievement.
 ```
 
 **Error Responses:**
+
 - `400`: achievementId is required
 - `500`: Failed to retrieve unlock rate
 
@@ -190,10 +201,12 @@ Retrieves the unlock rate for a specific achievement.
 Retrieves unlock rates for all achievements with optional sorting and limiting.
 
 **Query Parameters:**
+
 - `sort` (string, optional, default: "desc") - Sort order: "asc" or "desc"
 - `limit` (number, optional, default: 50) - Maximum number of results
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -232,9 +245,11 @@ Retrieves unlock rates for all achievements with optional sorting and limiting.
 Retrieves engagement metrics for a specific achievement.
 
 **Parameters:**
+
 - `achievementId` (string, required) - The achievement ID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -252,6 +267,7 @@ Retrieves engagement metrics for a specific achievement.
 ```
 
 **Error Responses:**
+
 - `400`: achievementId is required
 - `500`: Failed to retrieve engagement metrics
 
@@ -264,6 +280,7 @@ Retrieves engagement metrics for a specific achievement.
 Retrieves comprehensive system-wide statistics.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -312,6 +329,7 @@ Retrieves comprehensive system-wide statistics.
 Retrieves a dashboard-friendly overview of system statistics.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -370,9 +388,11 @@ Retrieves a dashboard-friendly overview of system statistics.
 Retrieves the most unlocked achievements.
 
 **Query Parameters:**
+
 - `limit` (number, optional, default: 10) - Number of results to return
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -401,9 +421,11 @@ Retrieves the most unlocked achievements.
 Retrieves the rarest (least unlocked) achievements.
 
 **Query Parameters:**
+
 - `limit` (number, optional, default: 10) - Number of results to return
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -432,9 +454,11 @@ Retrieves the rarest (least unlocked) achievements.
 Retrieves trending achievements with high recent engagement.
 
 **Query Parameters:**
+
 - `limit` (number, optional, default: 10) - Number of results to return
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -561,6 +585,7 @@ interface SystemwideStats {
 All endpoints follow a consistent error handling pattern:
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -570,6 +595,7 @@ All endpoints follow a consistent error handling pattern:
 ```
 
 ### Error Response
+
 ```json
 {
   "error": "Error message describing what went wrong"
@@ -578,12 +604,12 @@ All endpoints follow a consistent error handling pattern:
 
 ### Common Error Codes
 
-| Code | Message | Cause |
-|------|---------|-------|
-| 400 | Parameter is required | Missing required query parameter or path parameter |
-| 401 | Unauthorized | Missing or invalid JWT token |
-| 404 | Not Found | Achievement or user not found |
-| 500 | Failed to retrieve | Server-side error processing request |
+| Code | Message               | Cause                                              |
+| ---- | --------------------- | -------------------------------------------------- |
+| 400  | Parameter is required | Missing required query parameter or path parameter |
+| 401  | Unauthorized          | Missing or invalid JWT token                       |
+| 404  | Not Found             | Achievement or user not found                      |
+| 500  | Failed to retrieve    | Server-side error processing request               |
 
 ---
 
@@ -599,18 +625,21 @@ All endpoints follow a consistent error handling pattern:
 ## Usage Examples
 
 ### Get User Stats
+
 ```bash
 curl -X GET https://api.bitart.com/api/gamification/analytics/user/user123/achievements \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### Get Most Unlocked Achievements
+
 ```bash
 curl -X GET 'https://api.bitart.com/api/gamification/analytics/achievements/top-unlocked?limit=5' \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### Get System Dashboard Overview
+
 ```bash
 curl -X GET https://api.bitart.com/api/gamification/analytics/dashboard/overview \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
@@ -648,15 +677,16 @@ The analytics endpoints are designed to work seamlessly with frontend dashboard 
 
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2024-01-15 | Initial release with 8 core endpoints |
+| Version | Date       | Changes                               |
+| ------- | ---------- | ------------------------------------- |
+| 1.0     | 2024-01-15 | Initial release with 8 core endpoints |
 
 ---
 
 ## Support
 
 For issues or questions about the Analytics API:
+
 1. Check the [Gamification Documentation](./GAMIFICATION_GUIDE.md)
 2. Review error messages and [Common Issues](./TROUBLESHOOTING.md)
 3. Contact the development team

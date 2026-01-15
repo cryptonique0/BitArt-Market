@@ -110,12 +110,14 @@ app.use(securityHeaders);
 app.use(addCSRFToken);
 
 // CORS configuration
-app.use(cors({
-  origin: config.allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token']
-}));
+app.use(
+  cors({
+    origin: config.allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -152,12 +154,12 @@ app.use(performanceMonitor);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const startTime = Date.now();
-  
+
   res.on('finish', () => {
     const duration = Date.now() - startTime;
     logger.http(req, res, duration);
   });
-  
+
   next();
 });
 
@@ -171,7 +173,7 @@ app.get('/api/health', (req: Request, res: Response) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
-    network: config.network
+    network: config.network,
   });
 });
 
@@ -183,16 +185,19 @@ app.get('/api/health/performance', performanceHealthCheck);
 // ============================================
 
 app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
-  swaggerOptions: {
-    url: '/api-docs.json',
-    defaultModelsExpandDepth: 1,
-    defaultModelExpandDepth: 1,
-    docExpansion: 'list',
-    filter: true,
-    showRequestHeaders: true,
-  }
-}));
+app.get(
+  '/api-docs',
+  swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      url: '/api-docs.json',
+      defaultModelsExpandDepth: 1,
+      defaultModelExpandDepth: 1,
+      docExpansion: 'list',
+      filter: true,
+      showRequestHeaders: true,
+    },
+  })
+);
 
 app.get('/api-docs.json', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'application/json');
@@ -209,8 +214,8 @@ app.get('/', (_req: Request, res: Response) => {
       nfts: '/api/nfts',
       marketplace: '/api/marketplace/listings',
       users: '/api/users/{address}',
-      analytics: '/api/analytics/stats'
-    }
+      analytics: '/api/analytics/stats',
+    },
   });
 });
 
@@ -282,7 +287,7 @@ app.use(errorHandler);
 // ============================================
 
 // Initialize event listener service
-eventListenerService.initialize(io).catch((error) => {
+eventListenerService.initialize(io).catch(error => {
   logger.error('Failed to initialize event listener service:', error);
 });
 
@@ -291,8 +296,11 @@ AchievementsService.initializeAchievements()
   .then(() => {
     logger.info('✅ Achievements initialized successfully');
   })
-  .catch((error) => {
-    logger.warn('⚠️ Achievement initialization failed (may already be initialized):', error.message);
+  .catch(error => {
+    logger.warn(
+      '⚠️ Achievement initialization failed (may already be initialized):',
+      error.message
+    );
   });
 
 httpServer.listen(PORT, () => {
