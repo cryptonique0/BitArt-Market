@@ -4,7 +4,7 @@
  */
 
 import { ethers, Contract, ContractInterface, Signer } from 'ethers';
-import { config } from '../config/env';
+import { getConfig } from '../config/env';
 import { logger } from '../utils/logger';
 
 export interface MintParams {
@@ -48,6 +48,7 @@ export class BlockchainService {
    */
   static initialize() {
     try {
+      const config = getConfig();
       const network = config.network === 'mainnet' ? 'mainnet' : 'sepolia';
       const rpcUrl = config.network === 'mainnet'
         ? 'https://mainnet.base.org'

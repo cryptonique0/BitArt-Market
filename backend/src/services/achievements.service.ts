@@ -36,34 +36,216 @@ class AchievementsServiceClass {
   // Predefined achievements
   private readonly ACHIEVEMENTS = [
     // Trading achievements
-    { name: 'First Sale', description: 'Make your first NFT sale', icon: '💰', category: 'trading', tier: 'bronze', requirement_type: 'total_sales', requirement_value: 1, points: 10 },
-    { name: 'Big Spender', description: 'Spend 10 STX on NFTs', icon: '💸', category: 'trading', tier: 'silver', requirement_type: 'total_spent', requirement_value: 10, points: 25 },
-    { name: 'Whale', description: 'Portfolio value exceeds 100 STX', icon: '🐋', category: 'trading', tier: 'gold', requirement_type: 'portfolio_value', requirement_value: 100, points: 50 },
-    { name: 'Profit Master', description: 'Earn 50 STX profit', icon: '📈', category: 'trading', tier: 'platinum', requirement_type: 'profit', requirement_value: 50, points: 100 },
-    { name: 'Trading Legend', description: 'Complete 100 trades', icon: '⚡', category: 'trading', tier: 'legendary', requirement_type: 'total_trades', requirement_value: 100, points: 200 },
-    
+    {
+      name: 'First Sale',
+      description: 'Make your first NFT sale',
+      icon: '💰',
+      category: 'trading',
+      tier: 'bronze',
+      requirement_type: 'total_sales',
+      requirement_value: 1,
+      points: 10,
+    },
+    {
+      name: 'Big Spender',
+      description: 'Spend 10 STX on NFTs',
+      icon: '💸',
+      category: 'trading',
+      tier: 'silver',
+      requirement_type: 'total_spent',
+      requirement_value: 10,
+      points: 25,
+    },
+    {
+      name: 'Whale',
+      description: 'Portfolio value exceeds 100 STX',
+      icon: '🐋',
+      category: 'trading',
+      tier: 'gold',
+      requirement_type: 'portfolio_value',
+      requirement_value: 100,
+      points: 50,
+    },
+    {
+      name: 'Profit Master',
+      description: 'Earn 50 STX profit',
+      icon: '📈',
+      category: 'trading',
+      tier: 'platinum',
+      requirement_type: 'profit',
+      requirement_value: 50,
+      points: 100,
+    },
+    {
+      name: 'Trading Legend',
+      description: 'Complete 100 trades',
+      icon: '⚡',
+      category: 'trading',
+      tier: 'legendary',
+      requirement_type: 'total_trades',
+      requirement_value: 100,
+      points: 200,
+    },
+
     // Social achievements
-    { name: 'Popular', description: 'Get 10 followers', icon: '👥', category: 'social', tier: 'bronze', requirement_type: 'followers', requirement_value: 10, points: 10 },
-    { name: 'Influencer', description: 'Get 100 followers', icon: '⭐', category: 'social', tier: 'silver', requirement_type: 'followers', requirement_value: 100, points: 25 },
-    { name: 'Celebrity', description: 'Get 1000 followers', icon: '🌟', category: 'social', tier: 'gold', requirement_type: 'followers', requirement_value: 1000, points: 100 },
-    { name: 'Social Butterfly', description: 'Follow 50 users', icon: '🦋', category: 'social', tier: 'bronze', requirement_type: 'following', requirement_value: 50, points: 10 },
-    
+    {
+      name: 'Popular',
+      description: 'Get 10 followers',
+      icon: '👥',
+      category: 'social',
+      tier: 'bronze',
+      requirement_type: 'followers',
+      requirement_value: 10,
+      points: 10,
+    },
+    {
+      name: 'Influencer',
+      description: 'Get 100 followers',
+      icon: '⭐',
+      category: 'social',
+      tier: 'silver',
+      requirement_type: 'followers',
+      requirement_value: 100,
+      points: 25,
+    },
+    {
+      name: 'Celebrity',
+      description: 'Get 1000 followers',
+      icon: '🌟',
+      category: 'social',
+      tier: 'gold',
+      requirement_type: 'followers',
+      requirement_value: 1000,
+      points: 100,
+    },
+    {
+      name: 'Social Butterfly',
+      description: 'Follow 50 users',
+      icon: '🦋',
+      category: 'social',
+      tier: 'bronze',
+      requirement_type: 'following',
+      requirement_value: 50,
+      points: 10,
+    },
+
     // Creation achievements
-    { name: 'First Creation', description: 'Mint your first NFT', icon: '🎨', category: 'creation', tier: 'bronze', requirement_type: 'nfts_created', requirement_value: 1, points: 10 },
-    { name: 'Prolific Creator', description: 'Mint 10 NFTs', icon: '🖼️', category: 'creation', tier: 'silver', requirement_type: 'nfts_created', requirement_value: 10, points: 25 },
-    { name: 'Master Artist', description: 'Mint 50 NFTs', icon: '🎭', category: 'creation', tier: 'gold', requirement_type: 'nfts_created', requirement_value: 50, points: 75 },
-    { name: 'Art Factory', description: 'Mint 100 NFTs', icon: '🏭', category: 'creation', tier: 'platinum', requirement_type: 'nfts_created', requirement_value: 100, points: 150 },
-    
+    {
+      name: 'First Creation',
+      description: 'Mint your first NFT',
+      icon: '🎨',
+      category: 'creation',
+      tier: 'bronze',
+      requirement_type: 'nfts_created',
+      requirement_value: 1,
+      points: 10,
+    },
+    {
+      name: 'Prolific Creator',
+      description: 'Mint 10 NFTs',
+      icon: '🖼️',
+      category: 'creation',
+      tier: 'silver',
+      requirement_type: 'nfts_created',
+      requirement_value: 10,
+      points: 25,
+    },
+    {
+      name: 'Master Artist',
+      description: 'Mint 50 NFTs',
+      icon: '🎭',
+      category: 'creation',
+      tier: 'gold',
+      requirement_type: 'nfts_created',
+      requirement_value: 50,
+      points: 75,
+    },
+    {
+      name: 'Art Factory',
+      description: 'Mint 100 NFTs',
+      icon: '🏭',
+      category: 'creation',
+      tier: 'platinum',
+      requirement_type: 'nfts_created',
+      requirement_value: 100,
+      points: 150,
+    },
+
     // Collection achievements
-    { name: 'Collector', description: 'Own 5 NFTs', icon: '🗂️', category: 'collection', tier: 'bronze', requirement_type: 'nfts_owned', requirement_value: 5, points: 10 },
-    { name: 'Hoarder', description: 'Own 25 NFTs', icon: '💎', category: 'collection', tier: 'silver', requirement_type: 'nfts_owned', requirement_value: 25, points: 25 },
-    { name: 'Museum Curator', description: 'Own 100 NFTs', icon: '🏛️', category: 'collection', tier: 'gold', requirement_type: 'nfts_owned', requirement_value: 100, points: 100 },
-    
+    {
+      name: 'Collector',
+      description: 'Own 5 NFTs',
+      icon: '🗂️',
+      category: 'collection',
+      tier: 'bronze',
+      requirement_type: 'nfts_owned',
+      requirement_value: 5,
+      points: 10,
+    },
+    {
+      name: 'Hoarder',
+      description: 'Own 25 NFTs',
+      icon: '💎',
+      category: 'collection',
+      tier: 'silver',
+      requirement_type: 'nfts_owned',
+      requirement_value: 25,
+      points: 25,
+    },
+    {
+      name: 'Museum Curator',
+      description: 'Own 100 NFTs',
+      icon: '🏛️',
+      category: 'collection',
+      tier: 'gold',
+      requirement_type: 'nfts_owned',
+      requirement_value: 100,
+      points: 100,
+    },
+
     // Special achievements
-    { name: 'Early Adopter', description: 'Join BitArt Market in the first month', icon: '🚀', category: 'special', tier: 'gold', requirement_type: 'early_adopter', requirement_value: 1, points: 50, is_hidden: false },
-    { name: 'Verified Creator', description: 'Get verified status', icon: '✅', category: 'special', tier: 'platinum', requirement_type: 'verified', requirement_value: 1, points: 100 },
-    { name: 'Blue Chip Holder', description: 'Own an NFT worth 50+ STX', icon: '💠', category: 'special', tier: 'platinum', requirement_type: 'expensive_nft', requirement_value: 50, points: 75 },
-    { name: 'Community Champion', description: 'Hidden achievement', icon: '🏆', category: 'special', tier: 'legendary', requirement_type: 'manual', requirement_value: 1, points: 500, is_hidden: true },
+    {
+      name: 'Early Adopter',
+      description: 'Join BitArt Market in the first month',
+      icon: '🚀',
+      category: 'special',
+      tier: 'gold',
+      requirement_type: 'early_adopter',
+      requirement_value: 1,
+      points: 50,
+      is_hidden: false,
+    },
+    {
+      name: 'Verified Creator',
+      description: 'Get verified status',
+      icon: '✅',
+      category: 'special',
+      tier: 'platinum',
+      requirement_type: 'verified',
+      requirement_value: 1,
+      points: 100,
+    },
+    {
+      name: 'Blue Chip Holder',
+      description: 'Own an NFT worth 50+ STX',
+      icon: '💠',
+      category: 'special',
+      tier: 'platinum',
+      requirement_type: 'expensive_nft',
+      requirement_value: 50,
+      points: 75,
+    },
+    {
+      name: 'Community Champion',
+      description: 'Hidden achievement',
+      icon: '🏆',
+      category: 'special',
+      tier: 'legendary',
+      requirement_type: 'manual',
+      requirement_value: 1,
+      points: 500,
+      is_hidden: true,
+    },
   ];
 
   /**
@@ -86,12 +268,10 @@ class AchievementsServiceClass {
           .single();
 
         if (!existing) {
-          const { error } = await supabase
-            .from('achievements')
-            .insert({
-              ...achievement,
-              is_hidden: achievement.is_hidden || false,
-            });
+          const { error } = await supabase.from('achievements').insert({
+            ...achievement,
+            is_hidden: achievement.is_hidden || false,
+          });
 
           if (error) {
             logger.error(`Error inserting achievement ${achievement.name}:`, error);
@@ -139,10 +319,12 @@ class AchievementsServiceClass {
     try {
       const { data, error } = await supabase
         .from('user_achievements')
-        .select(`
+        .select(
+          `
           *,
           achievement:achievements(*)
-        `)
+        `
+        )
         .eq('user_id', userId)
         .order('unlocked_at', { ascending: false });
 
@@ -286,10 +468,12 @@ class AchievementsServiceClass {
           achievement_id: achievementId,
           unlocked_at: new Date().toISOString(),
         })
-        .select(`
+        .select(
+          `
           *,
           achievement:achievements(*)
-        `)
+        `
+        )
         .single();
 
       if (error) {
@@ -380,9 +564,7 @@ class AchievementsServiceClass {
    */
   async getAchievementLeaderboard(limit: number = 10): Promise<any[]> {
     try {
-      const { data, error } = await supabase
-        .from('user_achievements')
-        .select(`
+      const { data, error } = await supabase.from('user_achievements').select(`
           user_id,
           achievement:achievements(points)
         `);

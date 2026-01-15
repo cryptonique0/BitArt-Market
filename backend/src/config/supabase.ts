@@ -22,27 +22,29 @@ if (!isSupabaseConfigured) {
  * Supabase client for API requests (with Row Level Security)
  */
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseKey || 'placeholder-key', 
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseKey || 'placeholder-key',
   {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
+);
 
 /**
  * Supabase admin client (bypasses RLS - use carefully)
  */
 export const supabaseAdmin = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseServiceKey || 'placeholder-service-key', 
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseServiceKey || 'placeholder-service-key',
   {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
+);
 
 /**
  * Health check for Supabase connection
@@ -50,12 +52,12 @@ export const supabaseAdmin = createClient(
 export async function checkSupabaseHealth(): Promise<boolean> {
   try {
     const { error } = await supabase.from('users').select('count()', { count: 'exact' }).limit(1);
-    
+
     if (error) {
       logger.error('Supabase health check failed:', error);
       return false;
     }
-    
+
     logger.info('✅ Supabase connection established');
     return true;
   } catch (error) {
@@ -69,7 +71,7 @@ export async function checkSupabaseHealth(): Promise<boolean> {
  */
 export async function initializeSupabase(): Promise<void> {
   const isHealthy = await checkSupabaseHealth();
-  
+
   if (!isHealthy) {
     logger.warn('Supabase health check failed - continuing anyway');
   }

@@ -9,7 +9,7 @@ const ACHIEVEMENTS: Achievement[] = [
     type: AchievementType.CREATOR,
     requirement: 1,
     xpReward: 50,
-    rarity: 'common'
+    rarity: 'common',
   },
   {
     id: 'prolific_creator',
@@ -19,7 +19,7 @@ const ACHIEVEMENTS: Achievement[] = [
     type: AchievementType.CREATOR,
     requirement: 10,
     xpReward: 200,
-    rarity: 'uncommon'
+    rarity: 'uncommon',
   },
   {
     id: 'first_purchase',
@@ -29,7 +29,7 @@ const ACHIEVEMENTS: Achievement[] = [
     type: AchievementType.COLLECTOR,
     requirement: 1,
     xpReward: 50,
-    rarity: 'common'
+    rarity: 'common',
   },
   {
     id: 'first_sale',
@@ -39,7 +39,7 @@ const ACHIEVEMENTS: Achievement[] = [
     type: AchievementType.TRADER,
     requirement: 1,
     xpReward: 50,
-    rarity: 'common'
+    rarity: 'common',
   },
   {
     id: 'daily_streak_7',
@@ -49,8 +49,8 @@ const ACHIEVEMENTS: Achievement[] = [
     type: AchievementType.SPECIAL,
     requirement: 7,
     xpReward: 150,
-    rarity: 'uncommon'
-  }
+    rarity: 'uncommon',
+  },
 ];
 
 const userAchievements = new Map<string, UserAchievement[]>();
@@ -77,7 +77,7 @@ export const achievementService = {
       userId,
       achievementId,
       unlockedAt: new Date(),
-      progress: achievement.requirement
+      progress: achievement.requirement,
     };
 
     userAchs.push(userAchievement);
@@ -85,7 +85,11 @@ export const achievementService = {
     return userAchievement;
   },
 
-  async updateProgress(userId: string, achievementId: string, progress: number): Promise<UserAchievement | null> {
+  async updateProgress(
+    userId: string,
+    achievementId: string,
+    progress: number
+  ): Promise<UserAchievement | null> {
     const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
     if (!achievement) return null;
 
@@ -97,7 +101,7 @@ export const achievementService = {
         userId,
         achievementId,
         progress: 0,
-        unlockedAt: new Date(0) // Use epoch as placeholder for "not unlocked"
+        unlockedAt: new Date(0), // Use epoch as placeholder for "not unlocked"
       };
       userAchs.push(userAch);
     }
@@ -119,5 +123,5 @@ export const achievementService = {
   async getUnlockedCount(userId: string): Promise<number> {
     const userAchs = await this.getUserAchievements(userId);
     return userAchs.filter(a => a.unlockedAt).length;
-  }
+  },
 };
