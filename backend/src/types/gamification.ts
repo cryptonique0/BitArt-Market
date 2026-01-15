@@ -150,3 +150,21 @@ export interface LeaderboardEntry {
   badges: number;
   rank: number;
 }
+
+export interface UserXPTracker {
+  userId: string;
+  totalXP: number;
+  achievementXP: number;
+  dailyStreakXP: number;
+  lastUpdated: Date;
+}
+
+export interface CategoryLeaderboardEntry {
+  userId: string;
+  username: string;
+  avatar?: string;
+  totalXP: number;
+  achievementCount: number;
+  rank: number;
+  type: AchievementType;
+}

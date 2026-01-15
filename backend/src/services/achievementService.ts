@@ -3,7 +3,15 @@ import {
   UserAchievement,
   AchievementType,
   AchievementTier,
+  UserXPTracker,
+  CategoryLeaderboardEntry,
 } from '../types/gamification';
+
+// Track total XP per user
+const userXPMap = new Map<string, UserXPTracker>();
+
+// Track category-specific achievements
+const categoryAchievementMap = new Map<string, Map<AchievementType, Achievement[]>>();
 
 const ACHIEVEMENTS: Achievement[] = [
   {
@@ -212,6 +220,10 @@ export const achievementService = {
 
     userAchs.push(userAchievement);
     userAchievements.set(userId, userAchs);
+
+    // Track XP earned
+    await this.trackUserXP(userId, achievement.xpReward, 'achievement');
+
     return userAchievement;
   },
 
@@ -240,6 +252,8 @@ export const achievementService = {
 
     if (userAch.progress >= achievement.requirement && userAch.unlockedAt.getTime() === 0) {
       userAch.unlockedAt = new Date();
+      // Track XP when achievement is completed through progress update
+      await this.trackUserXP(userId, achievement.xpReward, 'achievement');
     }
 
     userAchievements.set(userId, userAchs);
@@ -348,5 +362,179 @@ export const achievementService = {
       });
 
     return unlockedTiers[0] || AchievementTier.BRONZE;
+  },
+
+  // ===== LEADERBOARD METHODS =====
+
+  async trackUserXP(
+    userId: string,
+    xpAmount: number,
+    source: 'achievement' | 'daily_streak'
+  ): Promise<UserXPTracker> {
+    let tracker = userXPMap.get(userId);
+
+    if (!tracker) {
+      tracker = {
+        userId,
+        totalXP: 0,
+        achievementXP: 0,
+        dailyStreakXP: 0,
+        lastUpdated: new Date(),
+      };
+    }
+
+    tracker.totalXP += xpAmount;
+    if (source === 'achievement') {
+      tracker.achievementXP += xpAmount;
+    } else if (source === 'daily_streak') {
+      tracker.dailyStreakXP += xpAmount;
+    }
+    tracker.lastUpdated = new Date();
+
+    userXPMap.set(userId, tracker);
+    return tracker;
+  },
+
+  getUserXPTracker(userId: string): UserXPTracker | undefined {
+    return userXPMap.get(userId);
+  },
+
+  getAllUserXP(): Map<string, UserXPTracker> {
+    return new Map(userXPMap);
+  },
+
+  async getLeaderboard(
+    type?: AchievementType,
+    limit: number = 10
+  ): Promise<CategoryLeaderboardEntry[]> {
+    // Get all users and their achievement XP
+    const allXPData = this.getAllUserXP();
+
+    const leaderboardData: CategoryLeaderboardEntry[] = [];
+
+    for (const [userId, tracker] of allXPData) {
+      const userAchs = await this.getUserAchievements(userId);
+      const achievements = ACHIEVEMENTS;
+
+      // Filter achievements by type if specified
+      let typeAchievements = achievements;
+      if (type) {
+        typeAchievements = achievements.filter(a => a.type === type);
+      }
+
+      // Count achievements for this user in this category
+      const unlockedIds = new Set(userAchs.filter(a => a.unlockedAt).map(ua => ua.achievementId));
+      const achievementCount = typeAchievements.filter(a => unlockedIds.has(a.id)).length;
+
+      if (achievementCount > 0 || tracker.totalXP > 0) {
+        leaderboardData.push({
+          userId,
+          username: `User_${userId.substring(0, 8)}`, // Placeholder - should come from user profile
+          totalXP: type ? tracker.achievementXP : tracker.totalXP, // Use category XP if type specified
+          achievementCount,
+          rank: 0, // Will be set below
+          type: type || AchievementType.CREATOR, // Default type
+        });
+      }
+    }
+
+    // Sort by XP (descending), then by achievement count
+    leaderboardData.sort((a, b) => {
+      if (b.totalXP !== a.totalXP) {
+        return b.totalXP - a.totalXP;
+      }
+      return b.achievementCount - a.achievementCount;
+    });
+
+    // Assign ranks
+    leaderboardData.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+
+    return leaderboardData.slice(0, limit);
+  },
+
+  async getUserRank(userId: string, type?: AchievementType): Promise<number | null> {
+    const leaderboard = await this.getLeaderboard(type, 10000); // Get all users
+
+    const userEntry = leaderboard.find(entry => entry.userId === userId);
+    return userEntry ? userEntry.rank : null;
+  },
+
+  async getLeaderboardAroundUser(
+    userId: string,
+    range: number = 5,
+    type?: AchievementType
+  ): Promise<CategoryLeaderboardEntry[]> {
+    const leaderboard = await this.getLeaderboard(type, 10000);
+    const userIndex = leaderboard.findIndex(entry => entry.userId === userId);
+
+    if (userIndex === -1) {
+      return [];
+    }
+
+    const start = Math.max(0, userIndex - range);
+    const end = Math.min(leaderboard.length, userIndex + range + 1);
+
+    return leaderboard.slice(start, end);
+  },
+
+  async getLeaderboardByType(
+    type: AchievementType,
+    limit: number = 10
+  ): Promise<CategoryLeaderboardEntry[]> {
+    return this.getLeaderboard(type, limit);
+  },
+
+  async getLeaderboardStats(): Promise<{
+    totalPlayers: number;
+    totalXPDistributed: number;
+    averageUserXP: number;
+    topUser: CategoryLeaderboardEntry | null;
+  }> {
+    const allXPData = this.getAllUserXP();
+    const totalPlayers = allXPData.size;
+    let totalXPDistributed = 0;
+
+    for (const tracker of allXPData.values()) {
+      totalXPDistributed += tracker.totalXP;
+    }
+
+    const averageUserXP = totalPlayers > 0 ? totalXPDistributed / totalPlayers : 0;
+
+    const leaderboard = await this.getLeaderboard(undefined, 1);
+    const topUser = leaderboard.length > 0 ? leaderboard[0] : null;
+
+    return {
+      totalPlayers,
+      totalXPDistributed,
+      averageUserXP,
+      topUser,
+    };
+  },
+
+  async getUserLeaderboardPosition(userId: string): Promise<{
+    userId: string;
+    rank: number;
+    totalXP: number;
+    percentile: number;
+    achievementCount: number;
+  } | null> {
+    const leaderboard = await this.getLeaderboard(undefined, 10000);
+    const userEntry = leaderboard.find(entry => entry.userId === userId);
+
+    if (!userEntry) {
+      return null;
+    }
+
+    const percentile = ((leaderboard.length - userEntry.rank + 1) / leaderboard.length) * 100;
+
+    return {
+      userId,
+      rank: userEntry.rank,
+      totalXP: userEntry.totalXP,
+      percentile,
+      achievementCount: userEntry.achievementCount,
+    };
   },
 };
