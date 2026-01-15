@@ -175,4 +175,146 @@ router.get('/rewards/lucky-draw/can-draw/:userId', async (req: Request, res: Res
   }
 });
 
+// ============ SEARCH & FILTER (NEW FEATURES) ============
+
+// Search achievements by title/description
+router.get('/achievements/search', async (req: Request, res: Response) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || typeof q !== 'string') {
+      return res.status(400).json({ error: 'Query parameter (q) is required' });
+    }
+
+    const results = await achievementService.searchAchievements(q);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to search achievements' });
+  }
+});
+
+// Get achievements by status (locked/in-progress/unlocked)
+router.get('/users/:userId/achievements/status/:status', async (req: Request, res: Response) => {
+  try {
+    const { userId, status } = req.params;
+
+    if (!['locked', 'in-progress', 'unlocked'].includes(status)) {
+      return res
+        .status(400)
+        .json({ error: 'Invalid status. Must be: locked, in-progress, or unlocked' });
+    }
+
+    const achievements = await achievementService.getAchievementsByStatus(
+      userId,
+      status as 'locked' | 'in-progress' | 'unlocked'
+    );
+    res.json(achievements);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch achievements by status' });
+  }
+});
+
+// ============ SEASONAL ACHIEVEMENTS (NEW FEATURE) ============
+
+// Get active seasons
+router.get('/seasons/active', async (req: Request, res: Response) => {
+  try {
+    const seasons = await achievementService.getActiveSeasons();
+    res.json(seasons);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch active seasons' });
+  }
+});
+
+// Get all seasons
+router.get('/seasons', async (req: Request, res: Response) => {
+  try {
+    const seasons = await achievementService.getAllSeasons();
+    res.json(seasons);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch seasons' });
+  }
+});
+
+// Get season by ID
+router.get('/seasons/:seasonId', async (req: Request, res: Response) => {
+  try {
+    const { seasonId } = req.params;
+    const season = await achievementService.getSeason(seasonId);
+    if (!season) {
+      return res.status(404).json({ error: 'Season not found' });
+    }
+    res.json(season);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch season' });
+  }
+});
+
+// Get seasonal achievements
+router.get('/seasons/:seasonId/achievements', async (req: Request, res: Response) => {
+  try {
+    const { seasonId } = req.params;
+    const achievements = await achievementService.getSeasonalAchievements(seasonId);
+    res.json(achievements);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch seasonal achievements' });
+  }
+});
+
+// Get seasonal leaderboard
+router.get('/seasons/:seasonId/leaderboard', async (req: Request, res: Response) => {
+  try {
+    const { seasonId } = req.params;
+    const { limit = '20' } = req.query;
+    const numLimit = Math.min(parseInt(limit as string) || 20, 100);
+    const leaderboard = await achievementService.getSeasonalLeaderboard(seasonId, numLimit);
+    res.json(leaderboard);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch seasonal leaderboard' });
+  }
+});
+
+// Get user seasonal progress
+router.get('/users/:userId/seasons/:seasonId/progress', async (req: Request, res: Response) => {
+  try {
+    const { userId, seasonId } = req.params;
+    const progress = await achievementService.getUserSeasonalProgress(userId, seasonId);
+    res.json(progress);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch seasonal progress' });
+  }
+});
+
+// Get user seasonal achievements
+router.get('/users/:userId/seasons/:seasonId/achievements', async (req: Request, res: Response) => {
+  try {
+    const { userId, seasonId } = req.params;
+    const achievements = await achievementService.getUserSeasonalAchievements(userId, seasonId);
+    res.json(achievements);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch user seasonal achievements' });
+  }
+});
+
+// Get seasonal rewards
+router.get('/users/:userId/seasons/:seasonId/rewards', async (req: Request, res: Response) => {
+  try {
+    const { userId, seasonId } = req.params;
+    const rewards = await achievementService.getSeasonalRewards(userId, seasonId);
+    res.json(rewards);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch seasonal rewards' });
+  }
+});
+
+// Get season timeline
+router.get('/seasons/timeline', async (req: Request, res: Response) => {
+  try {
+    const timeline = await achievementService.getSeasonTimeline();
+    res.json(timeline);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch season timeline' });
+  }
+});
+
 export default router;
