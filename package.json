@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "bitart-market",
   "version": "1.0.0",
   "description": "NFT Marketplace on Stacks Blockchain",
@@ -29,24 +28,19 @@
   ],
   "author": "BitArt Team",
   "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^7.2.0",
+    "prisma": "^7.2.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
     "concurrently": "^7.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
-    "prettier": "^3.1.1"
-  },
-  "dependencies": {}
-=======
-  "dependencies": {
-    "@prisma/client": "^7.2.0",
-    "prisma": "^7.2.0"
-  },
-  "devDependencies": {
+    "prettier": "^3.1.1",
     "@types/jest": "^30.0.0",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6"
   }
->>>>>>> 2caf294 (Initial commit with API documentation and features)
 }
