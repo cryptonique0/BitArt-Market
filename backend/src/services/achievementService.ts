@@ -5,10 +5,25 @@ import {
   AchievementTier,
   UserXPTracker,
   CategoryLeaderboardEntry,
+  UserStreak,
+  StreakStats,
+  StreakReward,
 } from '../types/gamification';
 
 // Track total XP per user
 const userXPMap = new Map<string, UserXPTracker>();
+
+// Track user streaks
+const userStreakMap = new Map<string, UserStreak>();
+
+// Streak reward configuration
+const STREAK_REWARDS: StreakReward[] = [
+  { dayThreshold: 7, xpBonus: 50, badge: '🔥', description: 'Week Warrior' },
+  { dayThreshold: 14, xpBonus: 100, badge: '⚡', description: 'Two Week Champion' },
+  { dayThreshold: 30, xpBonus: 250, badge: '💪', description: 'Monthly Master' },
+  { dayThreshold: 60, xpBonus: 500, badge: '👑', description: 'Legendary Contributor' },
+  { dayThreshold: 100, xpBonus: 1000, badge: '🌟', description: 'Century Achiever' },
+];
 
 // Track category-specific achievements
 const categoryAchievementMap = new Map<string, Map<AchievementType, Achievement[]>>();
@@ -535,6 +550,249 @@ export const achievementService = {
       totalXP: userEntry.totalXP,
       percentile,
       achievementCount: userEntry.achievementCount,
+    };
+  },
+
+  // ===== STREAK TRACKING METHODS =====
+
+  async updateStreak(userId: string): Promise<UserStreak> {
+    let streak = userStreakMap.get(userId);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!streak) {
+      // First time tracking
+      streak = {
+        userId,
+        currentStreak: 1,
+        longestStreak: 1,
+        lastActiveDate: today,
+        firstStreakDate: today,
+        totalStreakDays: 1,
+      };
+      userStreakMap.set(userId, streak);
+      return streak;
+    }
+
+    const lastActive = new Date(streak.lastActiveDate);
+    lastActive.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // Check if streak is still active
+    if (lastActive.getTime() === today.getTime()) {
+      // Already updated today - no change
+      return streak;
+    } else if (lastActive.getTime() === yesterday.getTime()) {
+      // Consecutive day - continue streak
+      streak.currentStreak++;
+      streak.totalStreakDays++;
+    } else {
+      // Streak broken - reset
+      this.resetStreak(userId);
+      streak = userStreakMap.get(userId)!;
+      streak.currentStreak = 1;
+      streak.totalStreakDays++;
+    }
+
+    // Update longest streak if current exceeds it
+    if (streak.currentStreak > streak.longestStreak) {
+      streak.longestStreak = streak.currentStreak;
+    }
+
+    streak.lastActiveDate = today;
+
+    userStreakMap.set(userId, streak);
+
+    // Award XP for streak continuation
+    if (streak.currentStreak > 1) {
+      const bonus = this.getStreakXPBonus(streak.currentStreak);
+      await this.trackUserXP(userId, bonus, 'daily_streak');
+    }
+
+    return streak;
+  },
+
+  getActiveStreak(userId: string): number {
+    const streak = userStreakMap.get(userId);
+    if (!streak) {
+      return 0;
+    }
+
+    // Check if streak is still active
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const lastActive = new Date(streak.lastActiveDate);
+    lastActive.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // If last active was today or yesterday, streak is active
+    if (lastActive.getTime() === today.getTime() || lastActive.getTime() === yesterday.getTime()) {
+      return streak.currentStreak;
+    }
+
+    // Streak is broken
+    return 0;
+  },
+
+  async getStreakStats(userId: string): Promise<StreakStats | null> {
+    const streak = userStreakMap.get(userId);
+    if (!streak) {
+      return null;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const millisUntilReset = tomorrow.getTime() - Date.now();
+    const daysUntilReset = Math.ceil(millisUntilReset / (1000 * 60 * 60 * 24));
+
+    const lastActive = new Date(streak.lastActiveDate);
+    lastActive.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const isActiveToday = lastActive.getTime() === today.getTime();
+    const xpBonus = this.getStreakXPBonus(streak.currentStreak);
+    const milestone = this.getStreakMilestone(streak.currentStreak);
+
+    return {
+      userId,
+      currentStreak: streak.currentStreak,
+      longestStreak: streak.longestStreak,
+      isActiveToday,
+      daysUntilReset,
+      xpBonus,
+      milestone,
+    };
+  },
+
+  resetStreak(userId: string): void {
+    const streak = userStreakMap.get(userId);
+    if (!streak) return;
+
+    streak.streakBrokenDate = new Date();
+    streak.currentStreak = 0;
+
+    userStreakMap.set(userId, streak);
+  },
+
+  getStreakXPBonus(currentStreak: number): number {
+    // Base bonus increases with streak
+    let bonus = 10; // 10 XP per day base
+
+    // Additional bonus for milestones
+    for (const reward of STREAK_REWARDS) {
+      if (currentStreak >= reward.dayThreshold) {
+        bonus = reward.xpBonus;
+      }
+    }
+
+    return bonus;
+  },
+
+  getStreakMilestone(currentStreak: number): number | null {
+    for (const reward of STREAK_REWARDS) {
+      if (currentStreak === reward.dayThreshold) {
+        return reward.dayThreshold;
+      }
+    }
+    return null;
+  },
+
+  getUserStreak(userId: string): UserStreak | undefined {
+    return userStreakMap.get(userId);
+  },
+
+  async getAllStreaks(): Promise<Map<string, UserStreak>> {
+    return new Map(userStreakMap);
+  },
+
+  async getStreakLeaderboard(
+    limit: number = 10
+  ): Promise<(UserStreak & { username: string; rank: number })[]> {
+    const allStreaks = await this.getAllStreaks();
+
+    const leaderboardData = Array.from(allStreaks.values())
+      .sort((a, b) => {
+        // Sort by current streak (descending), then by longest streak
+        if (b.currentStreak !== a.currentStreak) {
+          return b.currentStreak - a.currentStreak;
+        }
+        return b.longestStreak - a.longestStreak;
+      })
+      .slice(0, limit)
+      .map((streak, index) => ({
+        ...streak,
+        username: `User_${streak.userId.substring(0, 8)}`,
+        rank: index + 1,
+      }));
+
+    return leaderboardData;
+  },
+
+  getStreakRewardConfig(): StreakReward[] {
+    return [...STREAK_REWARDS];
+  },
+
+  async checkAndResetExpiredStreaks(): Promise<string[]> {
+    const resetUsers: string[] = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    for (const [userId, streak] of userStreakMap.entries()) {
+      const lastActive = new Date(streak.lastActiveDate);
+      lastActive.setHours(0, 0, 0, 0);
+
+      // If user hasn't been active since yesterday, reset their streak
+      if (lastActive.getTime() < yesterday.getTime() && streak.currentStreak > 0) {
+        this.resetStreak(userId);
+        resetUsers.push(userId);
+      }
+    }
+
+    return resetUsers;
+  },
+
+  async getStreakInsights(userId: string): Promise<{
+    streak: StreakStats | null;
+    nextMilestone: StreakReward | null;
+    progressToNext: number;
+    isRiskOfBreak: boolean;
+  } | null> {
+    const stats = await this.getStreakStats(userId);
+    if (!stats) {
+      return null;
+    }
+
+    // Find next milestone
+    const nextMilestone = STREAK_REWARDS.find(r => r.dayThreshold > stats.currentStreak) || null;
+
+    const progressToNext = nextMilestone
+      ? (stats.currentStreak / nextMilestone.dayThreshold) * 100
+      : 100;
+
+    // Check if at risk of losing streak (not active today but was active yesterday)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isRiskOfBreak = !stats.isActiveToday && stats.daysUntilReset < 1;
+
+    return {
+      streak: stats,
+      nextMilestone,
+      progressToNext,
+      isRiskOfBreak,
     };
   },
 };

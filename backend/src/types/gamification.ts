@@ -168,3 +168,29 @@ export interface CategoryLeaderboardEntry {
   rank: number;
   type: AchievementType;
 }
+export interface UserStreak {
+  userId: string;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: Date;
+  firstStreakDate: Date;
+  streakBrokenDate?: Date;
+  totalStreakDays: number; // Total consecutive days tracked
+}
+
+export interface StreakStats {
+  userId: string;
+  currentStreak: number;
+  longestStreak: number;
+  isActiveToday: boolean;
+  daysUntilReset: number;
+  xpBonus: number;
+  milestone: number | null;
+}
+
+export interface StreakReward {
+  dayThreshold: number;
+  xpBonus: number;
+  badge?: string;
+  description: string;
+}
