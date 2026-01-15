@@ -12,6 +12,11 @@ import {
   NewAchievementData,
   NearCompletionAchievement,
   AchievementRewardNotification,
+  AchievementComparison,
+  FriendAchievementData,
+  SocialLeaderboardEntry,
+  ShareableAchievementBadge,
+  UserProfile,
 } from '../types/gamification';
 
 // Track total XP per user
@@ -25,6 +30,12 @@ const notificationsMap = new Map<string, AchievementNotification[]>();
 
 // Track last viewed timestamp for each user
 const lastNotificationViewMap = new Map<string, Date>();
+
+// Track user friendships (bidirectional)
+const friendshipMap = new Map<string, Set<string>>();
+
+// Track user profiles for social features
+const userProfileMap = new Map<string, UserProfile>();
 
 // Streak reward configuration
 const STREAK_REWARDS: StreakReward[] = [
@@ -1373,5 +1384,314 @@ export const achievementService = {
 
   getLastNotificationView(userId: string): Date | undefined {
     return lastNotificationViewMap.get(userId);
+  },
+
+  // ===== SOCIAL FEATURES METHODS =====
+
+  async compareAchievements(userId1: string, userId2: string): Promise<AchievementComparison> {
+    const user1Achs = await this.getUserAchievements(userId1);
+    const user2Achs = await this.getUserAchievements(userId2);
+
+    const user1Unlocked = new Set(
+      user1Achs
+        .filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0)
+        .map(ua => ua.achievementId)
+    );
+    const user2Unlocked = new Set(
+      user2Achs
+        .filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0)
+        .map(ua => ua.achievementId)
+    );
+
+    const mutualIds = new Set([...user1Unlocked].filter(id => user2Unlocked.has(id)));
+    const user1OnlyIds = new Set([...user1Unlocked].filter(id => !user2Unlocked.has(id)));
+    const user2OnlyIds = new Set([...user2Unlocked].filter(id => !user1Unlocked.has(id)));
+
+    const mutualAchievements = ACHIEVEMENTS.filter(a => mutualIds.has(a.id));
+    const user1OnlyAchievements = ACHIEVEMENTS.filter(a => user1OnlyIds.has(a.id));
+    const user2OnlyAchievements = ACHIEVEMENTS.filter(a => user2OnlyIds.has(a.id));
+
+    const totalPossible = ACHIEVEMENTS.length;
+    const mutualCount = mutualIds.size;
+    const similarityPercentage = totalPossible > 0 ? (mutualCount / totalPossible) * 100 : 0;
+
+    return {
+      user1Id: userId1,
+      user2Id: userId2,
+      user1Username: `User_${userId1.substring(0, 8)}`,
+      user2Username: `User_${userId2.substring(0, 8)}`,
+      mutualAchievements,
+      user1OnlyAchievements,
+      user2OnlyAchievements,
+      mutualCount,
+      similarityPercentage,
+    };
+  },
+
+  async getFriendsAchievements(userId: string): Promise<FriendAchievementData[]> {
+    const friendIds = friendshipMap.get(userId) || new Set<string>();
+    const friendsData: FriendAchievementData[] = [];
+
+    for (const friendId of friendIds) {
+      const friendAchs = await this.getUserAchievements(friendId);
+      const unlockedCount = friendAchs.filter(
+        a => a.unlockedAt && a.unlockedAt.getTime() !== 0
+      ).length;
+      const completionPercentage =
+        ACHIEVEMENTS.length > 0 ? (unlockedCount / ACHIEVEMENTS.length) * 100 : 0;
+
+      // Get recent unlocks (last 5)
+      const recentUnlocks = friendAchs
+        .filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0)
+        .sort((a, b) => b.unlockedAt.getTime() - a.unlockedAt.getTime())
+        .slice(0, 5)
+        .map(ua => ACHIEVEMENTS.find(a => a.id === ua.achievementId)!)
+        .filter(a => a !== undefined);
+
+      // Get highest tier
+      const unlockedAchievements = friendAchs
+        .filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0)
+        .map(ua => ACHIEVEMENTS.find(a => a.id === ua.achievementId))
+        .filter(a => a !== undefined && a.tier) as Achievement[];
+
+      const highestTier =
+        unlockedAchievements.length > 0
+          ? this.getHighestTierUnlocked(unlockedAchievements)
+          : AchievementTier.BRONZE;
+
+      friendsData.push({
+        userId: friendId,
+        username: `User_${friendId.substring(0, 8)}`,
+        totalAchievements: unlockedCount,
+        completionPercentage,
+        recentUnlocks,
+        highestTier,
+      });
+    }
+
+    return friendsData;
+  },
+
+  async getSocialLeaderboard(limit: number = 20): Promise<SocialLeaderboardEntry[]> {
+    const allXPData = this.getAllUserXP();
+    const leaderboardData: SocialLeaderboardEntry[] = [];
+
+    for (const [userId, tracker] of allXPData) {
+      const userAchs = await this.getUserAchievements(userId);
+      const unlockedCount = userAchs.filter(
+        a => a.unlockedAt && a.unlockedAt.getTime() !== 0
+      ).length;
+      const completionPercentage =
+        ACHIEVEMENTS.length > 0 ? (unlockedCount / ACHIEVEMENTS.length) * 100 : 0;
+
+      leaderboardData.push({
+        userId,
+        username: `User_${userId.substring(0, 8)}`,
+        totalAchievements: unlockedCount,
+        completionPercentage,
+        totalXP: tracker.totalXP,
+        rank: 0,
+      });
+    }
+
+    // Sort by XP first, then achievement count
+    leaderboardData.sort((a, b) => {
+      if (b.totalXP !== a.totalXP) return b.totalXP - a.totalXP;
+      return b.totalAchievements - a.totalAchievements;
+    });
+
+    // Assign ranks
+    leaderboardData.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+
+    return leaderboardData.slice(0, limit);
+  },
+
+  async createShareableAchievementBadge(
+    userId: string,
+    achievementId: string
+  ): Promise<ShareableAchievementBadge | null> {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (!achievement) return null;
+
+    const userAchs = await this.getUserAchievements(userId);
+    const userAch = userAchs.find(ua => ua.achievementId === achievementId);
+
+    if (!userAch || !userAch.unlockedAt || userAch.unlockedAt.getTime() === 0) return null;
+
+    // Determine badge color based on rarity
+    const rarityColors: Record<string, string> = {
+      common: '#CCCCCC',
+      uncommon: '#00AA00',
+      rare: '#0055FF',
+      epic: '#AA00FF',
+      legendary: '#FFAA00',
+    };
+
+    const badge: ShareableAchievementBadge['badge'] = {
+      text: `${achievement.icon} ${achievement.title}`,
+      icon: achievement.badgeIcon || achievement.icon,
+      color: rarityColors[achievement.rarity] || '#CCCCCC',
+    };
+
+    return {
+      userId,
+      username: `User_${userId.substring(0, 8)}`,
+      achievement,
+      unlockedAt: userAch.unlockedAt,
+      shareUrl: `/achievements/${achievementId}?user=${userId}`,
+      badge,
+    };
+  },
+
+  async addFriend(userId1: string, userId2: string): Promise<boolean> {
+    if (userId1 === userId2) return false;
+
+    const user1Friends = friendshipMap.get(userId1) || new Set();
+    const user2Friends = friendshipMap.get(userId2) || new Set();
+
+    user1Friends.add(userId2);
+    user2Friends.add(userId1);
+
+    friendshipMap.set(userId1, user1Friends);
+    friendshipMap.set(userId2, user2Friends);
+
+    return true;
+  },
+
+  async removeFriend(userId1: string, userId2: string): Promise<boolean> {
+    const user1Friends = friendshipMap.get(userId1);
+    const user2Friends = friendshipMap.get(userId2);
+
+    if (!user1Friends || !user2Friends) return false;
+
+    user1Friends.delete(userId2);
+    user2Friends.delete(userId1);
+
+    friendshipMap.set(userId1, user1Friends);
+    friendshipMap.set(userId2, user2Friends);
+
+    return true;
+  },
+
+  getFriends(userId: string): string[] {
+    return Array.from(friendshipMap.get(userId) || new Set());
+  },
+
+  isFriend(userId1: string, userId2: string): boolean {
+    const friends = friendshipMap.get(userId1);
+    return friends ? friends.has(userId2) : false;
+  },
+
+  async getUserProfile(userId: string): Promise<UserProfile | null> {
+    const cached = userProfileMap.get(userId);
+    if (cached) return cached;
+
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedCount = userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).length;
+    const completionPercentage =
+      ACHIEVEMENTS.length > 0 ? (unlockedCount / ACHIEVEMENTS.length) * 100 : 0;
+    const tracker = userXPMap.get(userId);
+
+    const unlockedAchievements = userAchs
+      .filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0)
+      .map(ua => ACHIEVEMENTS.find(a => a.id === ua.achievementId))
+      .filter(a => a !== undefined && a.tier) as Achievement[];
+
+    const highestTier =
+      unlockedAchievements.length > 0
+        ? this.getHighestTierUnlocked(unlockedAchievements)
+        : AchievementTier.BRONZE;
+
+    const profile: UserProfile = {
+      userId,
+      username: `User_${userId.substring(0, 8)}`,
+      totalAchievements: unlockedCount,
+      completionPercentage,
+      totalXP: tracker?.totalXP || 0,
+      highestTier,
+      friendsList: this.getFriends(userId),
+    };
+
+    userProfileMap.set(userId, profile);
+    return profile;
+  },
+
+  async updateUserProfile(
+    userId: string,
+    updates: Partial<UserProfile>
+  ): Promise<UserProfile | null> {
+    const profile = await this.getUserProfile(userId);
+    if (!profile) return null;
+
+    const updated = { ...profile, ...updates, userId };
+    userProfileMap.set(userId, updated);
+
+    return updated;
+  },
+
+  async getMutualFriends(userId1: string, userId2: string): Promise<string[]> {
+    const user1Friends = new Set(this.getFriends(userId1));
+    const user2Friends = new Set(this.getFriends(userId2));
+
+    return Array.from(user1Friends).filter(id => user2Friends.has(id));
+  },
+
+  async getAchievementComparison(
+    userId1: string,
+    userId2: string
+  ): Promise<{
+    comparison: AchievementComparison;
+    areFriends: boolean;
+    mutualFriends: string[];
+  } | null> {
+    const comparison = await this.compareAchievements(userId1, userId2);
+    const areFriends = this.isFriend(userId1, userId2);
+    const mutualFriends = await this.getMutualFriends(userId1, userId2);
+
+    return {
+      comparison,
+      areFriends,
+      mutualFriends,
+    };
+  },
+
+  async getFriendsLeaderboard(
+    userId: string,
+    limit: number = 20
+  ): Promise<SocialLeaderboardEntry[]> {
+    const friendIds = this.getFriends(userId);
+    const leaderboardData: SocialLeaderboardEntry[] = [];
+
+    for (const friendId of friendIds) {
+      const userAchs = await this.getUserAchievements(friendId);
+      const unlockedCount = userAchs.filter(
+        a => a.unlockedAt && a.unlockedAt.getTime() !== 0
+      ).length;
+      const completionPercentage =
+        ACHIEVEMENTS.length > 0 ? (unlockedCount / ACHIEVEMENTS.length) * 100 : 0;
+      const tracker = userXPMap.get(friendId);
+
+      leaderboardData.push({
+        userId: friendId,
+        username: `User_${friendId.substring(0, 8)}`,
+        totalAchievements: unlockedCount,
+        completionPercentage,
+        totalXP: tracker?.totalXP || 0,
+        rank: 0,
+        friendsWith: true,
+      });
+    }
+
+    // Sort by XP
+    leaderboardData.sort((a, b) => b.totalXP - a.totalXP);
+
+    // Assign ranks
+    leaderboardData.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+
+    return leaderboardData.slice(0, limit);
   },
 };

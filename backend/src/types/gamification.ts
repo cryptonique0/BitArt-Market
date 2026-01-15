@@ -62,6 +62,62 @@ export interface XPTransaction {
   timestamp: Date;
 }
 
+export interface AchievementComparison {
+  user1Id: string;
+  user2Id: string;
+  user1Username: string;
+  user2Username: string;
+  mutualAchievements: Achievement[];
+  user1OnlyAchievements: Achievement[];
+  user2OnlyAchievements: Achievement[];
+  mutualCount: number;
+  similarityPercentage: number;
+}
+
+export interface FriendAchievementData {
+  userId: string;
+  username: string;
+  avatar?: string;
+  totalAchievements: number;
+  completionPercentage: number;
+  recentUnlocks: Achievement[];
+  highestTier: AchievementTier;
+}
+
+export interface SocialLeaderboardEntry {
+  userId: string;
+  username: string;
+  avatar?: string;
+  totalAchievements: number;
+  completionPercentage: number;
+  totalXP: number;
+  rank: number;
+  friendsWith?: boolean;
+}
+
+export interface ShareableAchievementBadge {
+  userId: string;
+  username: string;
+  achievement: Achievement;
+  unlockedAt: Date;
+  shareUrl: string;
+  badge: {
+    text: string;
+    icon: string;
+    color: string;
+  };
+}
+
+export interface UserProfile {
+  userId: string;
+  username: string;
+  avatar?: string;
+  totalAchievements: number;
+  completionPercentage: number;
+  totalXP: number;
+  highestTier: AchievementTier;
+  friendsList: string[];
+}
 export interface DailyReward {
   id: string;
   userId: string;
