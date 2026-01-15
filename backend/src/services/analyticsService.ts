@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/prismaClient';
 import {
   UserAchievementStats,
   AchievementPopularity,
@@ -10,8 +10,6 @@ import {
   AchievementRarity,
   DemographicStats,
 } from '../types/gamification';
-
-const prisma = new PrismaClient();
 
 /**
  * Analytics Service for Gamification System
@@ -54,29 +52,30 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
     });
 
     // Separate by status
-    const unlocked = userAchievements.filter(ua => ua.unlockedAt);
-    const inProgress = userAchievements.filter(ua => ua.progress > 0 && ua.progress < 100);
+    const unlocked = userAchievements.filter((ua: any) => ua.unlockedAt);
+    const inProgress = userAchievements.filter((ua: any) => ua.progress > 0 && ua.progress < 100);
     const locked = totalAvailable - userAchievements.length;
 
     // Calculate unlock rate
     const overallUnlockRate = totalAvailable > 0 ? (unlocked.length / totalAvailable) * 100 : 0;
 
     // Calculate average progress on locked
-    const lockedProgress = userAchievements.filter(ua => ua.progress < 100);
+    const lockedProgress = userAchievements.filter((ua: any) => ua.progress < 100);
     const averageProgressOnLocked =
       lockedProgress.length > 0
-        ? lockedProgress.reduce((sum, ua) => sum + ua.progress, 0) / lockedProgress.length
+        ? lockedProgress.reduce((sum: number, ua: any) => sum + ua.progress, 0) /
+          lockedProgress.length
         : 0;
 
     // Get recent unlocks (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentUnlocks = unlocked.filter(ua => ua.unlockedAt! > thirtyDaysAgo);
+    const recentUnlocks = unlocked.filter((ua: any) => ua.unlockedAt! > thirtyDaysAgo);
 
     // Calculate by type
     const byType: Record<string, any> = {};
     const typeGroups = allAchievements.reduce(
-      (acc, ach) => {
+      (acc: Record<string, any[]>, ach: any) => {
         if (!acc[ach.type]) acc[ach.type] = [];
         acc[ach.type].push(ach);
         return acc;
@@ -86,7 +85,8 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
 
     for (const [type, achievements] of Object.entries(typeGroups)) {
       const unlockedCount = userAchievements.filter(
-        ua => achievements.map(a => a.id).includes(ua.achievementId) && ua.unlockedAt
+        (ua: any) =>
+          (achievements as any[]).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
       ).length;
       byType[type] = {
         unlocked: unlockedCount,
@@ -98,7 +98,7 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
     // Calculate by rarity
     const byRarity: Record<string, any> = {};
     const rarityGroups = allAchievements.reduce(
-      (acc, ach) => {
+      (acc: Record<string, any[]>, ach: any) => {
         if (!acc[ach.rarity]) acc[ach.rarity] = [];
         acc[ach.rarity].push(ach);
         return acc;
@@ -108,7 +108,8 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
 
     for (const [rarity, achievements] of Object.entries(rarityGroups)) {
       const unlockedCount = userAchievements.filter(
-        ua => achievements.map(a => a.id).includes(ua.achievementId) && ua.unlockedAt
+        (ua: any) =>
+          (achievements as any[]).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
       ).length;
       byRarity[rarity] = {
         unlocked: unlockedCount,
@@ -120,7 +121,7 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
     // Calculate by tier
     const byTier: Record<string, any> = {};
     const tierGroups = allAchievements.reduce(
-      (acc, ach) => {
+      (acc: Record<string, any[]>, ach: any) => {
         if (!acc[ach.tier || 'unassigned']) acc[ach.tier || 'unassigned'] = [];
         acc[ach.tier || 'unassigned'].push(ach);
         return acc;
@@ -130,7 +131,8 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
 
     for (const [tier, achievements] of Object.entries(tierGroups)) {
       const unlockedCount = userAchievements.filter(
-        ua => achievements.map(a => a.id).includes(ua.achievementId) && ua.unlockedAt
+        (ua: any) =>
+          (achievements as any[]).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
       ).length;
       byTier[tier] = {
         unlocked: unlockedCount,
@@ -141,7 +143,7 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
 
     // Get first and last unlock dates
     const sortedUnlocks = unlocked.sort(
-      (a, b) => a.unlockedAt!.getTime() - b.unlockedAt!.getTime()
+      (a: any, b: any) => a.unlockedAt!.getTime() - b.unlockedAt!.getTime()
     );
     const firstUnlockDate = sortedUnlocks.length > 0 ? sortedUnlocks[0].unlockedAt : undefined;
     const lastUnlockDate =
@@ -214,7 +216,7 @@ export async function getAchievementPopularity(
     });
 
     const totalUnlocks = unlockedRecords.length;
-    const uniqueUsers = new Set(unlockedRecords.map(r => r.userId)).size;
+    const uniqueUsers = new Set(unlockedRecords.map((r: any) => r.userId)).size;
 
     // Get total users
     const totalUsers = await prisma.user.count();
@@ -228,20 +230,20 @@ export async function getAchievementPopularity(
     });
 
     // Get locked user average progress
-    const lockedRecords = allRecords.filter(r => !r.unlockedAt);
+    const lockedRecords = allRecords.filter((r: any) => !r.unlockedAt);
     const averageProgressByLockedUsers =
       lockedRecords.length > 0
-        ? lockedRecords.reduce((sum, r) => sum + r.progress, 0) / lockedRecords.length
+        ? lockedRecords.reduce((sum: number, r: any) => sum + r.progress, 0) / lockedRecords.length
         : 0;
 
     // Calculate days to unlock median
     const timesToUnlock = unlockedRecords
-      .map(r => {
+      .map((r: any) => {
         const createdDate = r.unlockedAt || new Date();
         const days = Math.ceil(createdDate.getTime() / (1000 * 60 * 60 * 24));
         return days;
       })
-      .sort((a, b) => a - b);
+      .sort((a: number, b: number) => a - b);
 
     const daysToUnlockMedian =
       timesToUnlock.length > 0 ? timesToUnlock[Math.floor(timesToUnlock.length / 2)] : undefined;
