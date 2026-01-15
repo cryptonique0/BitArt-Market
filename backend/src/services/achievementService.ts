@@ -316,6 +316,319 @@ export const achievementService = {
     return ACHIEVEMENTS.filter(a => a.milestone && a.type === type);
   },
 
+  // ===== COLLECTION MANAGEMENT METHODS =====
+
+  getAchievementsByType(type: AchievementType): Achievement[] {
+    return ACHIEVEMENTS.filter(a => a.type === type);
+  },
+
+  getAchievementsByRarity(
+    rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+  ): Achievement[] {
+    return ACHIEVEMENTS.filter(a => a.rarity === rarity);
+  },
+
+  getAchievementsByRarityGrouped(): Record<string, Achievement[]> {
+    const rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const;
+    const result: Record<string, Achievement[]> = {};
+
+    rarities.forEach(rarity => {
+      result[rarity] = ACHIEVEMENTS.filter(a => a.rarity === rarity);
+    });
+
+    return result;
+  },
+
+  async getCompletionPercentage(userId: string): Promise<number> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedCount = userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).length;
+    const totalCount = ACHIEVEMENTS.length;
+
+    return totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
+  },
+
+  async getCompletionStats(userId: string): Promise<{
+    totalAchievements: number;
+    unlockedAchievements: number;
+    completionPercentage: number;
+    lockedAchievements: number;
+    inProgressAchievements: number;
+  }> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const totalAchievements = ACHIEVEMENTS.length;
+    const unlockedAchievements = unlockedIds.size;
+    const completionPercentage = (unlockedAchievements / totalAchievements) * 100;
+
+    // Count in-progress achievements (have progress but not unlocked)
+    const inProgressAchievements = userAchs.filter(
+      a => !unlockedIds.has(a.achievementId) && a.progress > 0
+    ).length;
+
+    const lockedAchievements = totalAchievements - unlockedAchievements - inProgressAchievements;
+
+    return {
+      totalAchievements,
+      unlockedAchievements,
+      completionPercentage,
+      lockedAchievements,
+      inProgressAchievements,
+    };
+  },
+
+  async getCollectionByRarity(
+    userId: string
+  ): Promise<Record<string, { unlocked: number; total: number; percentage: number }>> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const;
+    const result: Record<string, { unlocked: number; total: number; percentage: number }> = {};
+
+    rarities.forEach(rarity => {
+      const achievements = ACHIEVEMENTS.filter(a => a.rarity === rarity);
+      const unlockedCount = achievements.filter(a => unlockedIds.has(a.id)).length;
+      const total = achievements.length;
+
+      result[rarity] = {
+        unlocked: unlockedCount,
+        total,
+        percentage: total > 0 ? (unlockedCount / total) * 100 : 0,
+      };
+    });
+
+    return result;
+  },
+
+  async getCollectionByType(
+    userId: string
+  ): Promise<Record<AchievementType, { unlocked: number; total: number; percentage: number }>> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const types = Object.values(AchievementType);
+    const result: Record<AchievementType, { unlocked: number; total: number; percentage: number }> =
+      {} as any;
+
+    types.forEach(type => {
+      const achievements = ACHIEVEMENTS.filter(a => a.type === type);
+      const unlockedCount = achievements.filter(a => unlockedIds.has(a.id)).length;
+      const total = achievements.length;
+
+      result[type] = {
+        unlocked: unlockedCount,
+        total,
+        percentage: total > 0 ? (unlockedCount / total) * 100 : 0,
+      };
+    });
+
+    return result;
+  },
+
+  async getCollectionByTier(
+    userId: string
+  ): Promise<Record<AchievementTier, { unlocked: number; total: number; percentage: number }>> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const tiers = Object.values(AchievementTier);
+    const result: Record<AchievementTier, { unlocked: number; total: number; percentage: number }> =
+      {} as any;
+
+    tiers.forEach(tier => {
+      const achievements = ACHIEVEMENTS.filter(a => a.tier === tier);
+      const unlockedCount = achievements.filter(a => unlockedIds.has(a.id)).length;
+      const total = achievements.length;
+
+      result[tier] = {
+        unlocked: unlockedCount,
+        total,
+        percentage: total > 0 ? (unlockedCount / total) * 100 : 0,
+      };
+    });
+
+    return result;
+  },
+
+  async getNextUnlockableAchievements(
+    userId: string,
+    limit: number = 5
+  ): Promise<(Achievement & { progress: number; progressPercentage: number })[]> {
+    const userAchs = await this.getUserAchievements(userId);
+    const userAchMap = new Map(userAchs.map(ua => [ua.achievementId, ua]));
+
+    // Get achievements that are in-progress (not unlocked but have progress)
+    const inProgress = ACHIEVEMENTS.filter(ach => {
+      const userAch = userAchMap.get(ach.id);
+      return (
+        userAch &&
+        userAch.progress > 0 &&
+        (!userAch.unlockedAt || userAch.unlockedAt.getTime() === 0)
+      );
+    });
+
+    // Sort by progress percentage (closest to unlock first)
+    const sorted = inProgress
+      .map(ach => {
+        const userAch = userAchMap.get(ach.id)!;
+        const progressPercentage = (userAch.progress / ach.requirement) * 100;
+        return { ...ach, progress: userAch.progress, progressPercentage };
+      })
+      .sort((a, b) => b.progressPercentage - a.progressPercentage);
+
+    return sorted.slice(0, limit);
+  },
+
+  async getMissingAchievements(userId: string, limit: number = 10): Promise<Achievement[]> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const locked = ACHIEVEMENTS.filter(a => !unlockedIds.has(a.id));
+
+    // Return random subset if more than limit
+    if (locked.length > limit) {
+      return locked.sort(() => Math.random() - 0.5).slice(0, limit);
+    }
+
+    return locked;
+  },
+
+  async getAchievementProgress(
+    userId: string,
+    achievementId: string
+  ): Promise<{
+    achievement: Achievement | null;
+    progress: number;
+    requirement: number;
+    progressPercentage: number;
+    isUnlocked: boolean;
+  } | null> {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (!achievement) return null;
+
+    const userAchs = await this.getUserAchievements(userId);
+    const userAch = userAchs.find(ua => ua.achievementId === achievementId);
+
+    if (!userAch) {
+      return {
+        achievement,
+        progress: 0,
+        requirement: achievement.requirement,
+        progressPercentage: 0,
+        isUnlocked: false,
+      };
+    }
+
+    const isUnlocked = userAch.unlockedAt && userAch.unlockedAt.getTime() !== 0;
+    const progressPercentage = (userAch.progress / achievement.requirement) * 100;
+
+    return {
+      achievement,
+      progress: userAch.progress,
+      requirement: achievement.requirement,
+      progressPercentage,
+      isUnlocked,
+    };
+  },
+
+  async getAchievementSummary(userId: string): Promise<{
+    totalCount: number;
+    completionPercentage: number;
+    byRarity: Record<string, { unlocked: number; total: number }>;
+    byType: Record<string, { unlocked: number; total: number }>;
+    byTier: Record<string, { unlocked: number; total: number }>;
+    nextMilestones: (Achievement & { progress: number; progressPercentage: number })[];
+  }> {
+    const completionStats = await this.getCompletionStats(userId);
+    const byRarity = await this.getCollectionByRarity(userId);
+    const byType = await this.getCollectionByType(userId);
+    const byTier = await this.getCollectionByTier(userId);
+    const nextMilestones = await this.getNextUnlockableAchievements(userId, 3);
+
+    return {
+      totalCount: completionStats.totalAchievements,
+      completionPercentage: completionStats.completionPercentage,
+      byRarity: Object.fromEntries(
+        Object.entries(byRarity).map(([rarity, data]) => [
+          rarity,
+          { unlocked: data.unlocked, total: data.total },
+        ])
+      ),
+      byType: Object.fromEntries(
+        Object.entries(byType).map(([type, data]) => [
+          type,
+          { unlocked: data.unlocked, total: data.total },
+        ])
+      ),
+      byTier: Object.fromEntries(
+        Object.entries(byTier).map(([tier, data]) => [
+          tier,
+          { unlocked: data.unlocked, total: data.total },
+        ])
+      ),
+      nextMilestones,
+    };
+  },
+
+  async getUserAchievementsByRarity(userId: string): Promise<Record<string, Achievement[]>> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const;
+    const result: Record<string, Achievement[]> = {};
+
+    rarities.forEach(rarity => {
+      result[rarity] = ACHIEVEMENTS.filter(a => a.rarity === rarity && unlockedIds.has(a.id));
+    });
+
+    return result;
+  },
+
+  async getUserAchievementsByType(userId: string): Promise<Record<AchievementType, Achievement[]>> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const types = Object.values(AchievementType);
+    const result: Record<AchievementType, Achievement[]> = {} as any;
+
+    types.forEach(type => {
+      result[type] = ACHIEVEMENTS.filter(a => a.type === type && unlockedIds.has(a.id));
+    });
+
+    return result;
+  },
+
+  async getUserAchievementsByTier(userId: string): Promise<Record<AchievementTier, Achievement[]>> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const tiers = Object.values(AchievementTier);
+    const result: Record<AchievementTier, Achievement[]> = {} as any;
+
+    tiers.forEach(tier => {
+      result[tier] = ACHIEVEMENTS.filter(a => a.tier === tier && unlockedIds.has(a.id));
+    });
+
+    return result;
+  },
+
   async getUserBadges(userId: string): Promise<{ tier: AchievementTier; count: number }[]> {
     const userAchs = await this.getUserAchievements(userId);
     const unlockedAchievements = userAchs.filter(a => a.unlockedAt).map(ua => ua.achievementId);
