@@ -329,3 +329,149 @@ export interface AchievementsByStatus {
   inProgress: Achievement[];
   unlocked: Achievement[];
 }
+
+// ============ ANALYTICS & STATISTICS ============
+
+export interface UserAchievementStats {
+  userId: string;
+  totalXP: number;
+  currentLevel: number;
+  totalAchievementsUnlocked: number;
+  totalAchievementsAvailable: number;
+  overallUnlockRate: number; // percentage (0-100)
+  averageProgressOnLockedAchievements: number; // percentage (0-100)
+  recentUnlocksCount: number; // unlocked in last 30 days
+  achievements: {
+    locked: number;
+    inProgress: number;
+    unlocked: number;
+  };
+  byType: {
+    [key in AchievementType]?: {
+      unlocked: number;
+      total: number;
+      unlockedRate: number;
+    };
+  };
+  byRarity: {
+    [key: string]: {
+      unlocked: number;
+      total: number;
+      unlockedRate: number;
+    };
+  };
+  byTier: {
+    [key: string]: {
+      unlocked: number;
+      total: number;
+      unlockedRate: number;
+    };
+  };
+  streakStats: {
+    currentStreak: number;
+    longestStreak: number;
+    totalStreakDays: number;
+  };
+  lastActivityDate: Date;
+  firstUnlockDate?: Date;
+  averageDaysToUnlock?: number;
+}
+
+export interface AchievementPopularity {
+  achievementId: string;
+  achievement: Achievement;
+  totalUnlocks: number;
+  uniqueUsers: number;
+  unlockRate: number; // percentage (0-100)
+  averageProgressByLockedUsers: number; // percentage of users who haven't unlocked
+  daysToUnlockMedian?: number; // median time from first progress to unlock
+  trendingScore: number; // 0-100, popularity over time
+  isPopular: boolean; // true if unlockRate > 50%
+  isRare: boolean; // true if unlockRate < 10%
+  userList?: string[]; // optional list of userIds who unlocked
+}
+
+export interface AchievementUnlockRate {
+  achievementId: string;
+  title: string;
+  unlockRate: number; // 0-100 percentage
+  totalUnlocks: number;
+  totalUsers: number;
+  popularity: 'legendary' | 'rare' | 'uncommon' | 'common'; // based on unlock rate
+  trend: 'increasing' | 'stable' | 'decreasing'; // over last 30 days
+}
+
+export interface SystemwideStats {
+  totalUsers: number;
+  totalUnlockedAchievements: number;
+  totalXPDistributed: number;
+  averageXPPerUser: number;
+  averageAchievementsPerUser: number;
+  mostPopularAchievement: AchievementUnlockRate;
+  rarestAchievement: AchievementUnlockRate;
+  averageUserLevel: number;
+  unlockRateByType: Record<string, number>;
+  unlockRateByRarity: Record<string, number>;
+  totalSeasonalAchievements: number;
+  activeSeasons: number;
+}
+
+export interface AchievementEngagementMetrics {
+  achievementId: string;
+  unlockVelocity: number; // unlocks per day
+  recentUnlocks: number; // unlocks in last 7 days
+  engagementScore: number; // 0-100
+  isEngaging: boolean; // true if score > 50
+  usersInProgress: number;
+  averageProgressPercentage: number;
+}
+
+export interface UserProgressTimeline {
+  userId: string;
+  achievements: Array<{
+    achievementId: string;
+    achievementTitle: string;
+    unlockedAt: Date;
+    daysToUnlock?: number;
+  }>;
+  totalTimeline: number; // days from first to last unlock
+  consistencyScore: number; // 0-100, based on unlock frequency
+}
+
+export interface ComparisonStats {
+  user1Id: string;
+  user2Id: string;
+  user1XP: number;
+  user2XP: number;
+  user1Level: number;
+  user2Level: number;
+  user1AchievementCount: number;
+  user2AchievementCount: number;
+  mutualAchievements: number;
+  uniqueToUser1: number;
+  uniqueToUser2: number;
+  similarityPercentage: number;
+  leaderboardDifference: number; // rank difference
+}
+
+export interface AchievementRarity {
+  common: number; // % of users who unlocked
+  uncommon: number;
+  rare: number;
+  epic: number;
+  legendary: number;
+}
+
+export interface DemographicStats {
+  averageXPByLevel: {
+    [level: number]: number;
+  };
+  averageAchievementsByLevel: {
+    [level: number]: number;
+  };
+  userDistributionByLevel: {
+    [level: number]: number;
+  };
+  activeDaysAverage: number;
+  retentionRate: number; // % active in last 30 days
+}

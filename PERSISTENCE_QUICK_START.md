@@ -9,12 +9,14 @@
 ## ⚡ 5-Minute Setup
 
 ### Step 1: Install Dependencies
+
 ```bash
 npm install @prisma/client
 npm install -D prisma
 ```
 
 ### Step 2: Configure Database
+
 ```bash
 # Copy environment variables
 cp .env.example.persistence .env.local
@@ -24,12 +26,14 @@ cp .env.example.persistence .env.local
 ```
 
 ### Step 3: Create Database
+
 ```bash
 # Create the database first (using your database tool)
 createdb bitart_gamification
 ```
 
 ### Step 4: Initialize Database
+
 ```bash
 # Generate Prisma client
 npm run prisma:generate
@@ -42,11 +46,13 @@ npm run db:init
 ```
 
 ### Step 5: Start Server
+
 ```bash
 npm run dev
 ```
 
 ### Step 6: Verify Setup
+
 ```bash
 # Test health check
 curl http://localhost:5000/api/persistence/admin/health
@@ -69,17 +75,19 @@ curl http://localhost:5000/api/persistence/admin/health
 ### Step 1: Update achievementService.ts
 
 **Before:**
+
 ```typescript
 const userAchievementsMap = new Map<string, UserAchievement[]>();
 
 export const achievementService = {
   getUserAchievements: (userId: string) => {
     return userAchievementsMap.get(userId) || [];
-  }
+  },
 };
 ```
 
 **After:**
+
 ```typescript
 import persistenceService from './persistenceService';
 
@@ -89,13 +97,14 @@ export const achievementService = {
       where: { userId },
       include: { achievement: true },
     });
-  }
+  },
 };
 ```
 
 ### Step 2: Update Other Services
 
 Apply similar pattern to:
+
 - `xpService.ts`
 - `rewardsService.ts`
 - Any other service using Map storage
@@ -109,14 +118,10 @@ import persistenceService from './services/persistenceService';
 router.post('/achievements/unlock', async (req, res) => {
   try {
     const { userId, achievementId } = req.body;
-    
+
     // Now uses database with transaction
-    const result = await persistenceService.saveUserAchievement(
-      userId,
-      achievementId,
-      100
-    );
-    
+    const result = await persistenceService.saveUserAchievement(userId, achievementId, 100);
+
     res.json({ success: true, achievement: result });
   } catch (error) {
     res.status(500).json({ error: 'Failed' });
@@ -151,15 +156,13 @@ curl -X POST http://localhost:5000/api/persistence/achievements/save \
 ## 🔄 Common Operations
 
 ### Save Achievement
+
 ```typescript
-const achievement = await persistenceService.saveUserAchievement(
-  userId,
-  achievementId,
-  progress
-);
+const achievement = await persistenceService.saveUserAchievement(userId, achievementId, progress);
 ```
 
 ### Award XP
+
 ```typescript
 const transaction = await persistenceService.saveXPTransaction(
   userId,
@@ -170,6 +173,7 @@ const transaction = await persistenceService.saveXPTransaction(
 ```
 
 ### Bulk Award XP
+
 ```typescript
 const count = await persistenceService.bulkAwardXP([
   { userId: 'user1', amount: 100, reason: 'seasonal_bonus' },
@@ -178,19 +182,19 @@ const count = await persistenceService.bulkAwardXP([
 ```
 
 ### Delete Achievement
+
 ```typescript
-const deleted = await persistenceService.deleteUserAchievement(
-  userId,
-  achievementId
-);
+const deleted = await persistenceService.deleteUserAchievement(userId, achievementId);
 ```
 
 ### Backup User Data
+
 ```typescript
 const backup = await databaseService.exportUserDataBackup(userId);
 ```
 
 ### Restore User Data
+
 ```typescript
 await databaseService.restoreUserDataBackup(backup);
 ```
@@ -200,12 +204,14 @@ await databaseService.restoreUserDataBackup(backup);
 ## 📊 Database Commands
 
 ### View Database
+
 ```bash
 # Open Prisma Studio (visual database browser)
 npm run prisma:studio
 ```
 
 ### Run Migrations
+
 ```bash
 # Development
 npm run prisma:migrate
@@ -218,12 +224,14 @@ npm run prisma:reset
 ```
 
 ### Check Migration Status
+
 ```bash
 # See which migrations are applied
 npx prisma migrate status
 ```
 
 ### Create Migration
+
 ```bash
 # After updating schema.prisma
 npx prisma migrate dev --name your_migration_name
@@ -234,12 +242,14 @@ npx prisma migrate dev --name your_migration_name
 ## 🧪 Quick Test
 
 ### Test 1: Health Check
+
 ```bash
 curl http://localhost:5000/api/persistence/admin/health
 # Should return: healthy: true
 ```
 
 ### Test 2: Save Achievement
+
 ```bash
 curl -X POST http://localhost:5000/api/persistence/achievements/save \
   -H "Authorization: Bearer TOKEN" \
@@ -253,6 +263,7 @@ curl -X POST http://localhost:5000/api/persistence/achievements/save \
 ```
 
 ### Test 3: Get Statistics
+
 ```bash
 curl http://localhost:5000/api/persistence/admin/stats \
   -H "Authorization: Bearer TOKEN"
@@ -260,6 +271,7 @@ curl http://localhost:5000/api/persistence/admin/stats \
 ```
 
 ### Test 4: Bulk Award
+
 ```bash
 curl -X POST http://localhost:5000/api/persistence/bulk/xp \
   -H "Authorization: Bearer TOKEN" \
@@ -281,15 +293,15 @@ curl -X POST http://localhost:5000/api/persistence/bulk/xp \
 
 ## 📁 Files Created
 
-| File | Purpose | Size |
-|------|---------|------|
-| `prisma/schema.prisma` | Database schema | 300 lines |
+| File                                         | Purpose          | Size      |
+| -------------------------------------------- | ---------------- | --------- |
+| `prisma/schema.prisma`                       | Database schema  | 300 lines |
 | `backend/src/services/persistenceService.ts` | Core persistence | 500 lines |
-| `backend/src/services/databaseService.ts` | DB management | 400 lines |
-| `backend/src/routes/persistenceRoutes.ts` | API endpoints | 450 lines |
-| `PERSISTENCE_LAYER_GUIDE.md` | Complete guide | 500 lines |
-| `PERSISTENCE_MIGRATION_EXAMPLES.ts` | Code examples | 400 lines |
-| `PERSISTENCE_IMPLEMENTATION_SUMMARY.md` | Summary | 300 lines |
+| `backend/src/services/databaseService.ts`    | DB management    | 400 lines |
+| `backend/src/routes/persistenceRoutes.ts`    | API endpoints    | 450 lines |
+| `PERSISTENCE_LAYER_GUIDE.md`                 | Complete guide   | 500 lines |
+| `PERSISTENCE_MIGRATION_EXAMPLES.ts`          | Code examples    | 400 lines |
+| `PERSISTENCE_IMPLEMENTATION_SUMMARY.md`      | Summary          | 300 lines |
 
 **Total:** 2650+ lines of code and documentation
 
@@ -298,6 +310,7 @@ curl -X POST http://localhost:5000/api/persistence/bulk/xp \
 ## 🔍 Troubleshooting
 
 ### "connect ECONNREFUSED"
+
 ```bash
 # Check PostgreSQL is running
 sudo service postgresql status
@@ -307,24 +320,28 @@ docker ps | grep postgres
 ```
 
 ### "Database does not exist"
+
 ```bash
 # Create database
 createdb bitart_gamification
 ```
 
 ### "No migrations found"
+
 ```bash
 # Run migrations
 npm run prisma:migrate
 ```
 
 ### "JWT authentication failed"
+
 ```bash
 # Make sure token is in Authorization header
 -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### "Migration lock"
+
 ```bash
 # Resolve lock
 npx prisma migrate resolve --rolled-back MIGRATION_NAME
@@ -355,6 +372,7 @@ npx prisma migrate resolve --rolled-back MIGRATION_NAME
 ## 🚀 Production Deployment
 
 ### Pre-Deployment
+
 ```bash
 # 1. Build TypeScript
 npm run build
@@ -370,6 +388,7 @@ npm test
 ```
 
 ### Deployment
+
 ```bash
 # 1. Set environment variables
 export DATABASE_URL=your_production_db_url
@@ -380,6 +399,7 @@ npm start
 ```
 
 ### Post-Deployment
+
 ```bash
 # 1. Verify health
 curl https://api.yourdomain.com/api/persistence/admin/health
@@ -406,18 +426,23 @@ tail -f server.log
 ## 💡 Key Concepts
 
 ### Transaction
+
 All database operations are wrapped in transactions. If anything fails, all changes are rolled back automatically.
 
 ### Rollback
+
 If an operation fails, the database automatically reverts to the state before the transaction started.
 
 ### Audit Trail
+
 Every transaction is logged. You can see what changed, when, and the status.
 
 ### Backup/Restore
+
 All user data can be exported and imported. Great for recovery or testing.
 
 ### Bulk Operations
+
 Process multiple records efficiently in a single transaction.
 
 ---
@@ -440,7 +465,7 @@ After setup, you should see:
 ✅ Database stats show created achievements  
 ✅ Can save/retrieve data from database  
 ✅ Transactions logged in audit trail  
-✅ Bulk operations work efficiently  
+✅ Bulk operations work efficiently
 
 ---
 
