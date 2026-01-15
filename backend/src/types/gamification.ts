@@ -194,3 +194,38 @@ export interface StreakReward {
   badge?: string;
   description: string;
 }
+export interface AchievementNotification {
+  userId: string;
+  achievementId: string;
+  type: 'unlocked' | 'near_completion' | 'milestone' | 'tier_achieved';
+  achievement: Achievement;
+  xpReward: number;
+  progress?: number;
+  requirement?: number;
+  unlockedAt: Date;
+  read: boolean;
+}
+
+export interface NewAchievementData {
+  achievement: Achievement;
+  unlockedAt: Date;
+  xpReward: number;
+}
+
+export interface NearCompletionAchievement extends Achievement {
+  progress: number;
+  requirement: number;
+  progressPercentage: number;
+  daysEstimated?: number;
+}
+
+export interface AchievementRewardNotification {
+  userId: string;
+  achievementId: string;
+  achievementTitle: string;
+  xpAwarded: number;
+  totalXP: number;
+  newLevel?: number;
+  tier?: AchievementTier;
+  timestamp: Date;
+}

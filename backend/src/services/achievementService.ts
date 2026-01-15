@@ -8,6 +8,10 @@ import {
   UserStreak,
   StreakStats,
   StreakReward,
+  AchievementNotification,
+  NewAchievementData,
+  NearCompletionAchievement,
+  AchievementRewardNotification,
 } from '../types/gamification';
 
 // Track total XP per user
@@ -15,6 +19,12 @@ const userXPMap = new Map<string, UserXPTracker>();
 
 // Track user streaks
 const userStreakMap = new Map<string, UserStreak>();
+
+// Track achievement notifications
+const notificationsMap = new Map<string, AchievementNotification[]>();
+
+// Track last viewed timestamp for each user
+const lastNotificationViewMap = new Map<string, Date>();
 
 // Streak reward configuration
 const STREAK_REWARDS: StreakReward[] = [
@@ -1107,5 +1117,261 @@ export const achievementService = {
       progressToNext,
       isRiskOfBreak,
     };
+  },
+
+  // ===== ACHIEVEMENT NOTIFICATION METHODS =====
+
+  async getNewAchievements(userId: string, since: Date): Promise<NewAchievementData[]> {
+    const userAchs = await this.getUserAchievements(userId);
+
+    const newAchs = userAchs
+      .filter(ua => ua.unlockedAt && ua.unlockedAt > since && ua.unlockedAt.getTime() !== 0)
+      .map(ua => {
+        const achievement = ACHIEVEMENTS.find(a => a.id === ua.achievementId);
+        return {
+          achievement: achievement!,
+          unlockedAt: ua.unlockedAt,
+          xpReward: achievement?.xpReward || 0,
+        };
+      })
+      .sort((a, b) => b.unlockedAt.getTime() - a.unlockedAt.getTime());
+
+    return newAchs;
+  },
+
+  async getNearlyCompletedAchievements(
+    userId: string,
+    threshold: number = 80
+  ): Promise<NearCompletionAchievement[]> {
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(ua => ua.achievementId)
+    );
+
+    const nearlyCompleted = userAchs
+      .filter(ua => !unlockedIds.has(ua.achievementId) && ua.progress > 0)
+      .map(ua => {
+        const achievement = ACHIEVEMENTS.find(a => a.id === ua.achievementId);
+        if (!achievement) return null;
+
+        const progressPercentage = (ua.progress / achievement.requirement) * 100;
+        if (progressPercentage < threshold) return null;
+
+        return {
+          ...achievement,
+          progress: ua.progress,
+          requirement: achievement.requirement,
+          progressPercentage,
+        };
+      })
+      .filter((a): a is NearCompletionAchievement => a !== null)
+      .sort((a, b) => b.progressPercentage - a.progressPercentage);
+
+    return nearlyCompleted;
+  },
+
+  async createNotification(userId: string, notification: AchievementNotification): Promise<void> {
+    const userNotifications = notificationsMap.get(userId) || [];
+    userNotifications.push(notification);
+    notificationsMap.set(userId, userNotifications);
+  },
+
+  async getUnreadNotifications(userId: string): Promise<AchievementNotification[]> {
+    const userNotifications = notificationsMap.get(userId) || [];
+    return userNotifications.filter(n => !n.read);
+  },
+
+  async getAllNotifications(userId: string): Promise<AchievementNotification[]> {
+    return notificationsMap.get(userId) || [];
+  },
+
+  async markNotificationAsRead(userId: string, achievementId: string): Promise<void> {
+    const userNotifications = notificationsMap.get(userId) || [];
+    const notification = userNotifications.find(n => n.achievementId === achievementId);
+    if (notification) {
+      notification.read = true;
+    }
+  },
+
+  async markAllNotificationsAsRead(userId: string): Promise<void> {
+    const userNotifications = notificationsMap.get(userId) || [];
+    userNotifications.forEach(n => {
+      n.read = true;
+    });
+  },
+
+  async clearNotifications(userId: string): Promise<void> {
+    notificationsMap.delete(userId);
+  },
+
+  async createRewardNotification(
+    userId: string,
+    achievementId: string,
+    xpAwarded: number,
+    tier?: AchievementTier
+  ): Promise<AchievementRewardNotification> {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    const tracker = userXPMap.get(userId);
+
+    const notification: AchievementRewardNotification = {
+      userId,
+      achievementId,
+      achievementTitle: achievement?.title || 'Achievement',
+      xpAwarded,
+      totalXP: tracker?.totalXP || 0,
+      tier,
+      timestamp: new Date(),
+    };
+
+    return notification;
+  },
+
+  async getRecentNotifications(
+    userId: string,
+    hours: number = 24
+  ): Promise<AchievementNotification[]> {
+    const userNotifications = notificationsMap.get(userId) || [];
+    const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+    return userNotifications
+      .filter(n => n.unlockedAt > cutoffTime)
+      .sort((a, b) => b.unlockedAt.getTime() - a.unlockedAt.getTime());
+  },
+
+  async getNotificationsSince(userId: string, since: Date): Promise<AchievementNotification[]> {
+    const userNotifications = notificationsMap.get(userId) || [];
+
+    return userNotifications
+      .filter(n => n.unlockedAt > since)
+      .sort((a, b) => b.unlockedAt.getTime() - a.unlockedAt.getTime());
+  },
+
+  async getNotificationCount(userId: string): Promise<{ total: number; unread: number }> {
+    const userNotifications = notificationsMap.get(userId) || [];
+    const unreadCount = userNotifications.filter(n => !n.read).length;
+
+    return {
+      total: userNotifications.length,
+      unread: unreadCount,
+    };
+  },
+
+  async triggerAchievementUnlockedNotification(
+    userId: string,
+    achievementId: string
+  ): Promise<AchievementRewardNotification | null> {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (!achievement) return null;
+
+    // Create notification
+    const notification: AchievementNotification = {
+      userId,
+      achievementId,
+      type: 'unlocked',
+      achievement,
+      xpReward: achievement.xpReward,
+      unlockedAt: new Date(),
+      read: false,
+    };
+
+    await this.createNotification(userId, notification);
+
+    // Create reward notification
+    return this.createRewardNotification(
+      userId,
+      achievementId,
+      achievement.xpReward,
+      achievement.tier
+    );
+  },
+
+  async triggerNearCompletionNotification(
+    userId: string,
+    achievementId: string,
+    threshold: number = 90
+  ): Promise<AchievementNotification | null> {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (!achievement) return null;
+
+    const userAchs = await this.getUserAchievements(userId);
+    const userAch = userAchs.find(ua => ua.achievementId === achievementId);
+
+    if (!userAch) return null;
+
+    const progressPercentage = (userAch.progress / achievement.requirement) * 100;
+    if (progressPercentage < threshold) return null;
+
+    const notification: AchievementNotification = {
+      userId,
+      achievementId,
+      type: 'near_completion',
+      achievement,
+      xpReward: achievement.xpReward,
+      progress: userAch.progress,
+      requirement: achievement.requirement,
+      unlockedAt: new Date(),
+      read: false,
+    };
+
+    await this.createNotification(userId, notification);
+    return notification;
+  },
+
+  async triggerMilestoneNotification(
+    userId: string,
+    achievementId: string
+  ): Promise<AchievementNotification | null> {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (!achievement || !achievement.milestone) return null;
+
+    const notification: AchievementNotification = {
+      userId,
+      achievementId,
+      type: 'milestone',
+      achievement,
+      xpReward: achievement.xpReward,
+      unlockedAt: new Date(),
+      read: false,
+    };
+
+    await this.createNotification(userId, notification);
+    return notification;
+  },
+
+  async triggerTierAchievedNotification(
+    userId: string,
+    tier: AchievementTier
+  ): Promise<AchievementNotification | null> {
+    const tierAchs = this.getAchievementsByTier(tier);
+    if (tierAchs.length === 0) return null;
+
+    // Use the highest XP achievement from the tier
+    const topAch = tierAchs.sort((a, b) => b.xpReward - a.xpReward)[0];
+
+    const notification: AchievementNotification = {
+      userId,
+      achievementId: topAch.id,
+      type: 'tier_achieved',
+      achievement: topAch,
+      xpReward: topAch.xpReward,
+      unlockedAt: new Date(),
+      read: false,
+    };
+
+    await this.createNotification(userId, notification);
+    return notification;
+  },
+
+  getUnreadCount(userId: string): number {
+    const userNotifications = notificationsMap.get(userId) || [];
+    return userNotifications.filter(n => !n.read).length;
+  },
+
+  setLastNotificationView(userId: string): void {
+    lastNotificationViewMap.set(userId, new Date());
+  },
+
+  getLastNotificationView(userId: string): Date | undefined {
+    return lastNotificationViewMap.get(userId);
   },
 };
