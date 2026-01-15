@@ -1,0 +1,287 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ GAMIFICATION MODELS ============
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  achievements     UserAchievement[]
+  xpTransactions   XPTransaction[]
+  levels           UserLevel[]
+  streaks          UserStreak[]
+  notifications    AchievementNotification[]
+  profiles         UserProfile[]
+  seasonalProgress UserSeasonalProgress[]
+  collectionItems  CollectionItem[]
+  friendsInitiated Friendship[] @relation("initiator")
+  friendsReceived  Friendship[] @relation("receiver")
+
+  @@index([email])
+  @@index([username])
+}
+
+model Achievement {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  icon            String
+  type            String   // AchievementType enum
+  requirement     Int
+  xpReward        Int
+  rarity          String   // 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+  tier            String?  // AchievementTier enum
+  badgeIcon       String?
+  milestone       Int?
+  seasonId        String?
+  seasonStartDate DateTime?
+  seasonEndDate   DateTime?
+  isSeasonal      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  unlockedBy       UserAchievement[]
+  notifications    AchievementNotification[]
+  collectionItems  CollectionItem[]
+
+  @@index([type])
+  @@index([seasonId])
+  @@index([isSeasonal])
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime
+  progress      Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+  @@index([unlockedAt])
+}
+
+model UserLevel {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  currentLevel      Int
+  totalXP           Int      @default(0)
+  xpForNextLevel    Int
+  xpInCurrentLevel  Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([totalXP])
+}
+
+model XPTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  reason    String
+  relatedId String?
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([reason])
+}
+
+model UserStreak {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  currentStreak    Int      @default(0)
+  longestStreak    Int      @default(0)
+  lastActivityDate DateTime?
+  streakStartDate  DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AchievementNotification {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  type          String   // 'new' | 'near_completion' | 'reward'
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model UserProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  bio                   String?
+  displayName           String?
+  profilePicture        String?
+  totalAchievements     Int      @default(0)
+  totalXP               Int      @default(0)
+  completionPercentage  Float    @default(0)
+  highestTier           String?
+  isPublic              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isPublic])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  initiator String
+  receiver  String
+  status    String   @default("pending") // 'pending' | 'accepted' | 'blocked'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  initiatorUser User @relation("initiator", fields: [initiator], references: [id], onDelete: Cascade)
+  receiverUser  User @relation("receiver", fields: [receiver], references: [id], onDelete: Cascade)
+
+  @@unique([initiator, receiver])
+  @@index([status])
+}
+
+model SeasonConfig {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  startDate DateTime
+  endDate   DateTime
+  rewards   String? // JSON stringified rewards
+  color     String   @default("#FFD700")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  leaderboard SeasonalLeaderboardEntry[]
+
+  @@index([startDate])
+  @@index([endDate])
+}
+
+model UserSeasonalProgress {
+  id       String @id @default(cuid())
+  userId   String
+  seasonId String
+  xpEarned Int    @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, seasonId])
+  @@index([userId])
+  @@index([seasonId])
+}
+
+model SeasonalLeaderboardEntry {
+  id        String   @id @default(cuid())
+  seasonId  String
+  userId    String
+  username  String
+  xpEarned  Int
+  rank      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  season SeasonConfig @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@unique([seasonId, userId])
+  @@index([seasonId])
+  @@index([rank])
+}
+
+model Collection {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  theme     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  items CollectionItem[]
+
+  @@index([userId])
+}
+
+model CollectionItem {
+  id            String   @id @default(cuid())
+  collectionId  String
+  userId        String
+  achievementId String
+  addedAt       DateTime @default(now())
+
+  // Relations
+  collection  Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, achievementId])
+  @@index([collectionId])
+  @@index([userId])
+}
+
+// ============ TRANSACTIONS FOR CONSISTENCY ============
+
+model TransactionLog {
+  id        String   @id @default(cuid())
+  type      String   // 'achievement' | 'xp' | 'seasonal' | 'bulk'
+  status    String   @default("pending") // 'pending' | 'completed' | 'failed' | 'rollback'
+  data      String   // JSON stringified transaction data
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  executedAt DateTime?
+
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
