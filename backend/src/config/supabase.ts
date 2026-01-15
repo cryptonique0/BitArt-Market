@@ -11,7 +11,9 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey || !supabaseServiceKey) {
+const isSupabaseConfigured = !!(supabaseUrl && supabaseKey && supabaseServiceKey);
+
+if (!isSupabaseConfigured) {
   logger.warn('Missing Supabase environment variables - using placeholder values for development');
   logger.warn('For production, set: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY');
 }
@@ -71,6 +73,13 @@ export async function initializeSupabase(): Promise<void> {
   if (!isHealthy) {
     logger.warn('Supabase health check failed - continuing anyway');
   }
+}
+
+/**
+ * Check if Supabase is properly configured
+ */
+export function isSupabaseAvailable(): boolean {
+  return isSupabaseConfigured;
 }
 
 export default supabase;

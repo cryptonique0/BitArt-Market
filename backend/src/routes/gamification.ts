@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { xpService } from '../services/xpService';
 import { achievementService } from '../services/achievementService';
 import { rewardsService } from '../services/rewardsService';
-import { authenticateToken } from '../services/achievementService';
+import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
 
@@ -24,7 +24,7 @@ router.get('/xp/user/:userId', async (req: Request, res: Response) => {
       xpForNextLevel: userLevel.xpForNextLevel,
       progressPercentage: progress,
       levelTitle: levelConfig.title,
-      levelColor: levelConfig.color
+      levelColor: levelConfig.color,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch user level' });
@@ -86,87 +86,27 @@ router.get('/achievements/user/:userId', async (req: Request, res: Response) => 
     const { userId } = req.params;
     const achievements = await achievementService.getUserAchievements(userId);
     const unlocked = achievements.filter(a => a.unlockedAt);
-<<<<<<< HEAD
-=======
-    const inProgress = achievements.filter(a => !a.unlockedAt);
->>>>>>> 2caf294 (Initial commit with API documentation and features)
 
     res.json({
       total: achievementService.getAllAchievements().length,
       unlockedCount: unlocked.length,
-<<<<<<< HEAD
-      unlockedAchievements: unlocked
-=======
-      inProgressCount: inProgress.length,
       unlockedAchievements: unlocked,
-      inProgressAchievements: inProgress
->>>>>>> 2caf294 (Initial commit with API documentation and features)
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch user achievements' });
   }
 });
 
-<<<<<<< HEAD
-=======
-router.post('/achievements/unlock', async (req: Request, res: Response) => {
-  try {
-    const { userId, achievementId } = req.body;
-    const result = await achievementService.unlockAchievement(userId, achievementId);
-    if (result) {
-      res.json({ success: true, achievement: result });
-    } else {
-      res.status(400).json({ error: 'Achievement not found or already unlocked' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to unlock achievement' });
-  }
-});
-
-router.post('/achievements/progress', async (req: Request, res: Response) => {
-  try {
-    const { userId, achievementId, progress } = req.body;
-    const result = await achievementService.updateProgress(userId, achievementId, progress);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update achievement progress' });
-  }
-});
-
-router.get('/achievements/:achievementId', (req: Request, res: Response) => {
-  try {
-    const { achievementId } = req.params;
-    const achievement = achievementService.getAchievementDetails(achievementId);
-    if (achievement) {
-      res.json(achievement);
-    } else {
-      res.status(404).json({ error: 'Achievement not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch achievement' });
-  }
-});
-
->>>>>>> 2caf294 (Initial commit with API documentation and features)
 // Daily Rewards Routes
 router.get('/rewards/daily/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const reward = await rewardsService.getDailyReward(userId);
     const canClaim = !reward.claimed;
-<<<<<<< HEAD
-
-    res.json({
-      ...reward,
-      canClaim
-=======
-    const streak = await rewardsService.getCurrentStreak(userId);
 
     res.json({
       ...reward,
       canClaim,
-      streak
->>>>>>> 2caf294 (Initial commit with API documentation and features)
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch daily reward' });
@@ -187,29 +127,10 @@ router.post('/rewards/daily/claim', async (req: Request, res: Response) => {
   }
 });
 
-<<<<<<< HEAD
 // Lucky Draw Routes
 router.get('/rewards/lucky-draw/prizes', (req: Request, res: Response) => {
   try {
     res.json([]);
-=======
-router.get('/rewards/daily/history/:userId', async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    const days = parseInt(req.query.days as string) || 30;
-    const history = await rewardsService.getDailyRewardHistory(userId, days);
-    res.json(history);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch reward history' });
-  }
-});
-
-// Lucky Draw Routes
-router.get('/rewards/lucky-draw/prizes', (req: Request, res: Response) => {
-  try {
-    const prizes = rewardsService.getPrizeConfigs();
-    res.json(prizes);
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch prize configs' });
   }
@@ -218,11 +139,6 @@ router.get('/rewards/lucky-draw/prizes', (req: Request, res: Response) => {
 router.post('/rewards/lucky-draw/spin', async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
-<<<<<<< HEAD
-=======
-
-    // Check if user can draw
->>>>>>> 2caf294 (Initial commit with API documentation and features)
     const canDraw = await rewardsService.canUserDraw(userId);
     if (!canDraw) {
       return res.status(400).json({ error: 'You can only draw once per day' });
@@ -249,20 +165,6 @@ router.post('/rewards/lucky-draw/claim', async (req: Request, res: Response) => 
   }
 });
 
-<<<<<<< HEAD
-=======
-router.get('/rewards/lucky-draw/history/:userId', async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const history = await rewardsService.getLuckyDrawHistory(userId, limit);
-    res.json(history);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch draw history' });
-  }
-});
-
->>>>>>> 2caf294 (Initial commit with API documentation and features)
 router.get('/rewards/lucky-draw/can-draw/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;

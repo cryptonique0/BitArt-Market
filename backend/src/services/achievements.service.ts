@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { supabase, isSupabaseAvailable } from '../config/supabase';
 import { logger } from '../utils/logger';
 
 export interface Achievement {
@@ -71,6 +71,12 @@ class AchievementsServiceClass {
    */
   async initializeAchievements(): Promise<boolean> {
     try {
+      // Skip if Supabase is not properly configured
+      if (!isSupabaseAvailable()) {
+        logger.info('Supabase not configured - skipping achievements initialization');
+        return true; // Return true to indicate graceful skip
+      }
+
       for (const achievement of this.ACHIEVEMENTS) {
         // Check if achievement already exists
         const { data: existing } = await supabase
