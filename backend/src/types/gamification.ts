@@ -315,3 +315,17 @@ export interface SeasonalLeaderboardEntry extends LeaderboardEntry {
   seasonalXP: number;
   seasonalAchievements: number;
 }
+
+export type AchievementStatus = 'locked' | 'in-progress' | 'unlocked';
+
+export interface AchievementSearchResult {
+  achievement: Achievement;
+  matchScore: number; // 0-100, higher = better match
+  matchReason: string; // 'title' | 'description' | 'both'
+}
+
+export interface AchievementsByStatus {
+  locked: Achievement[];
+  inProgress: Achievement[];
+  unlocked: Achievement[];
+}

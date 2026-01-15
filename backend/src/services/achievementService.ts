@@ -20,6 +20,9 @@ import {
   SeasonConfig,
   SeasonalAchievement,
   SeasonalLeaderboardEntry,
+  AchievementStatus,
+  AchievementSearchResult,
+  AchievementsByStatus,
 } from '../types/gamification';
 
 // Track total XP per user
@@ -236,6 +239,29 @@ const ACHIEVEMENTS: Achievement[] = [
 ];
 
 const userAchievements = new Map<string, UserAchievement[]>();
+
+// Helper function for string distance calculation
+function calculateStringDistance(str1: string, str2: string): number {
+  // Levenshtein-like distance but simplified for scoring
+  // Returns a value between 0 and 1 where 1 is exact match
+  if (str1 === str2) return 1;
+  if (str1.startsWith(str2) || str2.startsWith(str1)) return 0.9;
+
+  const longer = str1.length > str2.length ? str1 : str2;
+  const shorter = str1.length > str2.length ? str2 : str1;
+
+  let matches = 0;
+  let lastIndex = 0;
+  for (const char of shorter) {
+    const index = longer.indexOf(char, lastIndex);
+    if (index !== -1) {
+      matches++;
+      lastIndex = index + 1;
+    }
+  }
+
+  return matches / longer.length;
+}
 
 export const achievementService = {
   getAllAchievements(): Achievement[] {
@@ -1701,5 +1727,340 @@ export const achievementService = {
     });
 
     return leaderboardData.slice(0, limit);
+  },
+
+  // ===== SEASONAL ACHIEVEMENT METHODS =====
+
+  async createSeason(season: SeasonConfig): Promise<void> {
+    seasonConfigMap.set(season.id, season);
+  },
+
+  async getSeason(seasonId: string): Promise<SeasonConfig | undefined> {
+    return seasonConfigMap.get(seasonId);
+  },
+
+  async getAllSeasons(): Promise<SeasonConfig[]> {
+    return Array.from(seasonConfigMap.values());
+  },
+
+  async getActiveSeasons(): Promise<SeasonConfig[]> {
+    const now = new Date();
+    return Array.from(seasonConfigMap.values()).filter(
+      s => s.startDate <= now && s.endDate >= now && s.isActive
+    );
+  },
+
+  async getSeasonalAchievements(seasonId: string): Promise<SeasonalAchievement[]> {
+    const season = seasonConfigMap.get(seasonId);
+    if (!season) return [];
+
+    const now = new Date();
+    const isExpired = now > season.endDate;
+
+    return ACHIEVEMENTS.filter(a => a.seasonId === seasonId).map(ach => ({
+      ...ach,
+      seasonId: season.id,
+      seasonName: season.name,
+      seasonStartDate: season.startDate,
+      seasonEndDate: season.endDate,
+      daysRemaining: Math.ceil((season.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+      isExpired,
+    })) as SeasonalAchievement[];
+  },
+
+  async getActiveSeasonsAchievements(): Promise<Map<string, SeasonalAchievement[]>> {
+    const activeSeasons = await this.getActiveSeasons();
+    const result = new Map<string, SeasonalAchievement[]>();
+
+    for (const season of activeSeasons) {
+      const achievements = await this.getSeasonalAchievements(season.id);
+      result.set(season.id, achievements);
+    }
+
+    return result;
+  },
+
+  async getUserSeasonalAchievements(
+    userId: string,
+    seasonId: string
+  ): Promise<SeasonalAchievement[]> {
+    const seasonalAchs = await this.getSeasonalAchievements(seasonId);
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(a => a.achievementId)
+    );
+
+    return seasonalAchs.map(ach => ({
+      ...ach,
+      unlockedAt: userAchs.find(ua => ua.achievementId === ach.id)?.unlockedAt,
+    }));
+  },
+
+  async getSeasonalLeaderboard(
+    seasonId: string,
+    limit: number = 20
+  ): Promise<SeasonalLeaderboardEntry[]> {
+    // Check cache first
+    const cacheKey = `${seasonId}_${limit}`;
+    if (seasonalLeaderboardCache.has(cacheKey)) {
+      return seasonalLeaderboardCache.get(cacheKey) || [];
+    }
+
+    const leaderboardData: SeasonalLeaderboardEntry[] = [];
+    const allUserProgress = userSeasonalProgressMap;
+
+    for (const [userId, seasonMap] of allUserProgress) {
+      const seasonalXP = seasonMap.get(seasonId) || 0;
+      const userAchs = await this.getUserAchievements(userId);
+      const seasonalAchievements = userAchs.filter(ua =>
+        ACHIEVEMENTS.find(a => a.id === ua.achievementId && a.seasonId === seasonId)
+      );
+
+      const tracker = userXPMap.get(userId);
+      leaderboardData.push({
+        userId,
+        username: `User_${userId.substring(0, 8)}`,
+        avatar: '',
+        totalXP: tracker?.totalXP || 0,
+        level: Math.floor((tracker?.totalXP || 0) / 1000) + 1,
+        achievements: userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).length,
+        badges: 0,
+        rank: 0,
+        seasonId,
+        seasonalXP,
+        seasonalAchievements: seasonalAchievements.length,
+      });
+    }
+
+    // Sort by seasonal XP first, then total XP
+    leaderboardData.sort((a, b) => {
+      if (b.seasonalXP !== a.seasonalXP) return b.seasonalXP - a.seasonalXP;
+      return b.totalXP - a.totalXP;
+    });
+
+    // Assign ranks
+    leaderboardData.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+
+    const result = leaderboardData.slice(0, limit);
+    seasonalLeaderboardCache.set(cacheKey, result);
+    return result;
+  },
+
+  async trackSeasonalXP(userId: string, seasonId: string, amount: number): Promise<void> {
+    if (!userSeasonalProgressMap.has(userId)) {
+      userSeasonalProgressMap.set(userId, new Map());
+    }
+
+    const userSeasonMap = userSeasonalProgressMap.get(userId)!;
+    const currentXP = userSeasonMap.get(seasonId) || 0;
+    userSeasonMap.set(seasonId, currentXP + amount);
+
+    // Also track in regular XP as achievement XP
+    await this.trackUserXP(userId, amount, 'achievement');
+  },
+
+  async getUserSeasonalProgress(
+    userId: string,
+    seasonId: string
+  ): Promise<{
+    xp: number;
+    achievements: number;
+    rank?: number;
+  }> {
+    const userSeasonMap = userSeasonalProgressMap.get(userId);
+    const xp = userSeasonMap?.get(seasonId) || 0;
+
+    const userAchs = await this.getUserAchievements(userId);
+    const achievements = userAchs.filter(ua =>
+      ACHIEVEMENTS.find(a => a.id === ua.achievementId && a.seasonId === seasonId)
+    ).length;
+
+    const leaderboard = await this.getSeasonalLeaderboard(seasonId, 1000);
+    const userEntry = leaderboard.find(e => e.userId === userId);
+    const rank = userEntry?.rank;
+
+    return { xp, achievements, rank };
+  },
+
+  async getSeasonTimeline(): Promise<{
+    currentSeason?: SeasonConfig;
+    upcomingSeason?: SeasonConfig;
+    pastSeasons: SeasonConfig[];
+  }> {
+    const now = new Date();
+    const seasons = Array.from(seasonConfigMap.values()).sort(
+      (a, b) => b.startDate.getTime() - a.startDate.getTime()
+    );
+
+    const currentSeason = seasons.find(s => s.startDate <= now && s.endDate >= now);
+    const upcomingSeason = seasons.find(s => s.startDate > now);
+    const pastSeasons = seasons.filter(s => s.endDate < now);
+
+    return {
+      currentSeason,
+      upcomingSeason,
+      pastSeasons,
+    };
+  },
+
+  async getSeasonalAchievementCount(seasonId: string): Promise<number> {
+    return ACHIEVEMENTS.filter(a => a.seasonId === seasonId).length;
+  },
+
+  async getSeasonalCompletionPercentage(userId: string, seasonId: string): Promise<number> {
+    const seasonalAchs = await this.getSeasonalAchievements(seasonId);
+    if (seasonalAchs.length === 0) return 0;
+
+    const userAchs = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(
+      userAchs.filter(a => a.unlockedAt && a.unlockedAt.getTime() !== 0).map(a => a.achievementId)
+    );
+
+    const unlockedCount = seasonalAchs.filter(a => unlockedIds.has(a.id)).length;
+    return (unlockedCount / seasonalAchs.length) * 100;
+  },
+
+  async expireSeasonalAchievements(seasonId: string): Promise<number> {
+    const season = seasonConfigMap.get(seasonId);
+    if (season) {
+      season.isActive = false;
+      seasonConfigMap.set(seasonId, season);
+    }
+
+    // Clear cache for this season
+    Array.from(seasonalLeaderboardCache.keys())
+      .filter(key => key.startsWith(seasonId))
+      .forEach(key => seasonalLeaderboardCache.delete(key));
+
+    return ACHIEVEMENTS.filter(a => a.seasonId === seasonId).length;
+  },
+
+  async getSeasonalRewards(
+    userId: string,
+    seasonId: string
+  ): Promise<{
+    totalSeasonalXP: number;
+    seasonalAchievements: number;
+    bonusXP: number;
+    seasonReward?: string;
+  }> {
+    const progress = await this.getUserSeasonalProgress(userId, seasonId);
+    const completion = await this.getSeasonalCompletionPercentage(userId, seasonId);
+
+    // Calculate bonus based on completion
+    let bonusXP = 0;
+    if (completion === 100)
+      bonusXP = 1000; // Perfect season
+    else if (completion >= 75)
+      bonusXP = 500; // 75%+
+    else if (completion >= 50)
+      bonusXP = 250; // 50%+
+    else if (completion >= 25) bonusXP = 100; // 25%+
+
+    let seasonReward = '';
+    if (completion === 100) seasonReward = '👑 Season Master';
+    else if (completion >= 75) seasonReward = '🌟 Season Champion';
+    else if (completion >= 50) seasonReward = '⭐ Season Participant';
+
+    return {
+      totalSeasonalXP: progress.xp,
+      seasonalAchievements: progress.achievements,
+      bonusXP,
+      seasonReward,
+    };
+  },
+
+  async searchAchievements(query: string): Promise<AchievementSearchResult[]> {
+    const lowerQuery = query.toLowerCase().trim();
+    if (lowerQuery.length === 0) {
+      return [];
+    }
+
+    const results: AchievementSearchResult[] = [];
+
+    for (const achievement of ACHIEVEMENTS) {
+      let matchScore = 0;
+      let matchReason = '';
+
+      const titleMatch = achievement.title
+        .toLowerCase()
+        .includes(lowerQuery);
+      const descriptionMatch = achievement.description
+        .toLowerCase()
+        .includes(lowerQuery);
+
+      if (titleMatch && descriptionMatch) {
+        // Exact title match is weighted higher
+        const titleDistance = calculateStringDistance(
+          achievement.title.toLowerCase(),
+          lowerQuery
+        );
+        matchScore = Math.min(100, 95 + titleDistance * 5);
+        matchReason = 'both';
+      } else if (titleMatch) {
+        const titleDistance = calculateStringDistance(
+          achievement.title.toLowerCase(),
+          lowerQuery
+        );
+        // Boost score for exact/close matches
+        matchScore = Math.min(100, 80 + titleDistance * 20);
+        matchReason = 'title';
+      } else if (descriptionMatch) {
+        const descDistance = calculateStringDistance(
+          achievement.description.toLowerCase(),
+          lowerQuery
+        );
+        matchScore = Math.min(100, 60 + descDistance * 20);
+        matchReason = 'description';
+      }
+
+      if (matchScore > 0) {
+        results.push({
+          achievement,
+          matchScore,
+          matchReason,
+        });
+      }
+    }
+
+    // Sort by match score (descending)
+    return results.sort((a, b) => b.matchScore - a.matchScore);
+  },
+
+  async getAchievementsByStatus(
+    userId: string,
+    status: AchievementStatus
+  ): Promise<Achievement[]> {
+    const userAchs = userAchievements.get(userId) || [];
+    const unlockedIds = new Set(
+      userAchs.filter(ua => ua.unlockedAt.getTime() > 0).map(ua => ua.achievementId)
+    );
+
+    if (status === 'unlocked') {
+      return ACHIEVEMENTS.filter(ach => unlockedIds.has(ach.id));
+    } else if (status === 'locked') {
+      const inProgressIds = new Set(
+        userAchs.filter(ua => ua.progress > 0 && !unlockedIds.has(ua.achievementId))
+          .map(ua => ua.achievementId)
+      );
+      return ACHIEVEMENTS.filter(
+        ach => !unlockedIds.has(ach.id) && !inProgressIds.has(ach.id)
+      );
+    } else if (status === 'in-progress') {
+      // Achievement is in progress if user has started it but not completed it
+      return ACHIEVEMENTS.filter(ach => {
+        const userAch = userAchs.find(ua => ua.achievementId === ach.id);
+        return (
+          userAch &&
+          userAch.progress > 0 &&
+          userAch.progress < ach.requirement &&
+          !unlockedIds.has(ach.id)
+        );
+      });
+    }
+
+    return [];
   },
 };
