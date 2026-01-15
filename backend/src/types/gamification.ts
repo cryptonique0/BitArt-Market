@@ -5,7 +5,14 @@ export enum AchievementType {
   TRADER = 'trader',
   SOCIAL = 'social',
   MILESTONE = 'milestone',
-  SPECIAL = 'special'
+  SPECIAL = 'special',
+}
+
+export enum AchievementTier {
+  BRONZE = 'bronze',
+  SILVER = 'silver',
+  GOLD = 'gold',
+  PLATINUM = 'platinum',
 }
 
 export interface Achievement {
@@ -17,6 +24,9 @@ export interface Achievement {
   requirement: number;
   xpReward: number;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  tier?: AchievementTier;
+  badgeIcon?: string;
+  milestone?: number;
   unlockedAt?: Date;
 }
 
@@ -77,7 +87,7 @@ export enum LuckyDrawPrize {
   BADGE_RARE = 'badge_rare',
   BADGE_EPIC = 'badge_epic',
   NFT_DISCOUNT = 'nft_discount_10',
-  FEATURE_BOOST = 'feature_boost'
+  FEATURE_BOOST = 'feature_boost',
 }
 
 export interface LuckyDrawPrizeConfig {
