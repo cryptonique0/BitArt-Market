@@ -16,7 +16,9 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   onAchievementSelect,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'rankings' | 'user'>('overview');
-  const [selectedAchievement, setSelectedAchievement] = useState<string>(selectedAchievementId || '');
+  const [selectedAchievement, setSelectedAchievement] = useState<string>(
+    selectedAchievementId || ''
+  );
 
   const handleAchievementSelect = (id: string) => {
     setSelectedAchievement(id);
@@ -29,7 +31,9 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-900 to-purple-900 p-6 border-b border-gray-800">
         <h1 className="text-3xl font-bold mb-2">Gamification Analytics</h1>
-        <p className="text-gray-300">Monitor achievement statistics, engagement metrics, and user progress</p>
+        <p className="text-gray-300">
+          Monitor achievement statistics, engagement metrics, and user progress
+        </p>
       </div>
 
       {/* Tabs */}
@@ -129,7 +133,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-lg font-bold mb-4">About This User</h3>
               <p className="text-gray-400 text-sm">
-                View detailed achievement statistics, progress tracking, and performance metrics for user {userId}.
+                View detailed achievement statistics, progress tracking, and performance metrics for
+                user {userId}.
               </p>
             </div>
           </div>
@@ -138,7 +143,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
       {/* Footer */}
       <div className="bg-gray-800/50 border-t border-gray-800 p-4 text-center text-gray-400 text-sm">
-        <p>Analytics data is cached and refreshes every 5 minutes. Last updated: {new Date().toLocaleTimeString()}</p>
+        <p>
+          Analytics data is cached and refreshes every 5 minutes. Last updated:{' '}
+          {new Date().toLocaleTimeString()}
+        </p>
       </div>
     </div>
   );
