@@ -17,6 +17,9 @@ import {
   SocialLeaderboardEntry,
   ShareableAchievementBadge,
   UserProfile,
+  SeasonConfig,
+  SeasonalAchievement,
+  SeasonalLeaderboardEntry,
 } from '../types/gamification';
 
 // Track total XP per user
@@ -36,6 +39,11 @@ const friendshipMap = new Map<string, Set<string>>();
 
 // Track user profiles for social features
 const userProfileMap = new Map<string, UserProfile>();
+
+// Track seasonal achievements and user progress
+const seasonConfigMap = new Map<string, SeasonConfig>();
+const userSeasonalProgressMap = new Map<string, Map<string, number>>(); // userId -> seasonId -> XP
+const seasonalLeaderboardCache = new Map<string, SeasonalLeaderboardEntry[]>();
 
 // Streak reward configuration
 const STREAK_REWARDS: StreakReward[] = [

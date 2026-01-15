@@ -28,6 +28,10 @@ export interface Achievement {
   badgeIcon?: string;
   milestone?: number;
   unlockedAt?: Date;
+  seasonId?: string; // Seasonal achievement identifier
+  seasonStartDate?: Date; // When the seasonal achievement period starts
+  seasonEndDate?: Date; // When the seasonal achievement expires
+  isSeasonal?: boolean; // Mark as seasonal achievement
 }
 
 export interface UserAchievement {
@@ -284,4 +288,30 @@ export interface AchievementRewardNotification {
   newLevel?: number;
   tier?: AchievementTier;
   timestamp: Date;
+}
+export interface SeasonConfig {
+  id: string;
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  theme: string;
+  color: string;
+  icon: string;
+  isActive: boolean;
+}
+
+export interface SeasonalAchievement extends Achievement {
+  seasonId: string;
+  seasonName: string;
+  seasonStartDate: Date;
+  seasonEndDate: Date;
+  daysRemaining?: number;
+  isExpired?: boolean;
+}
+
+export interface SeasonalLeaderboardEntry extends LeaderboardEntry {
+  seasonId: string;
+  seasonalXP: number;
+  seasonalAchievements: number;
 }
