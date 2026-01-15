@@ -50,9 +50,8 @@ export class BlockchainService {
     try {
       const config = getConfig();
       const network = config.network === 'mainnet' ? 'mainnet' : 'sepolia';
-      const rpcUrl = config.network === 'mainnet'
-        ? 'https://mainnet.base.org'
-        : 'https://sepolia.base.org';
+      const rpcUrl =
+        config.network === 'mainnet' ? 'https://mainnet.base.org' : 'https://sepolia.base.org';
 
       this.provider = new ethers.JsonRpcProvider(rpcUrl);
       logger.info(`Blockchain service initialized with ${network}`);

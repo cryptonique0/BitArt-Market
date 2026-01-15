@@ -40,10 +40,25 @@ export class EventListenerService {
       this.io = io;
 
       // Initialize WebSocket provider for Base network
-      const wsUrl = process.env.BASE_WS_RPC_URL || 'wss://sepolia.base.org';
-      this.provider = new ethers.WebSocketProvider(wsUrl);
+      // Only initialize if valid WebSocket URL is configured
+      const wsUrl = process.env.BASE_WS_RPC_URL;
 
-      logger.info('Event listener service initialized');
+      if ((wsUrl && wsUrl.startsWith('wss://')) || wsUrl?.startsWith('ws://')) {
+        try {
+          this.provider = new ethers.WebSocketProvider(wsUrl);
+          logger.info('Event listener service initialized with WebSocket provider');
+        } catch (providerError) {
+          logger.warn(
+            'WebSocket provider initialization failed, using JSON-RPC fallback:',
+            providerError
+          );
+          // Provider will remain null, operations will use JSON-RPC instead
+        }
+      } else {
+        logger.info(
+          'Event listener service initialized (WebSocket RPC not configured, using JSON-RPC fallback)'
+        );
+      }
 
       // Setup Socket.IO connection handlers
       this.setupSocketHandlers();
@@ -51,7 +66,8 @@ export class EventListenerService {
       return true;
     } catch (error) {
       logger.error('Failed to initialize event listener:', error);
-      throw error;
+      // Don't throw - allow service to continue without event listening
+      return false;
     }
   }
 
@@ -61,7 +77,7 @@ export class EventListenerService {
   private setupSocketHandlers() {
     if (!this.io) return;
 
-    this.io.on('connection', (socket) => {
+    this.io.on('connection', socket => {
       logger.info(`Client connected: ${socket.id}`);
 
       // Subscribe to events
@@ -100,9 +116,7 @@ export class EventListenerService {
    */
   private async removeSubscription(socketId: string, subscription: EventSubscription) {
     const existing = this.subscriptions.get(socketId) || [];
-    const filtered = existing.filter(
-      (sub) => sub.eventType !== subscription.eventType
-    );
+    const filtered = existing.filter(sub => sub.eventType !== subscription.eventType);
     this.subscriptions.set(socketId, filtered);
 
     logger.info(`Subscription removed for ${socketId}: ${subscription.eventType}`);
@@ -222,18 +236,27 @@ export class EventListenerService {
       this.contractListeners.set(`auction-${contractAddress}`, contract);
 
       // Listen to AuctionCreated events
-      contract.on('AuctionCreated', async (auctionId, seller, nftAddress, tokenId, startPrice, event) => {
-        const contractEvent: ContractEvent = {
-          eventName: 'AuctionCreated',
-          contractAddress,
-          args: [auctionId.toString(), seller, nftAddress, tokenId.toString(), startPrice.toString()],
-          blockNumber: event.log.blockNumber,
-          transactionHash: event.log.transactionHash,
-          timestamp: Date.now(),
-        };
+      contract.on(
+        'AuctionCreated',
+        async (auctionId, seller, nftAddress, tokenId, startPrice, event) => {
+          const contractEvent: ContractEvent = {
+            eventName: 'AuctionCreated',
+            contractAddress,
+            args: [
+              auctionId.toString(),
+              seller,
+              nftAddress,
+              tokenId.toString(),
+              startPrice.toString(),
+            ],
+            blockNumber: event.log.blockNumber,
+            transactionHash: event.log.transactionHash,
+            timestamp: Date.now(),
+          };
 
-        await this.handleAuctionCreated(contractEvent);
-      });
+          await this.handleAuctionCreated(contractEvent);
+        }
+      );
 
       // Listen to BidPlaced events
       contract.on('BidPlaced', async (auctionId, bidder, amount, event) => {
@@ -545,10 +568,7 @@ export class EventListenerService {
       }
 
       query = query.order('created_at', { ascending: false });
-      query = query.range(
-        filters.offset || 0,
-        (filters.offset || 0) + (filters.limit || 50) - 1
-      );
+      query = query.range(filters.offset || 0, (filters.offset || 0) + (filters.limit || 50) - 1);
 
       const { data, error } = await query;
 

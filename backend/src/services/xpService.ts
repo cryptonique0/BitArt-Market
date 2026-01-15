@@ -13,18 +13,10 @@ const LEVEL_CONFIGS: LevelConfig[] = [
   { level: 10, minXP: 50000, maxXP: 100000, title: 'Ascendant', color: '#FFD700' }
 ];
 
-<<<<<<< HEAD
-=======
-// In-memory storage for demo purposes. Replace with database in production
->>>>>>> 2caf294 (Initial commit with API documentation and features)
 const userLevels = new Map<string, UserLevel>();
 const xpTransactions: XPTransaction[] = [];
 
 export const xpService = {
-<<<<<<< HEAD
-=======
-  // Award XP to user
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   async awardXP(userId: string, amount: number, reason: string, relatedId?: string): Promise<UserLevel> {
     let userLevel = userLevels.get(userId) || {
       userId,
@@ -34,10 +26,6 @@ export const xpService = {
       xpInCurrentLevel: 0
     };
 
-<<<<<<< HEAD
-=======
-    // Create transaction record
->>>>>>> 2caf294 (Initial commit with API documentation and features)
     const transaction: XPTransaction = {
       id: `xp_${Date.now()}`,
       userId,
@@ -48,17 +36,9 @@ export const xpService = {
     };
     xpTransactions.push(transaction);
 
-<<<<<<< HEAD
     userLevel.totalXP += amount;
     userLevel.xpInCurrentLevel += amount;
 
-=======
-    // Add XP
-    userLevel.totalXP += amount;
-    userLevel.xpInCurrentLevel += amount;
-
-    // Check for level up
->>>>>>> 2caf294 (Initial commit with API documentation and features)
     while (userLevel.xpInCurrentLevel >= userLevel.xpForNextLevel) {
       userLevel.xpInCurrentLevel -= userLevel.xpForNextLevel;
       userLevel.currentLevel += 1;
@@ -73,10 +53,6 @@ export const xpService = {
     return userLevel;
   },
 
-<<<<<<< HEAD
-=======
-  // Get user level info
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   async getUserLevel(userId: string): Promise<UserLevel> {
     return userLevels.get(userId) || {
       userId,
@@ -87,36 +63,20 @@ export const xpService = {
     };
   },
 
-<<<<<<< HEAD
-=======
-  // Get level config
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   getLevelConfig(level: number): LevelConfig {
     return LEVEL_CONFIGS[level - 1] || LEVEL_CONFIGS[LEVEL_CONFIGS.length - 1];
   },
 
-<<<<<<< HEAD
-=======
-  // Get all level configs
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   getAllLevelConfigs(): LevelConfig[] {
     return LEVEL_CONFIGS;
   },
 
-<<<<<<< HEAD
-=======
-  // Calculate progress percentage (0-100)
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   async getLevelProgress(userId: string): Promise<number> {
     const userLevel = await this.getUserLevel(userId);
     if (userLevel.xpForNextLevel === 0) return 100;
     return Math.round((userLevel.xpInCurrentLevel / userLevel.xpForNextLevel) * 100);
   },
 
-<<<<<<< HEAD
-=======
-  // Get XP transaction history
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   async getXPHistory(userId: string, limit = 20): Promise<XPTransaction[]> {
     return xpTransactions
       .filter(t => t.userId === userId)
@@ -124,10 +84,6 @@ export const xpService = {
       .slice(0, limit);
   },
 
-<<<<<<< HEAD
-=======
-  // Get level leaderboard
->>>>>>> 2caf294 (Initial commit with API documentation and features)
   getLeaderboard(limit = 10) {
     return Array.from(userLevels.values())
       .sort((a, b) => b.totalXP - a.totalXP)

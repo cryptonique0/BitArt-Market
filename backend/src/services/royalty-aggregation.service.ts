@@ -1,4 +1,5 @@
-import { supabase, supabaseAdmin } from '../config/supabase';
+import { supabase, supabaseAdmin, isSupabaseAvailable } from '../config/supabase';
+import { getConfig } from '../config/env';
 
 class RoyaltyAggregationServiceClass {
   /**
@@ -7,8 +8,13 @@ class RoyaltyAggregationServiceClass {
    */
   async aggregateRoyalties(): Promise<void> {
     try {
+      // Skip if Supabase is not properly configured
+      if (!isSupabaseAvailable()) {
+        return;
+      }
+
       console.log('[RoyaltyAggregation] Starting royalty aggregation...');
-      
+
       // Get all royalty earnings grouped by creator
       const { data: royalties, error: royaltiesError } = await supabaseAdmin
         .from('royalties')
@@ -60,7 +66,9 @@ class RoyaltyAggregationServiceClass {
         console.log(`[RoyaltyAggregation] Updated ${wallet}: +${amount}`);
       }
 
-      console.log(`[RoyaltyAggregation] Completed. Updated ${Object.keys(balances).length} creators`);
+      console.log(
+        `[RoyaltyAggregation] Completed. Updated ${Object.keys(balances).length} creators`
+      );
     } catch (error) {
       console.error('[RoyaltyAggregation] Error:', error);
     }
@@ -71,6 +79,11 @@ class RoyaltyAggregationServiceClass {
    */
   async processAutoPayouts(): Promise<void> {
     try {
+      // Skip if Supabase is not properly configured
+      if (!isSupabaseAvailable()) {
+        return;
+      }
+
       console.log('[AutoPayout] Checking auto-payout thresholds...');
 
       // Get users with auto-payout enabled and balance >= threshold
@@ -86,13 +99,16 @@ class RoyaltyAggregationServiceClass {
       }
 
       // Filter users where balance >= threshold
-      const eligible = users.filter(u => Number(u.available_balance) >= Number(u.auto_payout_threshold));
+      const eligible = users.filter(
+        u => Number(u.available_balance) >= Number(u.auto_payout_threshold)
+      );
       if (eligible.length === 0) {
         console.log('[AutoPayout] No users meet threshold criteria');
         return;
       }
 
-      const RoyaltyPayoutsService = (await import('./royalty-payouts.service')).RoyaltyPayoutsService;
+      const RoyaltyPayoutsService = (await import('./royalty-payouts.service'))
+        .RoyaltyPayoutsService;
 
       for (const user of eligible) {
         const amount = Number(user.available_balance);
@@ -108,8 +124,8 @@ class RoyaltyAggregationServiceClass {
           // Deduct from available_balance
           await supabaseAdmin
             .from('users')
-            .update({ 
-              available_balance: 0
+            .update({
+              available_balance: 0,
             })
             .eq('wallet_address', user.wallet_address);
 
