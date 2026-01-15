@@ -2,8 +2,12 @@ import { Router, Request, Response } from 'express';
 import { xpService } from '../services/xpService';
 import { achievementService } from '../services/achievementService';
 import { rewardsService } from '../services/rewardsService';
+import { authenticateToken } from '../services/achievementService';
 
 const router = Router();
+
+// Protect all routes with JWT authentication middleware
+router.use(authenticateToken);
 
 // XP Routes
 router.get('/xp/user/:userId', async (req: Request, res: Response) => {

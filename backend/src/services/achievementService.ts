@@ -1,8 +1,4 @@
 import { Achievement, UserAchievement, AchievementType } from '../types/gamification';
-<<<<<<< HEAD
-=======
-import jwt from 'jsonwebtoken';
->>>>>>> 2caf294 (Initial commit with API documentation and features)
 
 const ACHIEVEMENTS: Achievement[] = [
   {
