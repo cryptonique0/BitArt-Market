@@ -64,11 +64,9 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
       if (editingMessageId) {
         await messagingService.updateMessage(editingMessageId, messageContent);
         setEditingMessageId(null);
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === editingMessageId
-              ? { ...m, content: messageContent, isEdited: true }
-              : m
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === editingMessageId ? { ...m, content: messageContent, isEdited: true } : m
           )
         );
       } else {
@@ -77,7 +75,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           recipientAddress: otherParticipant,
           content: messageContent,
         });
-        setMessages((prev) => [...prev, newMessage]);
+        setMessages(prev => [...prev, newMessage]);
       }
 
       setMessageContent('');
@@ -94,7 +92,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
 
     try {
       await messagingService.deleteMessage(messageId);
-      setMessages((prev) => prev.filter((m) => m.id !== messageId));
+      setMessages(prev => prev.filter(m => m.id !== messageId));
     } catch (error) {
       console.error('Failed to delete message:', error);
     }
@@ -122,7 +120,12 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
             className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <div>
@@ -139,7 +142,12 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
             title="Transaction history"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
           </button>
           <button
@@ -148,7 +156,12 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
             title="Block user"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0 0H9m3 0h3m-3 0V9m3 0V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2m10 7a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4v2m0 0H9m3 0h3m-3 0V9m3 0V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2m10 7a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
           </button>
         </div>
@@ -165,7 +178,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
             ))}
           </div>
         ) : messages.length > 0 ? (
-          messages.map((message) => (
+          messages.map(message => (
             <MessageBubble
               key={message.id}
               message={message}
@@ -179,7 +192,9 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           ))
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-600 dark:text-gray-400">No messages yet. Start the conversation!</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              No messages yet. Start the conversation!
+            </p>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -210,7 +225,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           <input
             type="text"
             value={messageContent}
-            onChange={(e) => setMessageContent(e.target.value)}
+            onChange={e => setMessageContent(e.target.value)}
             placeholder="Type a message..."
             maxLength={5000}
             className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
@@ -269,18 +284,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           </span>
           {showActions && isOwnMessage && (
             <div className="flex gap-1">
-              <button
-                onClick={onEdit}
-                className="text-xs hover:opacity-70"
-                title="Edit"
-              >
+              <button onClick={onEdit} className="text-xs hover:opacity-70" title="Edit">
                 ✏️
               </button>
-              <button
-                onClick={onDelete}
-                className="text-xs hover:opacity-70"
-                title="Delete"
-              >
+              <button onClick={onDelete} className="text-xs hover:opacity-70" title="Delete">
                 🗑️
               </button>
             </div>
