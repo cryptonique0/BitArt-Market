@@ -53,33 +53,7 @@ function report(metric: Metric) {
 }
 
 export function startPerfMetrics() {
-  // Only try to load web-vitals if we haven't already attempted it
-  if (window.perfMetricsReported) return;
-
-  if (typeof window !== 'undefined') {
-    try {
-      // Use dynamic import to avoid blocking on module load errors
-      import('web-vitals')
-        .then(vitals => {
-          window.perfMetricsReported = true;
-
-          // Call each metric function if it exists
-          if (vitals.getCLS) vitals.getCLS(report);
-          if (vitals.getFID) vitals.getFID(report);
-          if (vitals.getLCP) vitals.getLCP(report);
-          if (vitals.getTTFB) vitals.getTTFB(report);
-          if (vitals.getFCP) vitals.getFCP(report);
-        })
-        .catch(error => {
-          // Silently fail if web-vitals can't be loaded
-          if (import.meta.env.DEV) {
-            console.debug('Web vitals not available:', error.message);
-          }
-          window.perfMetricsReported = true;
-        });
-    } catch (error) {
-      // Silently fail on any error
-      window.perfMetricsReported = true;
-    }
-  }
+  // Web-vitals monitoring disabled to avoid module resolution issues
+  // This maintains API compatibility while preventing build errors
+  window.perfMetricsReported = true;
 }

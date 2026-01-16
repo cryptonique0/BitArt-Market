@@ -15,9 +15,4 @@ export default defineConfig({
     exclude: ['web-vitals'],
     include: ['react', 'react-dom'],
   },
-  resolve: {
-    alias: {
-      'web-vitals': 'web-vitals/dist/web-vitals.js',
-    },
-  },
 });
