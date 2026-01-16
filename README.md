@@ -5,11 +5,12 @@
 [![E2E Tests](https://github.com/cryptonique0/BitArt-Market/actions/workflows/e2e.yml/badge.svg)](https://github.com/cryptonique0/BitArt-Market/actions/workflows/e2e.yml)
 [![Deploy](https://github.com/cryptonique0/BitArt-Market/actions/workflows/deploy.yml/badge.svg)](https://github.com/cryptonique0/BitArt-Market/actions/workflows/deploy.yml)
 
-A **Base-native**, production-ready NFT marketplace optimized for **Base Mainnet** with seamless wallet integration, transparent fees, and creator-first features. Also supports **Stacks blockchain** with Solidity/Clarity smart contracts, React frontend, and Node.js backend.
+A **Base-native**, production-ready NFT marketplace optimized for **Base Mainnet** with seamless wallet integration, transparent fees, creator-first features, and **gamification system** for user engagement. Also supports **Stacks blockchain** with Solidity/Clarity smart contracts, React frontend, and Node.js backend.
 
 ## 🎉 **Live on Base Mainnet!**
 
 All smart contracts deployed and verified on Base Mainnet with base-first UX:
+
 - **BitArtNFT**: `0xD15D1766cd7c2D4FbcEb4f015CbD54058304d682`
 - **BitArtMarketplace**: `0x7d28443e3571faB3821d669537E45484E4A06AC9`
 - **BitArtAuction**: `0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2`
@@ -18,7 +19,20 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 
 ## � Feature Highlights
 
+### 🎮 Gamification System (Latest)
+
+- **XP & Leveling** — Earn experience points from marketplace activities with configurable rewards
+- **Achievements & Badges** — Unlock badges for milestones with rarity tiers (common → legendary)
+- **Leaderboards** — Compete with other users on global XP leaderboards with rank tracking
+- **Daily Rewards** — Claim daily login rewards with streak bonuses and multipliers
+- **Lucky Draw Wheel** — Spin the wheel for random prizes (XP, badges, discounts)
+- **Achievement Analytics** — Track progress, completion rates, and popularity metrics
+- **Seasonal Achievements** — Time-limited challenges and seasonal rewards
+- **Social Features** — Compare achievements with friends, share badges, and view friend progress
+- **Streaks & Milestones** — Track daily activity streaks with milestone rewards
+
 ### 🏆 Engagement & Growth Pack (Days 15-17)
+
 - **Collector XP + Badges + Leaderboard** — XP from buys/sells/mints/listings, streak multipliers, tiered badges, and a combined XP + volume leaderboard to fuel “top 10” competition.
 - **Referral & Invite Links** — Per-user invite codes with tracked clicks, signups, referred volume, ETH kickbacks, and a “top referrers” widget.
 - **Drop Calendar + Allowlist Engine** — Scheduled drops with allowlist windows, countdowns, featured drops, and notify-by-email/webhook hooks.
@@ -26,6 +40,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Safety & Trust Pack** — Provenance and verified-creator badges, suspicious-collection warnings, and transaction preflight trust signals.
 
 ### 🔍 Latest: Advanced Search & Discovery (Days 8-9)
+
 - **Advanced Filtering** - Price range, creator, rarity, verification status, listed status
 - **Smart Sorting** - Popularity, price (asc/desc), trending, newest/oldest
 - **Search Ranking** - Relevance-based ranking with popularity tiebreaker
@@ -35,6 +50,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Marketplace Stats** - Floor price, average price, volume, sales count
 
 ### 🎨 Royalty Analytics Dashboard (Day 6)
+
 - **Royalty Tracking** - Real-time secondary sale earnings per NFT and creator
 - **30-Day Revenue Charts** - Interactive visual earnings trends with daily breakdown
 - **Creator Dashboard** - Comprehensive analytics with revenue summaries
@@ -44,6 +60,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Visual Charts** - Custom line and bar charts with dark mode support
 
 ### 📊 Creator Economy Tools (Days 4-5)
+
 - **Creator Profiles** - Dedicated pages showing NFTs created, total earnings, and sales history
 - **Marketplace Analytics** - 7 key metrics (volume, sales, users, listings, floor price, avg price, revenue)
 - **Revenue Charts** - 30-day visual earning trends with peak/average statistics
@@ -52,6 +69,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Recent Sales Table** - Transaction history with prices and buyer addresses
 
 ### 🎯 Extended Wallet & Transaction UX (Day 3)
+
 - **Transaction Status Components** - Loading states, success/error toasts, history tracking
 - **Wallet Error Handling** - Disconnect banners, reconnection flows, error display
 - **Transaction Service** - RPC polling, status updates, confirmation tracking
@@ -63,11 +81,13 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 ✨ **Production-ready features built specifically for Base Mainnet:**
 
 ### ⚡ Network Intelligence
+
 - **Auto-detection & auto-switch** to Base Mainnet (seamless UX)
 - **Chain change listeners** for real-time wallet updates
 - **Graceful fallback** if not on Base with prominent banner
 
 ### 💰 Gas Optimization
+
 - **Real-time gas estimation** from Base RPC
 - **Transparent fee breakdown** (item price, platform fee, royalty, gas)
 - **"Cheap Gas" badges** when transactions < 0.01 ETH
@@ -75,12 +95,14 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Live gas price updates** in Gwei and ETH
 
 ### 🔗 Explorer Integration
+
 - **BaseScan deep links** on every transaction
 - **Address & contract links** with copy-to-clipboard
 - **Transaction status display** with explorer navigation
 - **Shortened hashes** for readable UI while keeping full links
 
 ### 🏷️ Badge System
+
 - **"Built on Base"** badge on all marketplace NFTs
 - **Base OG** badge for early supporters
 - **Verified creator** badges
@@ -89,6 +111,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Customizable badge sizes** (sm, md, lg)
 
 ### 💳 Coinbase Wallet Optimization
+
 - **Automatic Coinbase Wallet detection**
 - **Smart Wallet capability detection** (account abstraction)
 - **Feature indicators** (EIP-1559, batch transactions)
@@ -96,6 +119,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Smart Wallet gasless hints**
 
 ### ⚙️ Gasless Transactions (Optional)
+
 - **Paymaster integration framework** (Pimlico-ready)
 - **ERC-4337 account abstraction** support
 - **Eligibility detection** for gasless users
@@ -106,6 +130,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 ## 🚀 Features
 
 ### Smart Contracts
+
 - **ERC721 NFTs** (Base) with metadata storage and royalties (EIP-2981)
 - **SFT-based NFTs** (Stacks) with metadata storage
 - **Royalty system** for creator earnings on resales
@@ -116,6 +141,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **ReentrancyGuard** protection (Base)
 
 ### Frontend
+
 - **Responsive design** (mobile, tablet, desktop) with Tailwind CSS
 - **Dark/Light mode** support with persistent theme storage
 - **Real-time blockchain data** display with Base RPC integration
@@ -129,6 +155,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Smooth animations** and transitions with loading states
 
 ### Backend
+
 - **REST API** with 20+ endpoints for marketplace operations
 - **IPFS integration** for decentralized storage (Pinata)
 - **User profile management** with creator stats
@@ -138,16 +165,21 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 - **Creator service** - Earnings aggregation and profile data
 - **Search and filtering** engine with pagination and ranking
 - **Consolidated marketplace service** - Unified listing, buying, fee calculations
+- **Gamification services** - XP tracking, achievements, leaderboards, daily rewards, lucky draw
+- **Achievement tracking** - User progress, unlock notifications, seasonal challenges
+- **Leaderboard system** - Real-time rank updates with category-based rankings
 - **Service barrel exports** - Simplified and organized API
 
 ### Multi-Chain Support
+
 - **Base Mainnet (Primary)**: EVM-compatible L2 with low fees and fast transactions
   - ERC721 NFT contract with royalty support
   - Marketplace with automatic royalty distribution
   - Auction contract with bidding mechanism
+
 ## 📋 Project Structure
 
-```
+````
 /contracts
   /solidity       → Solidity contracts for Base (ERC721, Marketplace, Auction)
   /clarity        → Clarity smart contracts for Stacks
@@ -186,13 +218,14 @@ npm install --workspace frontend
 
 # Install contracts dependencies
 cd contracts && npm install && cd ..
-```
+````
 
 ## 🚀 Getting Started
 
 ### 1. Configure Environment Variables
 
 **Backend** (`backend/.env.local`):
+
 ```env
 PORT=3001
 NETWORK=testnet
@@ -203,7 +236,8 @@ BASE_RPC_URL=https://mainnet.base.org
 ```
 
 **Frontend** (`frontend/.env.local`):
-```env
+
+````env
 VITE_NETWORK=testnet
 VITE_API_URL=http://localhost:3001/api
 
@@ -230,18 +264,23 @@ npm run test
 
 # Deploy to Stacks testnet
 npm run deploy:testnet
-```
+````
 
 See [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) for full deployment details.
+
 # Test contracts
+
 npm run test
 
 # Deploy to testnet
+
 npm run deploy:testnet
 
 # Deploy to mainnet (after testing)
+
 npm run deploy:mainnet
-```
+
+````
 
 See [CONTRACTS.md](./docs/CONTRACTS.md) for detailed contract documentation.
 
@@ -249,7 +288,7 @@ See [CONTRACTS.md](./docs/CONTRACTS.md) for detailed contract documentation.
 
 ```bash
 npm run dev --workspace backend
-```
+````
 
 The API will be available at `http://localhost:3001`
 
@@ -270,10 +309,21 @@ The app will be available at `http://localhost:5173`
 5. Click "Mint NFT"
 6. Approve transaction in wallet
 
+## ✅ Recent Updates & Fixes (January 2026)
+
+- ✨ **Gamification System** - Fully implemented with XP, achievements, leaderboards, and daily rewards
+- 🔧 **TypeScript Configuration** - Fixed tsconfig.json parsing errors
+- 🛡️ **Error Handling** - Improved graceful error handling for blockchain and Supabase services
+- ⚙️ **Middleware Fixes** - Corrected authentication middleware imports in gamification routes
+- 📝 **Validation** - Fixed validation middleware duplicate code issues
+- 🔌 **Service Initialization** - Added proper configuration checks for optional services (WebSocket, Supabase)
+- 📦 **Build Configuration** - Updated environment variable handling and service initialization
+
 ## 📚 Documentation
 
 - **[Smart Contracts](./docs/CONTRACTS.md)** - Clarity contract details, functions, and safety
 - **[API Reference](./docs/API.md)** - Backend endpoints and data models
+- **[Gamification Guide](./README_GAMIFICATION.md)** - XP, achievements, leaderboards, and rewards system
 - **[Wallet Integration](./docs/WALLET.md)** - Stacks.js setup and wallet connection
 - **[Deployment Guide](./docs/DEPLOYMENT.md)** - Production deployment steps
 - **[Architecture](./docs/ARCHITECTURE.md)** - System design and data flow
@@ -290,39 +340,46 @@ The app will be available at `http://localhost:5173`
 ## 📊 API Endpoints
 
 ### Base Blockchain
+
 - `GET /api/base/health` - Base network health check
 - `GET /api/base/account/:address` - Get Base wallet balance and info
 
 ### NFTs
+
 - `GET /api/nfts` - List all NFTs with filters and pagination
 - `GET /api/nfts/:id` - Get NFT details with metadata
 - `POST /api/nfts` - Create NFT (authenticated)
 - `GET /api/nfts/:id/history` - Transaction history
 
 ### Marketplace
+
 - `GET /api/marketplace/listings` - Active listings with filters
 - `POST /api/marketplace/listings` - Create listing
 - `PUT /api/marketplace/listings/:id` - Update listing price
 - `DELETE /api/marketplace/listings/:id` - Cancel listing
 
 ### Users
+
 - `GET /api/users/:address` - User profile with stats
 - `GET /api/users/:address/nfts` - User's NFT collection
 - `GET /api/users/:address/collections` - User's created collections
 - `POST /api/users/:address/avatar` - Upload avatar
 
 ### Analytics
+
 - `GET /api/analytics/stats` - Marketplace statistics (volume, sales, users)
 - `GET /api/analytics/trends` - 7-day trend indicators
 - `GET /api/analytics/top-creators` - Top creators by volume
 - `GET /api/analytics/top-buyers` - Top buyers by spending
 
 ### Creator Profiles
+
 - `GET /api/creators/:address` - Creator profile and earnings
 - `GET /api/creators/:address/stats` - Detailed creator statistics
 - `GET /api/creators/:address/sales` - Sales history
 
 ### Royalties
+
 - `GET /api/royalties/creator/:address` - Creator royalty summary
 - `GET /api/royalties/creator/:address/history?days=30` - Royalty chart data
 - `GET /api/royalties/nft/:nftId` - NFT-specific royalty stats
@@ -330,6 +387,7 @@ The app will be available at `http://localhost:5173`
 - `POST /api/royalties/calculate` - Calculate royalties for a sale
 
 ### Search & Discovery
+
 - `GET /api/search?q=query&sort=popularity&page=1&limit=20` - Advanced search with filters
 - `GET /api/search/trending?limit=10` - Trending NFTs
 - `GET /api/search/suggestions?q=query` - Search autocomplete
@@ -338,6 +396,7 @@ The app will be available at `http://localhost:5173`
 ## 🎨 UI/UX Components
 
 ### Pages
+
 - **Homepage** - Trending, newest, featured NFTs
 - **Discover** - Search, filters, categories
 - **Create** - Minting interface
@@ -347,6 +406,7 @@ The app will be available at `http://localhost:5173`
 - **Marketplace** - All active listings with advanced filters
 
 ### Features
+
 - Dark/Light mode toggle
 - Real-time notifications
 - Responsive design
@@ -378,6 +438,7 @@ We provide deployment configurations for Render (backend) and Vercel (frontend).
 **See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step instructions.**
 
 #### Backend (Node.js/Express on Render)
+
 ```bash
 # Verify build
 npm run build --workspace backend
@@ -393,6 +454,7 @@ git push origin main
 ```
 
 #### Frontend (React/Vite on Vercel)
+
 ```bash
 # Verify build
 npm run build --workspace frontend
@@ -408,6 +470,7 @@ vercel --prod
 ### Environment Variables
 
 **Backend (.env.production.backend)**
+
 ```env
 NODE_ENV=production
 PORT=3001
@@ -420,6 +483,7 @@ CORS_ORIGIN=https://your-frontend-domain.com
 ```
 
 **Frontend (.env.production.frontend)**
+
 ```env
 VITE_API_URL=https://your-backend-api.com
 VITE_STACKS_API_URL=https://api.mainnet.stacks.co
@@ -432,10 +496,12 @@ VITE_BASE_AUCTION_CONTRACT=0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2
 ```
 
 ### Production URLs (After Deployment)
+
 - **Frontend**: https://bitart-market.vercel.app (example)
 - **Backend API**: https://bitart-market-api.onrender.com (example)
 
 **See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions on:**
+
 - Setting up Render for backend
 - Configuring Vercel for frontend
 - Environment variable management
@@ -447,35 +513,41 @@ VITE_BASE_AUCTION_CONTRACT=0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2
 ### Common Issues
 
 **1. Wallet Won't Connect**
+
 - Ensure MetaMask/Coinbase Wallet is installed
 - Check you're on the correct network (Base Mainnet)
 - Clear browser cache and reload
 - Try switching to Base manually in wallet settings
 
 **2. Transaction Fails**
+
 - Verify sufficient ETH balance for gas fees
 - Check contract addresses in environment variables
 - Ensure wallet is connected to Base Mainnet (Chain ID: 8453)
 - Review BaseScan for transaction details
 
 **3. NFT Images Not Loading**
+
 - Check Pinata JWT token is valid
 - Verify IPFS gateway is accessible
 - Ensure image URLs use `https://` protocol
 - Try alternative IPFS gateways (ipfs.io, cloudflare-ipfs.com)
 
 **4. API Returns 500 Error**
+
 - Check backend environment variables
 - Verify Base RPC URL is responding
 - Review backend logs for specific errors
 - Ensure database/cache is running
 
 **5. Dark Mode Issues**
+
 - Clear localStorage: `localStorage.clear()`
 - Check theme toggle component
 - Verify Tailwind dark mode configuration
 
 **6. Charts Not Displaying**
+
 - Check royalty service is returning data
 - Verify API endpoints are accessible
 - Review browser console for JavaScript errors
@@ -518,6 +590,7 @@ MIT License - see [LICENSE](./LICENSE) file for details
 ## 📧 Support
 
 For questions or issues:
+
 - Open an issue on GitHub
 - Join the [Stacks Discord](https://discord.com/invite/stacks)
 - Check the [documentation](./docs/)
