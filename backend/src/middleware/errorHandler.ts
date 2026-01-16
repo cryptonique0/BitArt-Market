@@ -7,44 +7,46 @@ import { ZodError } from 'zod';
  */
 export const errorHandler = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
-) => {
+  _next: NextFunction
+): void => {
   // Log error
   console.error('Error:', {
     name: err.name,
     message: err.message,
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-    path: req.path,
-    method: req.method,
+    path: _req.path,
+    method: _req.method,
     timestamp: new Date().toISOString(),
   });
 
   // Handle known operational errors
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+    res.status(err.statusCode).json({
       success: false,
       error: err.message,
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     });
+    return;
   }
 
   // Handle Zod validation errors
   if (err instanceof ZodError) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       error: 'Validation failed',
-      details: err.errors.map((e: any) => ({
-        field: e.path.join('.'),
+      details: err.errors.map((e: Record<string, unknown>) => ({
+        field: (e.path as Array<string | number>).join('.'),
         message: e.message,
       })),
     });
+    return;
   }
 
   // Handle MongoDB/Database errors
   if (err.name === 'MongoError' || err.name === 'MongoServerError') {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: 'Database error occurred',
     });
@@ -52,34 +54,35 @@ export const errorHandler = (
 
   // Handle JWT errors
   if (err.name === 'JsonWebTokenError') {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       error: 'Invalid token',
     });
+    return;
   }
 
   if (err.name === 'TokenExpiredError') {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       error: 'Token expired',
     });
+    return;
   }
 
   // Handle multer file upload errors
   if (err.name === 'MulterError') {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       error: 'File upload error',
       details: err.message,
     });
+    return;
   }
 
   // Default to 500 server error
-  return res.status(500).json({
+  res.status(500).json({
     success: false,
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : err.message,
+    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 };
@@ -87,8 +90,10 @@ export const errorHandler = (
 /**
  * Async handler wrapper to catch errors in async route handlers
  */
-export const asyncHandler = (fn: Function) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+export const asyncHandler = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
@@ -96,7 +101,7 @@ export const asyncHandler = (fn: Function) => {
 /**
  * 404 Not Found handler
  */
-export const notFoundHandler = (req: Request, res: Response) => {
+export const notFoundHandler = (req: Request, res: Response): void => {
   res.status(404).json({
     success: false,
     error: `Route ${req.originalUrl} not found`,

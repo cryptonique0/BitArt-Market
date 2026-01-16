@@ -6,7 +6,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { getConfig } from '../config/env';
@@ -20,7 +20,15 @@ export interface AuthUser {
   role?: 'user' | 'creator' | 'admin';
 }
 
+export interface JWTPayload extends JwtPayload {
+  sub: string;
+  email?: string;
+  wallet_address?: string;
+  role?: string;
+}
+
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       authUser?: AuthUser | null;
@@ -37,18 +45,32 @@ function getTokenFromHeader(req: Request): string | null {
   return null;
 }
 
-export async function requireSupabaseAuth(req: Request, res: Response, next: NextFunction) {
+export async function requireSupabaseAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
   try {
     const token = getTokenFromHeader(req);
-    if (!token) return res.status(401).json({ error: 'Missing Authorization token' });
+    if (!token) {
+      res.status(401).json({ error: 'Missing Authorization token' });
+      return;
+    }
 
     const { data, error } = await supabase.auth.getUser(token);
-    if (error || !data?.user) return res.status(401).json({ error: 'Invalid token' });
+    if (error || !data?.user) {
+      res.status(401).json({ error: 'Invalid token' });
+      return;
+    }
 
     req.authUser = {
       id: data.user.id,
       email: data.user.email || undefined,
-      role: (data.user.user_metadata?.role as any) || undefined,
+      role: (data.user.user_metadata &&
+      typeof data.user.user_metadata === 'object' &&
+      'role' in data.user.user_metadata
+        ? String((data.user.user_metadata as Record<string, unknown>).role)
+        : undefined) as 'user' | 'creator' | 'admin' | undefined,
     };
 
     next();
@@ -58,18 +80,21 @@ export async function requireSupabaseAuth(req: Request, res: Response, next: Nex
   }
 }
 
-export function requireAppJWT(req: Request, res: Response, next: NextFunction) {
+export function requireAppJWT(req: Request, res: Response, next: NextFunction): void {
   try {
     const token = getTokenFromHeader(req);
-    if (!token) return res.status(401).json({ error: 'Missing Authorization token' });
+    if (!token) {
+      res.status(401).json({ error: 'Missing Authorization token' });
+      return;
+    }
 
-    const payload = jwt.verify(token, config.jwtSecret) as any;
+    const payload = jwt.verify(token, config.jwtSecret) as JWTPayload;
 
     req.authUser = {
       id: payload.sub,
       email: payload.email,
       wallet_address: payload.wallet_address,
-      role: payload.role,
+      role: payload.role as 'user' | 'creator' | 'admin' | undefined,
     };
 
     next();
@@ -92,16 +117,19 @@ export function requireRole(roles: Array<'user' | 'creator' | 'admin'>) {
   };
 }
 
-export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
   const token = getTokenFromHeader(req);
-  if (!token) return next();
+  if (!token) {
+    next();
+    return;
+  }
   try {
-    const payload = jwt.verify(token, config.jwtSecret) as any;
+    const payload = jwt.verify(token, config.jwtSecret) as JWTPayload;
     req.authUser = {
       id: payload.sub,
       email: payload.email,
       wallet_address: payload.wallet_address,
-      role: payload.role,
+      role: payload.role as 'user' | 'creator' | 'admin' | undefined,
     };
   } catch {
     req.authUser = null;

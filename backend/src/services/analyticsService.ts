@@ -86,7 +86,7 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
     for (const [type, achievements] of Object.entries(typeGroups)) {
       const unlockedCount = userAchievements.filter(
         (ua: any) =>
-          (achievements as any[]).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
+          (achievements).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
       ).length;
       byType[type] = {
         unlocked: unlockedCount,
@@ -109,7 +109,7 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
     for (const [rarity, achievements] of Object.entries(rarityGroups)) {
       const unlockedCount = userAchievements.filter(
         (ua: any) =>
-          (achievements as any[]).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
+          (achievements).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
       ).length;
       byRarity[rarity] = {
         unlocked: unlockedCount,
@@ -132,7 +132,7 @@ export async function getUserAchievementStats(userId: string): Promise<UserAchie
     for (const [tier, achievements] of Object.entries(tierGroups)) {
       const unlockedCount = userAchievements.filter(
         (ua: any) =>
-          (achievements as any[]).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
+          (achievements).map((a: any) => a.id).includes(ua.achievementId) && ua.unlockedAt
       ).length;
       byTier[tier] = {
         unlocked: unlockedCount,
@@ -251,7 +251,7 @@ export async function getAchievementPopularity(
     // Calculate trending score (popularity over time)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentUnlocks = unlockedRecords.filter(r => r.unlockedAt! > thirtyDaysAgo);
+    const recentUnlocks = unlockedRecords.filter(r => r.unlockedAt > thirtyDaysAgo);
     const trendingScore = Math.min(100, (recentUnlocks.length / Math.max(1, totalUnlocks)) * 100);
 
     // Determine popularity level

@@ -61,7 +61,7 @@ router.put('/:address', (req: Request, res: Response) => {
     const { address } = req.params;
     const { bio, social } = req.body;
 
-    let user = users[address] || {
+    const user = users[address] || {
       address,
       bio: '',
       avatar: '',
