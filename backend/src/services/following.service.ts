@@ -6,7 +6,6 @@ import {
   FollowerProfile,
   FollowingProfile,
   FollowNotification,
-  FollowingNotificationPreferences,
   PopularCreators,
   FollowRecommendation,
 } from '../types/following';
