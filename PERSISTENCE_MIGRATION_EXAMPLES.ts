@@ -30,22 +30,59 @@ export const achievementService = {
 */
 
 // ============ AFTER: Using Persistence Layer ============
+// Note: This is a documentation example file showing the pattern to use.
+// The imports below are from actual service implementations.
 
+// @ts-ignore - persistenceService is from your actual implementation
 import persistenceService from './persistenceService';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Type definitions
+interface UserAchievement {
+  userId: string;
+  achievementId: string;
+  unlockedAt: Date;
+  progress: number;
+  achievement?: Record<string, unknown>;
+}
+
+interface UserLevel {
+  userId: string;
+  currentLevel: number;
+  totalXP: number;
+  xpInCurrentLevel: number;
+  xpForNextLevel: number;
+}
+
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  seasonId?: string;
+  isSeasonal?: boolean;
+}
+
+interface XPTransaction {
+  userId: string;
+  amount: number;
+  reason: string;
+  relatedId?: string;
+  timestamp: Date;
+}
+
 export const achievementService = {
   /**
    * Get user achievements from database
    */
-  getUserAchievements: async (userId: string) => {
+  getUserAchievements: async (userId: string): Promise<UserAchievement[]> => {
     try {
-      return await prisma.userAchievement.findMany({
+      const achievements = await prisma.userAchievement.findMany({
         where: { userId },
         include: { achievement: true },
       });
+      return achievements as unknown as UserAchievement[];
     } catch (error) {
       console.error('Failed to fetch user achievements:', error);
       throw error;
@@ -55,13 +92,14 @@ export const achievementService = {
   /**
    * Unlock achievement (with transaction)
    */
-  unlockAchievement: async (userId: string, achievementId: string) => {
+  unlockAchievement: async (userId: string, achievementId: string): Promise<UserAchievement> => {
     try {
-      return await persistenceService.saveUserAchievement(
+      const result = await persistenceService.saveUserAchievement(
         userId,
         achievementId,
         100 // 100% progress for unlocked
       );
+      return result as unknown as UserAchievement;
     } catch (error) {
       console.error('Failed to unlock achievement:', error);
       throw error;
@@ -71,7 +109,12 @@ export const achievementService = {
   /**
    * Award XP (with transaction)
    */
-  awardXP: async (userId: string, amount: number, reason: string, relatedId?: string) => {
+  awardXP: async (
+    userId: string,
+    amount: number,
+    reason: string,
+    relatedId?: string
+  ): Promise<UserLevel> => {
     try {
       // Save XP transaction
       await persistenceService.saveXPTransaction(userId, amount, reason, relatedId);
@@ -90,13 +133,14 @@ export const achievementService = {
       const xpForNextLevel = newLevel * 500;
       const xpInCurrentLevel = newTotalXP - (newLevel - 1) * 500;
 
-      return await persistenceService.saveUserLevel(
+      const result = await persistenceService.saveUserLevel(
         userId,
         newLevel,
         newTotalXP,
         xpInCurrentLevel,
         xpForNextLevel
       );
+      return result as unknown as UserLevel;
     } catch (error) {
       console.error('Failed to award XP:', error);
       throw error;
@@ -106,11 +150,12 @@ export const achievementService = {
   /**
    * Get user XP
    */
-  getUserXP: async (userId: string) => {
+  getUserXP: async (userId: string): Promise<UserLevel | null> => {
     try {
-      return await prisma.userLevel.findUnique({
+      const level = await prisma.userLevel.findUnique({
         where: { userId },
       });
+      return level as unknown as UserLevel | null;
     } catch (error) {
       console.error('Failed to fetch user XP:', error);
       throw error;
@@ -120,12 +165,13 @@ export const achievementService = {
   /**
    * Get leaderboard
    */
-  getLeaderboard: async (limit: number = 10) => {
+  getLeaderboard: async (limit: number = 10): Promise<UserLevel[]> => {
     try {
-      return await prisma.userLevel.findMany({
+      const leaderboard = await prisma.userLevel.findMany({
         orderBy: { totalXP: 'desc' },
         take: limit,
       });
+      return leaderboard as unknown as UserLevel[];
     } catch (error) {
       console.error('Failed to fetch leaderboard:', error);
       throw error;
@@ -140,7 +186,7 @@ export const achievementService = {
       userId: string;
       achievementId: string;
     }>
-  ) => {
+  ): Promise<number> => {
     try {
       const persistenceUpdates = updates.map(u => ({
         userId: u.userId,
@@ -148,7 +194,8 @@ export const achievementService = {
         progress: 100,
       }));
 
-      return await persistenceService.bulkUpdateAchievements(persistenceUpdates);
+      const count = await persistenceService.bulkUpdateAchievements(persistenceUpdates);
+      return count as unknown as number;
     } catch (error) {
       console.error('Failed to bulk unlock achievements:', error);
       throw error;
@@ -165,7 +212,7 @@ export const achievementService = {
       reason: string;
       relatedId?: string;
     }>
-  ) => {
+  ): Promise<unknown> => {
     try {
       return await persistenceService.bulkAwardXP(awards);
     } catch (error) {
@@ -177,7 +224,7 @@ export const achievementService = {
   /**
    * Reset user achievements (admin only)
    */
-  resetUserAchievements: async (userId: string) => {
+  resetUserAchievements: async (userId: string): Promise<unknown> => {
     try {
       return await persistenceService.deleteUserAllAchievements(userId);
     } catch (error) {
@@ -189,14 +236,18 @@ export const achievementService = {
   /**
    * Get achievement progress
    */
-  getAchievementProgress: async (userId: string, achievementId: string) => {
+  getAchievementProgress: async (
+    userId: string,
+    achievementId: string
+  ): Promise<UserAchievement | null> => {
     try {
-      return await prisma.userAchievement.findUnique({
+      const progress = await prisma.userAchievement.findUnique({
         where: {
           userId_achievementId: { userId, achievementId },
         },
         include: { achievement: true },
       });
+      return progress as unknown as UserAchievement | null;
     } catch (error) {
       console.error('Failed to fetch achievement progress:', error);
       throw error;
@@ -206,7 +257,7 @@ export const achievementService = {
   /**
    * Search achievements
    */
-  searchAchievements: async (query: string) => {
+  searchAchievements: async (query: string): Promise<Achievement[]> => {
     try {
       // Search in database
       const achievements = await prisma.achievement.findMany({
@@ -219,13 +270,15 @@ export const achievementService = {
       });
 
       // Sort by relevance
-      return achievements
+      const sorted = achievements
         .map(a => {
           const titleMatch = a.title.toLowerCase().includes(query.toLowerCase()) ? 50 : 0;
           const descMatch = a.description.toLowerCase().includes(query.toLowerCase()) ? 25 : 0;
           return { ...a, relevance: titleMatch + descMatch };
         })
-        .sort((a, b) => b.relevance - a.relevance);
+        .sort((a, b) => (b.relevance as number) - (a.relevance as number));
+
+      return sorted as unknown as Achievement[];
     } catch (error) {
       console.error('Failed to search achievements:', error);
       throw error;
@@ -238,7 +291,7 @@ export const achievementService = {
   getAchievementsByStatus: async (
     userId: string,
     status: 'locked' | 'in-progress' | 'unlocked'
-  ) => {
+  ): Promise<Achievement[]> => {
     try {
       const allAchievements = await prisma.achievement.findMany();
       const userAchievements = await prisma.userAchievement.findMany({
@@ -247,7 +300,7 @@ export const achievementService = {
 
       const unlockedIds = new Set(userAchievements.map(a => a.achievementId));
 
-      let filtered = allAchievements;
+      let filtered: typeof allAchievements = [];
 
       if (status === 'unlocked') {
         filtered = allAchievements.filter(a => unlockedIds.has(a.id));
@@ -260,7 +313,7 @@ export const achievementService = {
           .filter(Boolean) as typeof allAchievements;
       }
 
-      return filtered;
+      return filtered as unknown as Achievement[];
     } catch (error) {
       console.error('Failed to get achievements by status:', error);
       throw error;
@@ -270,14 +323,15 @@ export const achievementService = {
   /**
    * Get seasonal achievements
    */
-  getSeasonalAchievements: async (seasonId: string) => {
+  getSeasonalAchievements: async (seasonId: string): Promise<Achievement[]> => {
     try {
-      return await prisma.achievement.findMany({
+      const achievements = await prisma.achievement.findMany({
         where: {
           seasonId,
           isSeasonal: true,
         },
       });
+      return achievements as unknown as Achievement[];
     } catch (error) {
       console.error('Failed to fetch seasonal achievements:', error);
       throw error;
@@ -287,7 +341,11 @@ export const achievementService = {
   /**
    * Update seasonal progress
    */
-  updateSeasonalProgress: async (userId: string, seasonId: string, xpEarned: number) => {
+  updateSeasonalProgress: async (
+    userId: string,
+    seasonId: string,
+    xpEarned: number
+  ): Promise<unknown> => {
     try {
       return await persistenceService.saveSeasonalProgress(userId, seasonId, xpEarned);
     } catch (error) {
@@ -299,7 +357,7 @@ export const achievementService = {
   /**
    * Export user achievement backup
    */
-  exportUserAchievements: async (userId: string) => {
+  exportUserAchievements: async (userId: string): Promise<unknown> => {
     try {
       return await persistenceService.batchExportUserAchievements(userId);
     } catch (error) {
@@ -315,7 +373,7 @@ export const xpService = {
   /**
    * Get user level
    */
-  getUserLevel: async (userId: string) => {
+  getUserLevel: async (userId: string): Promise<UserLevel> => {
     try {
       let level = await prisma.userLevel.findUnique({
         where: { userId },
@@ -334,7 +392,7 @@ export const xpService = {
         });
       }
 
-      return level;
+      return level as unknown as UserLevel;
     } catch (error) {
       console.error('Failed to get user level:', error);
       throw error;
@@ -344,11 +402,22 @@ export const xpService = {
   /**
    * Award XP with transaction
    */
-  awardXP: async (userId: string, amount: number, reason: string, relatedId?: string) => {
+  awardXP: async (
+    userId: string,
+    amount: number,
+    reason: string,
+    relatedId?: string
+  ): Promise<{ transaction: unknown; level: UserLevel }> => {
     try {
-      return await persistenceService.withTransaction(async tx => {
+      const result = await persistenceService.withTransaction(async (tx: unknown) => {
+        // Type cast for transaction operations
+        const txClient = tx as Record<string, unknown>;
+
         // Save transaction
-        const transaction = await tx.xPTransaction.create({
+        const xPTransactionCreate = txClient.xPTransaction as Record<string, unknown>;
+        const transactionCreate = (
+          xPTransactionCreate.create as (arg: Record<string, unknown>) => Promise<unknown>
+        )({
           data: {
             userId,
             amount,
@@ -358,21 +427,34 @@ export const xpService = {
           },
         });
 
+        const transaction = await transactionCreate;
+
         // Update user level
-        const currentLevel = await tx.userLevel.findUnique({
+        const userLevelFind = txClient.userLevel as Record<string, unknown>;
+        const findUnique = (
+          userLevelFind.findUnique as (arg: Record<string, unknown>) => Promise<unknown>
+        )({
           where: { userId },
         });
+
+        const currentLevel = (await findUnique) as Record<string, unknown> | null;
 
         if (!currentLevel) {
           throw new Error('User level not found');
         }
 
-        const newTotalXP = currentLevel.totalXP + amount;
+        const currentLevelXP = (currentLevel.totalXP as number) || 0;
+        const newTotalXP = currentLevelXP + amount;
         const newLevel = Math.floor(newTotalXP / 500) + 1;
         const xpForNextLevel = newLevel * 500;
         const xpInCurrentLevel = newTotalXP - (newLevel - 1) * 500;
 
-        const updatedLevel = await tx.userLevel.update({
+        const userLevelUpdate = txClient.userLevel as Record<string, unknown>;
+        const updateFn = userLevelUpdate.update as (
+          arg: Record<string, unknown>
+        ) => Promise<unknown>;
+
+        const updatedLevel = await updateFn({
           where: { userId },
           data: {
             currentLevel: newLevel,
@@ -385,6 +467,8 @@ export const xpService = {
 
         return { transaction, level: updatedLevel };
       }, 'award_xp');
+
+      return result as { transaction: unknown; level: UserLevel };
     } catch (error) {
       console.error('Failed to award XP:', error);
       throw error;
@@ -394,13 +478,14 @@ export const xpService = {
   /**
    * Get XP history
    */
-  getXPHistory: async (userId: string, limit: number = 20) => {
+  getXPHistory: async (userId: string, limit: number = 20): Promise<XPTransaction[]> => {
     try {
-      return await prisma.xPTransaction.findMany({
+      const history = await prisma.xPTransaction.findMany({
         where: { userId },
         orderBy: { timestamp: 'desc' },
         take: limit,
       });
+      return history as unknown as XPTransaction[];
     } catch (error) {
       console.error('Failed to fetch XP history:', error);
       throw error;
@@ -410,12 +495,13 @@ export const xpService = {
   /**
    * Get leaderboard
    */
-  getLeaderboard: async (limit: number = 10) => {
+  getLeaderboard: async (limit: number = 10): Promise<UserLevel[]> => {
     try {
-      return await prisma.userLevel.findMany({
+      const leaderboard = await prisma.userLevel.findMany({
         orderBy: { totalXP: 'desc' },
         take: limit,
       });
+      return leaderboard as unknown as UserLevel[];
     } catch (error) {
       console.error('Failed to fetch leaderboard:', error);
       throw error;
@@ -426,12 +512,12 @@ export const xpService = {
 // ============ EXAMPLE: Routes Integration ============
 
 // In your routes file:
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 
 const router = Router();
 
 // Get user achievements (from database)
-router.get('/achievements/user/:userId', async (req, res) => {
+router.get('/achievements/user/:userId', async (req: Request, res: Response) => {
   try {
     const achievements = await achievementService.getUserAchievements(req.params.userId);
     res.json({ success: true, achievements });
@@ -441,10 +527,13 @@ router.get('/achievements/user/:userId', async (req, res) => {
 });
 
 // Unlock achievement (with transaction)
-router.post('/achievements/unlock', async (req, res) => {
+router.post('/achievements/unlock', async (req: Request, res: Response) => {
   try {
-    const { userId, achievementId } = req.body;
-    const result = await achievementService.unlockAchievement(userId, achievementId);
+    const { userId, achievementId } = req.body as Record<string, unknown>;
+    const result = await achievementService.unlockAchievement(
+      userId as string,
+      achievementId as string
+    );
     res.json({ success: true, achievement: result });
   } catch (error) {
     res.status(500).json({ error: 'Failed to unlock achievement' });
@@ -452,10 +541,10 @@ router.post('/achievements/unlock', async (req, res) => {
 });
 
 // Award XP (with transaction)
-router.post('/xp/award', async (req, res) => {
+router.post('/xp/award', async (req: Request, res: Response) => {
   try {
-    const { userId, amount, reason } = req.body;
-    const result = await xpService.awardXP(userId, amount, reason);
+    const { userId, amount, reason } = req.body as Record<string, unknown>;
+    const result = await xpService.awardXP(userId as string, amount as number, reason as string);
     res.json({ success: true, result });
   } catch (error) {
     res.status(500).json({ error: 'Failed to award XP' });
@@ -463,10 +552,12 @@ router.post('/xp/award', async (req, res) => {
 });
 
 // Bulk operations
-router.post('/achievements/bulk-unlock', async (req, res) => {
+router.post('/achievements/bulk-unlock', async (req: Request, res: Response) => {
   try {
-    const { updates } = req.body;
-    const count = await achievementService.bulkUnlockAchievements(updates);
+    const { updates } = req.body as Record<string, unknown>;
+    const count = await achievementService.bulkUnlockAchievements(
+      updates as Array<{ userId: string; achievementId: string }>
+    );
     res.json({ success: true, count });
   } catch (error) {
     res.status(500).json({ error: 'Failed to bulk unlock achievements' });
