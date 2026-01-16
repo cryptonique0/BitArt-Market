@@ -6,7 +6,7 @@ if (process.env.NODE_ENV === 'production') {
   prisma = new PrismaClient();
 } else {
   // Avoid creating a new instance in development during hot reloads
-  let globalWithPrisma = global as typeof globalThis & {
+  const globalWithPrisma = global as typeof globalThis & {
     prisma: PrismaClient;
   };
 

@@ -317,7 +317,7 @@ class TradingStatsServiceClass {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-      let checkDate = tradeDates[0] === today || tradeDates[0] === yesterday ? tradeDates[0] : null;
+      const checkDate = tradeDates[0] === today || tradeDates[0] === yesterday ? tradeDates[0] : null;
 
       if (checkDate) {
         for (let i = 0; i < tradeDates.length; i++) {

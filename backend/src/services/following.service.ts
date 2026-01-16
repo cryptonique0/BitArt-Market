@@ -116,14 +116,34 @@ class FollowingServiceClass {
         return [];
       }
 
-      return (data || []).map((follow: any) => ({
-        userId: follow.follower_id,
-        username: follow.followers?.username || 'Unknown',
-        avatar: follow.followers?.avatar,
-        bio: follow.followers?.bio,
-        totalAchievements: follow.followers?.total_achievements || 0,
-        currentLevel: follow.followers?.current_level || 1,
-        followedAt: new Date(follow.followed_at),
+      return (data || []).map((follow: Record<string, unknown>) => ({
+        userId: String(follow.follower_id),
+        username: String(
+          follow.followers && typeof follow.followers === 'object' && 'username' in follow.followers
+            ? (follow.followers as Record<string, unknown>).username
+            : 'Unknown'
+        ),
+        avatar:
+          follow.followers && typeof follow.followers === 'object' && 'avatar' in follow.followers
+            ? String((follow.followers as Record<string, unknown>).avatar)
+            : undefined,
+        bio:
+          follow.followers && typeof follow.followers === 'object' && 'bio' in follow.followers
+            ? String((follow.followers as Record<string, unknown>).bio)
+            : undefined,
+        totalAchievements:
+          follow.followers &&
+          typeof follow.followers === 'object' &&
+          'total_achievements' in follow.followers
+            ? Number((follow.followers as Record<string, unknown>).total_achievements)
+            : 0,
+        currentLevel:
+          follow.followers &&
+          typeof follow.followers === 'object' &&
+          'current_level' in follow.followers
+            ? Number((follow.followers as Record<string, unknown>).current_level)
+            : 1,
+        followedAt: new Date(String(follow.followed_at)),
         isCreator: false,
       }));
     } catch (error) {
@@ -161,16 +181,47 @@ class FollowingServiceClass {
         return [];
       }
 
-      return (data || []).map((follow: any) => ({
-        userId: follow.following_id,
-        username: follow.following_user?.username || 'Unknown',
-        avatar: follow.following_user?.avatar,
-        bio: follow.following_user?.bio,
-        totalAchievements: follow.following_user?.total_achievements || 0,
-        currentLevel: follow.following_user?.current_level || 1,
-        followedAt: new Date(follow.followed_at),
+      return (data || []).map((follow: Record<string, unknown>) => ({
+        userId: String(follow.following_id),
+        username: String(
+          follow.following_user &&
+            typeof follow.following_user === 'object' &&
+            'username' in follow.following_user
+            ? (follow.following_user as Record<string, unknown>).username
+            : 'Unknown'
+        ),
+        avatar:
+          follow.following_user &&
+          typeof follow.following_user === 'object' &&
+          'avatar' in follow.following_user
+            ? String((follow.following_user as Record<string, unknown>).avatar)
+            : undefined,
+        bio:
+          follow.following_user &&
+          typeof follow.following_user === 'object' &&
+          'bio' in follow.following_user
+            ? String((follow.following_user as Record<string, unknown>).bio)
+            : undefined,
+        totalAchievements:
+          follow.following_user &&
+          typeof follow.following_user === 'object' &&
+          'total_achievements' in follow.following_user
+            ? Number((follow.following_user as Record<string, unknown>).total_achievements)
+            : 0,
+        currentLevel:
+          follow.following_user &&
+          typeof follow.following_user === 'object' &&
+          'current_level' in follow.following_user
+            ? Number((follow.following_user as Record<string, unknown>).current_level)
+            : 1,
+        followedAt: new Date(String(follow.followed_at)),
         isCreator: true,
-        nftCount: follow.following_user?.nft_count || 0,
+        nftCount:
+          follow.following_user &&
+          typeof follow.following_user === 'object' &&
+          'nft_count' in follow.following_user
+            ? Number((follow.following_user as Record<string, unknown>).nft_count)
+            : 0,
       }));
     } catch (error) {
       if (!isSupabaseAvailable()) return [];
@@ -268,14 +319,14 @@ class FollowingServiceClass {
         return { creators: [] };
       }
 
-      const creators = (data || []).map((user: any, index: number) => ({
-        userId: user.user_id,
-        username: user.username,
-        avatar: user.avatar,
-        followersCount: user.followers?.length || 0,
-        totalXP: user.total_xp || 0,
-        currentLevel: user.current_level || 1,
-        nftCount: user.nft_count || 0,
+      const creators = (data || []).map((user: Record<string, unknown>, index: number) => ({
+        userId: String(user.user_id),
+        username: String(user.username),
+        avatar: user.avatar ? String(user.avatar) : undefined,
+        followersCount: Array.isArray(user.followers) ? user.followers.length : 0,
+        totalXP: user.total_xp ? Number(user.total_xp) : 0,
+        currentLevel: user.current_level ? Number(user.current_level) : 1,
+        nftCount: user.nft_count ? Number(user.nft_count) : 0,
         rank: index + 1,
       }));
 

@@ -18,7 +18,7 @@ const xpTransactions: XPTransaction[] = [];
 
 export const xpService = {
   async awardXP(userId: string, amount: number, reason: string, relatedId?: string): Promise<UserLevel> {
-    let userLevel = userLevels.get(userId) || {
+    const userLevel = userLevels.get(userId) || {
       userId,
       currentLevel: 1,
       totalXP: 0,
