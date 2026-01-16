@@ -6,56 +6,71 @@ interface BadgeProps {
   type: BadgeType;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  animated?: boolean;
 }
 
 const badgeConfig: Record<BadgeType, {
   label: string;
   icon: string;
   bgColor: string;
+  bgGradient: string;
   textColor: string;
   tooltip: string;
+  borderColor: string;
 }> = {
   'base-native': {
     label: 'Built on Base',
     icon: '🔵',
     bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+    bgGradient: 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/40',
     textColor: 'text-blue-800 dark:text-blue-300',
-    tooltip: 'This NFT is minted on Base Mainnet'
+    tooltip: 'This NFT is minted on Base Mainnet',
+    borderColor: 'border-blue-200 dark:border-blue-800'
   },
   'base-og': {
     label: 'Base OG',
     icon: '👑',
     bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+    bgGradient: 'from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/40',
     textColor: 'text-purple-800 dark:text-purple-300',
-    tooltip: 'Early Base Mainnet supporter'
+    tooltip: 'Early Base Mainnet supporter',
+    borderColor: 'border-purple-200 dark:border-purple-800'
   },
   'verified': {
     label: 'Verified',
     icon: '✓',
     bgColor: 'bg-green-100 dark:bg-green-900/30',
+    bgGradient: 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/40',
     textColor: 'text-green-800 dark:text-green-300',
-    tooltip: 'Creator identity verified'
+    tooltip: 'Creator identity verified',
+    borderColor: 'border-green-200 dark:border-green-800'
   },
   'trending': {
     label: 'Trending',
     icon: '📈',
     bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+    bgGradient: 'from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-900/40',
     textColor: 'text-orange-800 dark:text-orange-300',
-    tooltip: 'Trending in the last 7 days'
+    tooltip: 'Trending in the last 7 days',
+    borderColor: 'border-orange-200 dark:border-orange-800'
   },
   'featured': {
     label: 'Featured',
     icon: '⭐',
     bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
+    bgGradient: 'from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-900/40',
     textColor: 'text-yellow-800 dark:text-yellow-300',
-    tooltip: 'Featured by BitArt curators'
+    tooltip: 'Featured by BitArt curators',
+    borderColor: 'border-yellow-200 dark:border-yellow-800'
   },
   'new': {
     label: 'New',
     icon: '🆕',
     bgColor: 'bg-pink-100 dark:bg-pink-900/30',
+    bgGradient: 'from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-900/40',
     textColor: 'text-pink-800 dark:text-pink-300',
-    tooltip: 'Newly minted (< 7 days)'
+    tooltip: 'Newly minted (< 7 days)',
+    borderColor: 'border-pink-200 dark:border-pink-800'
   }
 };
 
@@ -68,17 +83,19 @@ const sizeConfig = {
 /**
  * Base-native badge component
  * Shows badges for Base-specific features, verified creators, trending, etc.
+ * Enhanced with gradients and animations
  */
-export const Badge: React.FC<BadgeProps> = ({ type, className = '', size = 'md' }) => {
+export const Badge: React.FC<BadgeProps> = ({ type, className = '', size = 'md', animated = false }) => {
   const config = badgeConfig[type];
   const sizeClass = sizeConfig[size];
+  const animationClass = animated ? 'animate-pulse hover:animate-none' : '';
 
   return (
     <span
       title={config.tooltip}
-      className={`inline-flex items-center gap-1 font-semibold rounded-full ${config.bgColor} ${config.textColor} ${sizeClass} ${className}`}
+      className={`inline-flex items-center gap-1 font-semibold rounded-full bg-gradient-to-br ${config.bgGradient} border ${config.borderColor} ${config.textColor} ${sizeClass} ${animationClass} transition-all duration-200 hover:shadow-md cursor-default ${className}`}
     >
-      <span>{config.icon}</span>
+      <span className="inline-block">{config.icon}</span>
       <span>{config.label}</span>
     </span>
   );
