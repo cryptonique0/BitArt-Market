@@ -3,7 +3,7 @@ import { FollowingService } from '../services/following.service';
 import { requireAppJWT } from '../middleware/auth';
 
 const router = Router();
-const followingService = new FollowingService();
+const followingService = FollowingService;
 
 /**
  * POST /api/follows
