@@ -19,7 +19,21 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 
 ## 📋 Feature Highlights
 
-### 👥 User Following System (NEW)
+### � Social Comments & Reactions (NEW)
+
+- **Emoji Reactions** — React to NFTs with 12 different emojis (👍, ❤️, 🔥, 🤯, 😂, 😢, 😠, 🤔, 🌙, 💎, 🚀, 👏)
+- **Threaded Comments** — Full comment threading with nested replies, edit/delete, and soft deletes
+- **Comment Moderation** — Flag inappropriate comments with reason submission and moderation queue
+- **Comment Statistics** — Track total comments, reactions, and engagement metrics per NFT
+- **Notification System** — Get notified when someone replies to your comments
+- **User Profiles in Comments** — Show commenter avatar, username, and join date
+- **Character Limits** — Comments limited to 5000 characters with character counter
+- **Dark Mode Support** — Full dark mode styling for all comment components
+- **Mobile Responsive** — Optimized comment UI for all device sizes
+- **Pagination** — Comments loaded in batches of 20 with load more functionality
+- **Soft Deletes** — Deleted comments preserved in database with "(deleted)" indicator
+
+### 👥 User Following System
 
 - **Follow Creators & Collectors** — Build your network by following favorite artists and collectors
 - **Follower Management** — View who follows you, who you follow, with detailed profiles
