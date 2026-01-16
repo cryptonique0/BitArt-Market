@@ -314,16 +314,42 @@ httpServer.listen(PORT, () => {
   WebSocket: Enabled for real-time events
   
   API Documentation:
-  - GET    /api/health                 - Health check
-  - GET    /api/nfts                   - List NFTs
-  - POST   /api/nfts                   - Create NFT
-  - GET    /api/nfts/:id               - Get NFT details
-  - GET    /api/marketplace/listings   - Get marketplace listings
-  - POST   /api/marketplace/listings   - Create listing
-  - GET    /api/users/:address         - Get user profile
-  - GET    /api/analytics/stats        - Get marketplace stats
-  - GET    /api/events/history         - Get blockchain events
-  - WebSocket: Real-time blockchain events
+  
+  🏥 Core API
+  - GET    /api/health                                - Health check & system status
+  
+  🎨 NFT Management
+  - GET    /api/nfts                                  - List all NFTs
+  - POST   /api/nfts                                  - Create new NFT
+  - GET    /api/nfts/:id                              - Get NFT details
+  
+  💼 Marketplace
+  - GET    /api/marketplace/listings                  - Get marketplace listings
+  - POST   /api/marketplace/listings                  - Create listing
+  - GET    /api/users/:address                        - Get user profile
+  - GET    /api/analytics/stats                       - Get marketplace statistics
+  
+  🎮 Gamification & Analytics
+  - GET    /api/gamification/analytics/user/:id/achievements    - User achievement stats
+  - GET    /api/gamification/analytics/system/stats             - System-wide statistics
+  - GET    /api/gamification/analytics/achievements/:id/popularity - Achievement popularity
+  - GET    /api/gamification/analytics/achievements/top-unlocked  - Top 10 achievements
+  - GET    /api/gamification/analytics/achievements/rarest       - Rarest achievements
+  - GET    /api/gamification/analytics/achievements/trending     - Trending achievements
+  - GET    /api/gamification/analytics/leaderboard              - User leaderboard
+  - GET    /api/gamification/analytics/engagement/:id           - Achievement engagement metrics
+  
+  👥 Social Features
+  - POST   /api/follows                               - Follow user
+  - DELETE /api/follows/:id                           - Unfollow user
+  - GET    /api/follows/followers/:id                 - Get followers list
+  - GET    /api/follows/following/:id                 - Get following list
+  - GET    /api/follows/stats/:id                     - Get follow statistics
+  - GET    /api/follows/popular-creators              - Get popular creators
+  
+  📊 Events & Real-time
+  - GET    /api/events/history                        - Get blockchain events history
+  - WebSocket: ws://localhost:${PORT}                 - Real-time blockchain events
   
   Listening on port ${PORT}...
   `);
