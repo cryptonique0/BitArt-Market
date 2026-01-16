@@ -20,6 +20,7 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 ## 📊 **Development Status (January 17, 2026)**
 
 ✅ **Production Ready** — All systems operational and fully tested
+
 - **Backend:** Running on port 3001, all 8+ services initialized
 - **Frontend:** Serving on port 5173 with full UI polish and responsive design
 - **Database:** PostgreSQL with Prisma ORM, all migrations applied
@@ -277,6 +278,7 @@ cd contracts && npm install && cd ..
 ### 🟢 Currently Live (Local Development Servers)
 
 **Frontend Server:** 🌐 http://localhost:5173/
+
 - React 19 + TypeScript + Vite
 - Tailwind CSS with full dark mode support
 - 20+ keyframe animations and smooth transitions
@@ -285,6 +287,7 @@ cd contracts && npm install && cd ..
 - UI fine-tuning with 130+ commits of improvements
 
 **Backend API Server:** 🔗 http://localhost:3001/api
+
 - Node.js 20.19.4 + Express
 - 24+ RESTful endpoints (6 categories with emoji organization)
 - All 8+ services running and initialized
@@ -293,6 +296,7 @@ cd contracts && npm install && cd ..
 - Real-time blockchain integration with Base Mainnet
 
 **Smart Contracts:** ✅ Deployed & Verified on Base Mainnet
+
 - BitArtNFT (ERC721 with royalties)
 - BitArtMarketplace (with automatic fee distribution)
 - BitArtAuction (with bidding and reserve prices)
@@ -538,12 +542,14 @@ The app will be available at `http://localhost:5173`
 ### 5. Connect Your Wallet & Explore
 
 **Supported Wallets:**
+
 - MetaMask (for Base Mainnet)
 - Coinbase Wallet (recommended for Base)
 - Leather Wallet (for Stacks)
 - Hiro Wallet (for Stacks)
 
 **Steps:**
+
 1. Install and open your preferred wallet
 2. Switch to **Base Mainnet** (Chain ID: 8453)
 3. Click "Connect Wallet" on the website
