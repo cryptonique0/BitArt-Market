@@ -17,7 +17,19 @@ All smart contracts deployed and verified on Base Mainnet with base-first UX:
 
 🔗 [View on BaseScan](https://basescan.org)
 
-## � Feature Highlights
+## 📋 Feature Highlights
+
+### 👥 User Following System (NEW)
+
+- **Follow Creators & Collectors** — Build your network by following favorite artists and collectors
+- **Follower Management** — View who follows you, who you follow, with detailed profiles
+- **Follow Notifications** — Get notified when creators drop new NFTs, new collections launch
+- **Creator Discovery** — Find popular creators by followers and XP, see trending artists
+- **Smart Recommendations** — Get personalized creator suggestions based on shared achievements
+- **NFT Drop Alerts** — Automatic notifications when followed creators release new work
+- **Social Profiles** — Show follower/following counts, creator badges, activity levels
+- **Notification Center** — Centralized notifications with read/unread tracking
+- **Real-time Updates** — 30-second polling for instant notification delivery
 
 ### 🎮 Gamification System (Latest)
 
@@ -553,11 +565,49 @@ VITE_BASE_AUCTION_CONTRACT=0x2119FA24f5C1973eE5c9886E850eB5E835d1ABD2
 - Review browser console for JavaScript errors
 - Ensure data arrays are not empty
 
+**7. Following System Issues**
+
+- Verify database migration applied: `database-migration-following-system.sql`
+- Check JWT token validity for protected endpoints
+- Ensure Supabase connection is active
+- Review notification endpoint returns data
+
 ### Getting Help
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/bitart-market/issues)
 - **Documentation**: Check [docs/](./docs) folder for detailed guides
 - **Community**: Join our Discord for support
+
+## 📚 Documentation
+
+Comprehensive guides for all features:
+
+### Core Features
+
+- [Advanced Search & Discovery](./ADVANCED_SEARCH_INTEGRATION.md)
+- [Gamification System](./README_GAMIFICATION.md)
+- **[User Following System](./FOLLOWING_SYSTEM_INTEGRATION.md)** ← New!
+  - [Quick Reference](./FOLLOWING_SYSTEM_QUICK_REFERENCE.md)
+  - [Testing Guide](./FOLLOWING_SYSTEM_TESTING_GUIDE.md)
+  - [Implementation Details](./FOLLOWING_SYSTEM_IMPLEMENTATION.md)
+
+### Analytics & Creator Tools
+
+- [Analytics Implementation](./ANALYTICS_IMPLEMENTATION.md)
+- [Creator Analytics Dashboard](./ANALYTICS_DASHBOARD_GUIDE.md)
+- [Royalty Aggregation](./BLOCKCHAIN_IMPLEMENTATION_SUMMARY.md)
+
+### Deployment & Setup
+
+- [Deployment Guide](./DEPLOYMENT_GUIDE_XVERSE.md)
+- [E2E Testing Setup](./E2E_SETUP_COMPLETE.md)
+- [CI/CD Pipeline](./CI_CD_GUIDE.md)
+
+### Architecture
+
+- [Blockchain Integration](./BLOCKCHAIN_IMPLEMENTATION_SUMMARY.md)
+- [Complete Project Summary](./COMPLETE_PROJECT_SUMMARY.md)
+- [API Documentation](./API_DOCS.md)
 
 ## 🤝 Contributing
 
@@ -585,6 +635,7 @@ MIT License - see [LICENSE](./LICENSE) file for details
 - **10+ React Components** with dark mode support
 - **7-Day Development Roadmap** completed
 - **Production-Ready** with full error handling
+- **User Following System** with real-time notifications
 - [Pinata](https://www.pinata.cloud/)
 
 ## 📧 Support

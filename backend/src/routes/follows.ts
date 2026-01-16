@@ -1,164 +1,213 @@
 import { Router, Request, Response } from 'express';
-import * as followsService from '../services/follows';
+import { FollowingService } from '../services/following.service';
+import { requireAppJWT } from '../middleware/auth';
 
 const router = Router();
+const followingService = new FollowingService();
 
 /**
  * POST /api/follows
- * Follow a creator
+ * Follow a user
  */
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', requireAppJWT, async (req: Request, res: Response) => {
   try {
-    const { follower, following } = req.body;
+    const { followingId } = req.body;
+    const followerId = (req as any).user?.id;
 
-    if (!follower || !following) {
-      return res.status(400).json({ error: 'Follower and following addresses are required' });
+    if (!followerId || !followingId) {
+      return res.status(400).json({ error: 'User IDs are required' });
     }
 
-    const result = await followsService.followCreator(follower, following);
+    if (followerId === followingId) {
+      return res.status(400).json({ error: 'Cannot follow yourself' });
+    }
+
+    const result = await followingService.followUser(followerId, followingId);
     res.status(201).json(result);
   } catch (error) {
-    res.status(400).json({ error: 'Failed to follow creator' });
+    console.error('Error following user:', error);
+    res.status(400).json({ error: 'Failed to follow user' });
   }
 });
 
 /**
- * DELETE /api/follows/:follower/:following
- * Unfollow a creator
+ * DELETE /api/follows/:followingId
+ * Unfollow a user
  */
-router.delete('/:follower/:following', async (req: Request, res: Response) => {
+router.delete('/:followingId', requireAppJWT, async (req: Request, res: Response) => {
   try {
-    const { follower, following } = req.params;
+    const { followingId } = req.params;
+    const followerId = (req as any).user?.id;
 
-    const result = await followsService.unfollowCreator(follower, following);
-    res.json(result);
+    if (!followerId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const result = await followingService.unfollowUser(followerId, followingId);
+    res.json({ success: result });
   } catch (error) {
-    res.status(400).json({ error: 'Failed to unfollow creator' });
+    console.error('Error unfollowing user:', error);
+    res.status(400).json({ error: 'Failed to unfollow user' });
   }
 });
 
 /**
- * GET /api/follows/:follower/:following
- * Check if user is following a creator
+ * GET /api/follows/status/:followingId
+ * Check if current user is following a user
  */
-router.get('/:follower/:following', async (req: Request, res: Response) => {
+router.get('/status/:followingId', requireAppJWT, async (req: Request, res: Response) => {
   try {
-    const { follower, following } = req.params;
+    const { followingId } = req.params;
+    const followerId = (req as any).user?.id;
 
-    const isFollowing = await followsService.isFollowing(follower, following);
+    if (!followerId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const isFollowing = await followingService.isFollowing(followerId, followingId);
     res.json({ isFollowing });
   } catch (error) {
+    console.error('Error checking follow status:', error);
     res.status(500).json({ error: 'Failed to check follow status' });
   }
 });
 
 /**
- * GET /api/follows/:address/followers
- * Get followers of a creator
+ * GET /api/follows/followers/:userId
+ * Get followers of a user
  */
-router.get('/:address/followers', async (req: Request, res: Response) => {
+router.get('/followers/:userId', async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const page = parseInt(req.query.page as string) || 1;
+    const { userId } = req.params;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+    const offset = parseInt(req.query.offset as string) || 0;
 
-    const followers = await followsService.getFollowers(address, limit, page);
-    res.json(followers);
+    const followers = await followingService.getFollowers(userId, limit, offset);
+    res.json({ followers, count: followers.length });
   } catch (error) {
+    console.error('Error fetching followers:', error);
     res.status(500).json({ error: 'Failed to get followers' });
   }
 });
 
 /**
- * GET /api/follows/:address/following
- * Get creators that a user is following
+ * GET /api/follows/following/:userId
+ * Get users that a user is following
  */
-router.get('/:address/following', async (req: Request, res: Response) => {
+router.get('/following/:userId', async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const page = parseInt(req.query.page as string) || 1;
+    const { userId } = req.params;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+    const offset = parseInt(req.query.offset as string) || 0;
 
-    const following = await followsService.getFollowing(address, limit, page);
-    res.json(following);
+    const following = await followingService.getFollowing(userId, limit, offset);
+    res.json({ following, count: following.length });
   } catch (error) {
+    console.error('Error fetching following:', error);
     res.status(500).json({ error: 'Failed to get following' });
   }
 });
 
 /**
- * GET /api/follows/:address/stats
- * Get follower statistics for a creator
+ * GET /api/follows/stats/:userId
+ * Get follow statistics for a user
  */
-router.get('/:address/stats', async (req: Request, res: Response) => {
+router.get('/stats/:userId', async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
+    const { userId } = req.params;
 
-    const stats = await followsService.getCreatorStats(address);
+    const stats = await followingService.getFollowStats(userId);
     res.json(stats);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to get creator stats' });
+    console.error('Error fetching follow stats:', error);
+    res.status(500).json({ error: 'Failed to get follow stats' });
   }
 });
 
 /**
- * GET /api/follows/:address/count
- * Get follower count for a creator
+ * GET /api/follows/popular
+ * Get popular creators by follower count and XP
  */
-router.get('/:address/count', async (req: Request, res: Response) => {
+router.get('/popular', async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
-    const count = await followsService.getFollowerCount(address);
-    res.json({ count });
+    const creators = await followingService.getPopularCreators(limit);
+    res.json({ creators, count: creators.length });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to get follower count' });
+    console.error('Error fetching popular creators:', error);
+    res.status(500).json({ error: 'Failed to get popular creators' });
   }
 });
 
 /**
- * GET /api/follows/top-creators
- * Get top creators by follower count
+ * GET /api/follows/recommendations/:userId
+ * Get follow recommendations for a user
  */
-router.get('/top-creators', async (req: Request, res: Response) => {
+router.get('/recommendations/:userId', async (req: Request, res: Response) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 20;
+    const { userId } = req.params;
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
 
-    const creators = await followsService.getTopCreators(limit);
-    res.json(creators);
+    const recommendations = await followingService.getFollowRecommendations(userId, limit);
+    res.json({ recommendations, count: recommendations.length });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to get top creators' });
+    console.error('Error fetching recommendations:', error);
+    res.status(500).json({ error: 'Failed to get follow recommendations' });
   }
 });
 
 /**
- * GET /api/follows/:address/notifications
- * Get follow notifications for a creator
+ * GET /api/follows/notifications/:userId
+ * Get follow-related notifications for a user
  */
-router.get('/:address/notifications', async (req: Request, res: Response) => {
+router.get('/notifications/:userId', async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
-    const limit = parseInt(req.query.limit as string) || 50;
+    const { userId } = req.params;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
-    const notifications = await followsService.getFollowNotifications(address, limit);
-    res.json(notifications);
+    const notifications = await followingService.getFollowNotifications(userId, limit);
+    res.json({ notifications, count: notifications.length });
   } catch (error) {
+    console.error('Error fetching notifications:', error);
     res.status(500).json({ error: 'Failed to get notifications' });
   }
 });
 
 /**
- * GET /api/follows/:address1/:address2/mutual
- * Get mutual follows between two creators
+ * PUT /api/follows/notifications/:notificationId/read
+ * Mark a notification as read
  */
-router.get('/:address1/:address2/mutual', async (req: Request, res: Response) => {
+router.put('/notifications/:notificationId/read', async (req: Request, res: Response) => {
   try {
-    const { address1, address2 } = req.params;
+    const { notificationId } = req.params;
 
-    const mutual = await followsService.getMutualFollows(address1, address2);
-    res.json(mutual);
+    const success = await followingService.markNotificationAsRead(notificationId);
+    res.json({ success });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to get mutual follows' });
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({ error: 'Failed to mark notification as read' });
+  }
+});
+
+/**
+ * POST /api/follows/notify-followers
+ * Notify all followers about a new NFT drop
+ */
+router.post('/notify-followers', requireAppJWT, async (req: Request, res: Response) => {
+  try {
+    const { nftId, nftTitle } = req.body;
+    const creatorId = (req as any).user?.id;
+
+    if (!creatorId || !nftId || !nftTitle) {
+      return res.status(400).json({ error: 'NFT details are required' });
+    }
+
+    await followingService.notifyFollowersAboutDrop(creatorId, nftId, nftTitle);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error notifying followers:', error);
+    res.status(400).json({ error: 'Failed to notify followers' });
   }
 });
 
