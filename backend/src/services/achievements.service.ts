@@ -260,29 +260,45 @@ class AchievementsServiceClass {
       }
 
       for (const achievement of this.ACHIEVEMENTS) {
-        // Check if achievement already exists
-        const { data: existing } = await supabase
-          .from('achievements')
-          .select('id')
-          .eq('name', achievement.name)
-          .single();
+        try {
+          // Check if achievement already exists
+          const { data: existing } = await supabase
+            .from('achievements')
+            .select('id')
+            .eq('name', achievement.name)
+            .single();
 
-        if (!existing) {
-          const { error } = await supabase.from('achievements').insert({
-            ...achievement,
-            is_hidden: achievement.is_hidden || false,
-          });
+          if (!existing) {
+            const { error } = await supabase.from('achievements').insert({
+              ...achievement,
+              is_hidden: achievement.is_hidden || false,
+            });
 
-          if (error) {
-            logger.error(`Error inserting achievement ${achievement.name}:`, error);
+            if (error) {
+              // Only log if not a network error
+              if (!error.message?.includes('fetch')) {
+                logger.error(`Error inserting achievement ${achievement.name}:`, error);
+              }
+            }
+          }
+        } catch (itemError: any) {
+          // Silently skip if Supabase is not properly connected
+          if (
+            !itemError.message?.includes('fetch failed') &&
+            !itemError.message?.includes('ENOTFOUND')
+          ) {
+            logger.error(`Error processing achievement:`, itemError);
           }
         }
       }
 
       logger.info('Achievements initialized');
       return true;
-    } catch (error) {
-      logger.error('Error in initializeAchievements:', error);
+    } catch (error: any) {
+      // Don't log network/connection errors
+      if (!error?.message?.includes('fetch') && !error?.message?.includes('ENOTFOUND')) {
+        logger.error('Error in initializeAchievements:', error);
+      }
       return false;
     }
   }

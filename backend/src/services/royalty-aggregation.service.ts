@@ -62,7 +62,6 @@ class RoyaltyAggregationServiceClass {
           .update({ paid_out: true })
           .eq('creator_wallet', wallet)
           .is('paid_out', false);
-
         console.log(`[RoyaltyAggregation] Updated ${wallet}: +${amount}`);
       }
 
@@ -70,7 +69,10 @@ class RoyaltyAggregationServiceClass {
         `[RoyaltyAggregation] Completed. Updated ${Object.keys(balances).length} creators`
       );
     } catch (error) {
-      console.error('[RoyaltyAggregation] Error:', error);
+      // Only log error if Supabase is available and this isn't a connection error
+      if (isSupabaseAvailable()) {
+        console.error('[RoyaltyAggregation] Error:', error);
+      }
     }
   }
 
@@ -137,7 +139,10 @@ class RoyaltyAggregationServiceClass {
 
       console.log(`[AutoPayout] Completed. Processed ${eligible.length} users`);
     } catch (error) {
-      console.error('[AutoPayout] Error:', error);
+      // Only log error if Supabase is available and this isn't a connection error
+      if (isSupabaseAvailable()) {
+        console.error('[AutoPayout] Error:', error);
+      }
     }
   }
 
