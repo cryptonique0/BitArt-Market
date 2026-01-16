@@ -165,13 +165,6 @@ export const HomePage: React.FC = () => {
       </div>
     </div>
   </section>;
-  import {
-    engagementExtraService,
-    type Quest,
-    type SocialProofEvent,
-    type PortfolioHealth,
-  } from '../services/engagement-extra';
-  import defaultAvatar from '../components/default-avatar.png';
 
   const fetchExtras = async () => {
     try {
