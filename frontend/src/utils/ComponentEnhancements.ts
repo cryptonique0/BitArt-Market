@@ -8,7 +8,7 @@ export const InputFocusStyles = {
           focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900/50
           transition-all duration-200 focus:outline-none`,
   label: 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors',
-  error: 'absolute text-sm text-red-600 dark:text-red-400 mt-1'
+  error: 'absolute text-sm text-red-600 dark:text-red-400 mt-1',
 };
 
 // Commit 8: Validation Feedback
@@ -16,7 +16,7 @@ export const ValidationFeedback = {
   success: 'text-green-600 dark:text-green-400 text-sm mt-1',
   error: 'text-red-600 dark:text-red-400 text-sm mt-1',
   warning: 'text-yellow-600 dark:text-yellow-400 text-sm mt-1',
-  info: 'text-blue-600 dark:text-blue-400 text-sm mt-1'
+  info: 'text-blue-600 dark:text-blue-400 text-sm mt-1',
 };
 
 // Commit 9: Floating Label Animation
@@ -32,7 +32,7 @@ export const FloatingLabel = `
 export const LoadingStates = {
   spinner: 'animate-spin h-4 w-4',
   skeleton: 'bg-gray-200 dark:bg-gray-700 animate-pulse rounded',
-  progress: 'h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full'
+  progress: 'h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full',
 };
 
 // Commit 11: Mobile Menu Animation
@@ -49,7 +49,7 @@ export const BreadcrumbStyles = {
   container: 'flex items-center gap-2 text-sm',
   link: 'text-purple-600 dark:text-purple-400 hover:underline',
   separator: 'text-gray-400 dark:text-gray-600',
-  current: 'text-gray-600 dark:text-gray-400 font-medium'
+  current: 'text-gray-600 dark:text-gray-400 font-medium',
 };
 
 // Commit 13: Modal Slide Animation
@@ -64,9 +64,10 @@ export const ModalAnimation = `
 // Commit 14: Dropdown Styling
 export const DropdownStyles = {
   container: 'relative inline-block',
-  button: 'flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700',
+  button:
+    'flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700',
   menu: 'absolute top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700',
-  item: 'px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white transition-colors'
+  item: 'px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white transition-colors',
 };
 
 // Commit 15: Checkbox Animations
@@ -83,7 +84,7 @@ export const CheckboxAnimation = `
 export const RadioStyles = {
   container: 'flex items-center gap-3',
   input: 'w-4 h-4 accent-purple-600 dark:accent-purple-400 cursor-pointer',
-  label: 'text-gray-700 dark:text-gray-300 cursor-pointer select-none'
+  label: 'text-gray-700 dark:text-gray-300 cursor-pointer select-none',
 };
 
 // Commit 17: Range Slider
@@ -91,33 +92,36 @@ export const SliderStyles = {
   container: 'flex flex-col gap-4',
   input: `w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer
           accent-purple-600 dark:accent-purple-400`,
-  track: 'flex justify-between text-sm text-gray-600 dark:text-gray-400 mt-2'
+  track: 'flex justify-between text-sm text-gray-600 dark:text-gray-400 mt-2',
 };
 
 // Commit 18: Progress Bar
 export const ProgressStyles = {
   container: 'w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden',
   bar: 'bg-gradient-to-r from-purple-600 to-pink-600 h-full transition-all duration-300',
-  label: 'text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+  label: 'text-sm font-medium text-gray-700 dark:text-gray-300 mb-1',
 };
 
 // Commit 19: Avatar Styling
 export const AvatarStyles = {
   container: 'relative',
   image: 'w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700',
-  fallback: 'w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold',
-  status: 'absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-800'
+  fallback:
+    'w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold',
+  status:
+    'absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-800',
 };
 
 // Commit 20: Tooltip Styling
 export const TooltipStyles = {
   trigger: 'cursor-help',
-  content: 'absolute bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-1 rounded text-xs whitespace-nowrap',
-  arrow: 'absolute w-2 h-2 bg-gray-900 dark:bg-gray-100 transform rotate-45'
+  content:
+    'absolute bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-1 rounded text-xs whitespace-nowrap',
+  arrow: 'absolute w-2 h-2 bg-gray-900 dark:bg-gray-100 transform rotate-45',
 };
 
 // Memoized Component Wrapper (Commit 85)
-export const withMemo = <P,>(Component: React.FC<P>) => {
+export const withMemo = <P>(Component: React.FC<P>) => {
   return React.memo(Component, (prev, next) => {
     return JSON.stringify(prev) === JSON.stringify(next);
   });
@@ -131,7 +135,7 @@ export const withLazy = (Component: React.ComponentType<any>, fallback = null) =
 // Virtual Scrolling HOC (Commit 87)
 export const VirtualList = {
   container: 'overflow-y-auto',
-  item: 'absolute w-full transition-transform duration-100'
+  item: 'absolute w-full transition-transform duration-100',
 };
 
 export default {
@@ -143,5 +147,5 @@ export default {
   SliderStyles,
   ProgressStyles,
   AvatarStyles,
-  TooltipStyles
+  TooltipStyles,
 };
