@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Salvar",
+    "delete": "Deletar",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "sort": "Ordenar"
+  },
+  "nav": {
+    "home": "Início",
+    "discover": "Descobrir",
+    "marketplace": "Marketplace",
+    "create": "Criar",
+    "studio": "Estúdio",
+    "profile": "Perfil"
+  },
+  "nft": {
+    "title": "NFT",
+    "name": "Nome",
+    "description": "Descrição",
+    "price": "Preço",
+    "owner": "Proprietário",
+    "creator": "Criador",
+    "listed": "Listado",
+    "notListed": "Não Listado",
+    "buy": "Comprar Agora",
+    "sell": "Vender",
+    "transfer": "Transferir",
+    "properties": "Propriedades",
+    "history": "Histórico",
+    "details": "Detalhes"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "featured": "Destaque",
+    "trending": "Tendências",
+    "new": "Novo",
+    "topSellers": "Melhores Vendedores",
+    "collections": "Coleções",
+    "volume": "Volume",
+    "floor": "Preço Mínimo",
+    "sales": "Vendas",
+    "items": "Itens"
+  },
+  "language": {
+    "select": "Selecionar Idioma",
+    "current": "Idioma Atual"
+  }
+}

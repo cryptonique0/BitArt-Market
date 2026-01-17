@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "search": "検索",
+    "filter": "フィルター",
+    "sort": "並べ替え"
+  },
+  "nav": {
+    "home": "ホーム",
+    "discover": "発見",
+    "marketplace": "マーケットプレイス",
+    "create": "作成",
+    "studio": "スタジオ",
+    "profile": "プロフィール"
+  },
+  "nft": {
+    "title": "NFT",
+    "name": "名前",
+    "description": "説明",
+    "price": "価格",
+    "owner": "所有者",
+    "creator": "クリエイター",
+    "listed": "出品中",
+    "notListed": "出品なし",
+    "buy": "今すぐ購入",
+    "sell": "販売",
+    "transfer": "転送",
+    "properties": "プロパティ",
+    "history": "履歴",
+    "details": "詳細"
+  },
+  "marketplace": {
+    "title": "マーケットプレイス",
+    "featured": "おすすめ",
+    "trending": "トレンド",
+    "new": "新着",
+    "topSellers": "トップセラー",
+    "collections": "コレクション",
+    "volume": "取引量",
+    "floor": "フロア価格",
+    "sales": "販売",
+    "items": "アイテム"
+  },
+  "language": {
+    "select": "言語を選択",
+    "current": "現在の言語"
+  }
+}

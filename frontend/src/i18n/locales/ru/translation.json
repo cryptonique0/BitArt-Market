@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "sort": "Сортировка"
+  },
+  "nav": {
+    "home": "Главная",
+    "discover": "Откройте",
+    "marketplace": "Маркетплейс",
+    "create": "Создать",
+    "studio": "Студия",
+    "profile": "Профиль"
+  },
+  "nft": {
+    "title": "NFT",
+    "name": "Имя",
+    "description": "Описание",
+    "price": "Цена",
+    "owner": "Владелец",
+    "creator": "Создатель",
+    "listed": "В списке",
+    "notListed": "Не в списке",
+    "buy": "Купить сейчас",
+    "sell": "Продать",
+    "transfer": "Перевод",
+    "properties": "Свойства",
+    "history": "История",
+    "details": "Детали"
+  },
+  "marketplace": {
+    "title": "Маркетплейс",
+    "featured": "Избранное",
+    "trending": "Тренды",
+    "new": "Новое",
+    "topSellers": "Топ продавцов",
+    "collections": "Коллекции",
+    "volume": "Объем",
+    "floor": "Минимальная цена",
+    "sales": "Продажи",
+    "items": "Товары"
+  },
+  "language": {
+    "select": "Выбрать язык",
+    "current": "Текущий язык"
+  }
+}

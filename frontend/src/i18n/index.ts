@@ -6,6 +6,10 @@ import enTranslations from './locales/en/translation.json';
 import esTranslations from './locales/es/translation.json';
 import frTranslations from './locales/fr/translation.json';
 import zhTranslations from './locales/zh/translation.json';
+import jaTranslations from './locales/ja/translation.json';
+import deTranslations from './locales/de/translation.json';
+import ptTranslations from './locales/pt/translation.json';
+import ruTranslations from './locales/ru/translation.json';
 
 const resources = {
   en: {
@@ -19,6 +23,18 @@ const resources = {
   },
   zh: {
     translation: zhTranslations,
+  },
+  ja: {
+    translation: jaTranslations,
+  },
+  de: {
+    translation: deTranslations,
+  },
+  pt: {
+    translation: ptTranslations,
+  },
+  ru: {
+    translation: ruTranslations,
   },
 };
 

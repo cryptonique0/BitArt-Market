@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "search": "Suchen",
+    "filter": "Filter",
+    "sort": "Sortieren"
+  },
+  "nav": {
+    "home": "Startseite",
+    "discover": "Entdecken",
+    "marketplace": "Marktplatz",
+    "create": "Erstellen",
+    "studio": "Studio",
+    "profile": "Profil"
+  },
+  "nft": {
+    "title": "NFT",
+    "name": "Name",
+    "description": "Beschreibung",
+    "price": "Preis",
+    "owner": "Besitzer",
+    "creator": "Schöpfer",
+    "listed": "Gelistet",
+    "notListed": "Nicht gelistet",
+    "buy": "Jetzt kaufen",
+    "sell": "Verkaufen",
+    "transfer": "Übertragen",
+    "properties": "Eigenschaften",
+    "history": "Verlauf",
+    "details": "Details"
+  },
+  "marketplace": {
+    "title": "Marktplatz",
+    "featured": "Ausgewählt",
+    "trending": "Trending",
+    "new": "Neu",
+    "topSellers": "Top-Verkäufer",
+    "collections": "Sammlungen",
+    "volume": "Volumen",
+    "floor": "Bodenpreis",
+    "sales": "Verkäufe",
+    "items": "Artikel"
+  },
+  "language": {
+    "select": "Sprache wählen",
+    "current": "Aktuelle Sprache"
+  }
+}
