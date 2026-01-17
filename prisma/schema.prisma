@@ -31,6 +31,8 @@ model User {
   collectionItems  CollectionItem[]
   friendsInitiated Friendship[] @relation("initiator")
   friendsReceived  Friendship[] @relation("receiver")
+  govProposals     GovProposal[]
+  govVotes         GovVote[]
 
   @@index([email])
   @@index([username])
@@ -266,6 +268,49 @@ model CollectionItem {
 
   @@unique([collectionId, achievementId])
   @@index([collectionId])
+  @@index([userId])
+}
+
+// ============ GOVDAO MODELS ============
+
+model GovProposal {
+  id                   String   @id @default(cuid())
+  proposerId           String
+  title                String   @db.VarChar(100)
+  description          String   @db.Text
+  proposalType         String   // 'parameter-change' | 'fund-allocation' | 'feature-request'
+  votingPeriodBlocks   Int
+  executionData        String?  @db.Text
+  contractProposalId   Int      @unique
+  status               String   @default("active") // 'active' | 'passed' | 'failed' | 'executed' | 'cancelled'
+  startBlock           Int?
+  endBlock             Int?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Relations
+  proposer User       @relation(fields: [proposerId], references: [id], onDelete: Cascade)
+  votes    GovVote[]
+
+  @@index([proposerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model GovVote {
+  id               String   @id @default(cuid())
+  proposalId       String
+  userId           String
+  voteChoice       String   // 'for' | 'against' | 'abstain'
+  votingPowerUsed  Int
+  createdAt        DateTime @default(now())
+
+  // Relations
+  proposal GovProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([proposalId, userId])
+  @@index([proposalId])
   @@index([userId])
 }
 
