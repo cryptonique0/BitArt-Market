@@ -310,6 +310,58 @@ class WalletService {
       return null;
     }
   }
+
+  /**
+   * Get available wallets
+   */
+  getAvailableWallets() {
+    return walletConnector.getAvailableWallets();
+  }
+
+  /**
+   * Connect with specific wallet type
+   */
+  async connectWithWalletType(walletType: WalletType, chainId?: number) {
+    try {
+      const connection = await walletConnector.connect(walletType, { chainId });
+      localStorage.setItem(this.baseSessionKey, connection.account);
+      localStorage.setItem('wallet-type', walletType);
+      return connection;
+    } catch (error) {
+      console.error('Failed to connect with wallet type:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get current wallet type
+   */
+  getCurrentWalletType(): WalletType | null {
+    const stored = localStorage.getItem('wallet-type');
+    return stored as WalletType | null;
+  }
+
+  /**
+   * Switch network/chain
+   */
+  async switchNetwork(chainId: number) {
+    try {
+      await walletConnector.switchChain(chainId);
+      return true;
+    } catch (error) {
+      console.error('Failed to switch network:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Check if specific wallet is installed
+   */
+  isWalletTypeInstalled(walletType: WalletType): boolean {
+    const wallets = walletConnector.getAvailableWallets();
+    const wallet = wallets.find(w => w.type === walletType);
+    return wallet?.isInstalled || false;
+  }
 }
 
 export const walletService = new WalletService();
