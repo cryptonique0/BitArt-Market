@@ -145,7 +145,10 @@ export const Header: React.FC = () => {
                 </span>
               )}
 
-              {connected ? (
+              {/* Conditional Wallet UI - RainbowKit or Custom */}
+              {USE_RAINBOWKIT ? (
+                <RainbowKitConnectButton />
+              ) : connected ? (
                 <div className="flex items-center gap-3">
                   {/* Base Badge */}
                   <BaseNativeBadge />
