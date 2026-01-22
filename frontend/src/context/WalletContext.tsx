@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { ethers } from 'ethers';
 import { walletConnector } from '../services/multi-wallet-connector';
-import { WalletType, WalletInfo, WalletConnection } from '../types/wallet';
+import { WalletType, WalletInfo } from '../types/wallet';
 
 interface WalletContextType {
   account: string | null;
@@ -24,113 +24,53 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
+  const [walletType, setWalletType] = useState<WalletType | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [availableWallets, setAvailableWallets] = useState<WalletInfo[]>([]);
 
-  // Safe provider detection for multi-wallet environments
-  const getEthereumProvider = useCallback((): EthereumProvider | null => {
-    try {
-      const providers = getWindowEthereum();
+  // Initialize available wallets
+  useEffect(() => {
+    const wallets = walletConnector.getAvailableWallets();
+    setAvailableWallets(wallets);
+  }, []);
 
-      if (!providers) return null;
-
-      // If single provider with request method, use it directly
-      if (typeof (providers as Record<string, unknown>).request === 'function') {
-        return providers as EthereumProvider;
-      }
-
-      // If array of providers, prefer MetaMask, fallback to first
-      if (Array.isArray(providers)) {
-        const metamask = providers.find((p: unknown) => (p as Record<string, unknown>).isMetaMask);
-        return (metamask || providers[0]) as EthereumProvider;
-      }
-
-      // If object with providers property
-      if (
-        (providers as Record<string, unknown>).providers &&
-        Array.isArray((providers as Record<string, unknown>).providers)
-      ) {
-        const providersList = (providers as Record<string, unknown>).providers as unknown[];
-        const metamask = providersList.find(
-          (p: unknown) => (p as Record<string, unknown>).isMetaMask
-        );
-        return (metamask || providersList[0]) as EthereumProvider;
-      }
-
-      return providers as EthereumProvider;
-    } catch (err) {
-      console.error('Error getting ethereum provider:', err);
-      return null;
+  const handleAccountsChanged = useCallback((accounts: string[]) => {
+    if (accounts.length === 0) {
+      setAccount(null);
+      setProvider(null);
+      setSigner(null);
+      setChainId(null);
+      setWalletType(null);
+      setError(null);
+    } else {
+      setAccount(accounts[0].toLowerCase());
     }
   }, []);
 
-  const setupProvider = useCallback(
-    async (selectedAccount: string) => {
-      try {
-        const ethereum = getEthereumProvider();
-        if (!ethereum || !ethereum.request) throw new Error('No Ethereum provider');
-
-        // Type cast is safe because we checked for request method
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const ethProvider = new ethers.BrowserProvider(ethereum as any);
-        const signer = await ethProvider.getSigner();
-        const network = await ethProvider.getNetwork();
-
-        setProvider(ethProvider);
-        setSigner(signer);
-        setAccount(selectedAccount.toLowerCase());
-        setChainId(Number(network.chainId));
-        setError(null);
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Failed to setup provider';
-        setError(errorMsg);
-        console.error('Setup provider error:', err);
-      }
-    },
-    [getEthereumProvider]
-  );
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAccountsChanged = useCallback(
-    (accounts: any) => {
-      const accountList = Array.isArray(accounts) ? (accounts as string[]) : [];
-      if (accountList.length === 0) {
-        setAccount(null);
-        setProvider(null);
-        setSigner(null);
-        setChainId(null);
-        setError(null);
-      } else {
-        setupProvider(accountList[0]);
-      }
-    },
-    [setupProvider]
-  );
-
   const handleChainChanged = useCallback(() => {
-    // Reload page on chain change for simplicity
     window.location.reload();
   }, []);
 
-  const connectWallet = useCallback(async () => {
+  const connectWallet = useCallback(async (selectedWalletType?: WalletType) => {
     try {
       setIsConnecting(true);
       setError(null);
 
-      const ethereum = getEthereumProvider();
-      if (!ethereum || !ethereum.request) {
-        throw new Error('MetaMask or other Web3 wallet not detected');
-      }
+      // Default to MetaMask if no wallet type specified
+      const typeToConnect = selectedWalletType || WalletType.METAMASK;
 
-      // Request accounts
-      const accounts = await ethereum.request({
-        method: 'eth_requestAccounts',
+      const connection = await walletConnector.connect(typeToConnect, {
+        onConnecting: () => setIsConnecting(true),
+        onError: err => setError(err.message),
       });
 
-      const accountList = Array.isArray(accounts) ? (accounts as string[]) : [];
-      if (accountList && accountList.length > 0) {
-        await setupProvider(accountList[0]);
-      }
+      setProvider(connection.provider);
+      setSigner(connection.signer);
+      setAccount(connection.account);
+      setChainId(connection.chainId);
+      setWalletType(connection.walletType);
+      setError(null);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to connect wallet';
       setError(errorMsg);
@@ -138,41 +78,41 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsConnecting(false);
     }
-  }, [getEthereumProvider, setupProvider]);
+  }, []);
 
-  const disconnectWallet = useCallback(() => {
+  const disconnectWallet = useCallback(async () => {
+    await walletConnector.disconnect();
     setAccount(null);
     setProvider(null);
     setSigner(null);
     setChainId(null);
+    setWalletType(null);
     setError(null);
+  }, []);
+
+  const switchChain = useCallback(async (newChainId: number) => {
+    try {
+      await walletConnector.switchChain(newChainId);
+      setChainId(newChainId);
+      setError(null);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to switch chain';
+      setError(errorMsg);
+      throw err;
+    }
   }, []);
 
   // Initialize wallet on mount
   useEffect(() => {
     const initializeWallet = async () => {
       try {
-        const ethereum = getEthereumProvider();
-        if (!ethereum) {
-          console.warn('No Ethereum provider found');
-          return;
-        }
-
-        // Request accounts to check if already connected
-        try {
-          const accounts = await ethereum.request?.({ method: 'eth_accounts' });
-          const accountList = Array.isArray(accounts) ? (accounts as string[]) : [];
-          if (accountList && accountList.length > 0) {
-            await setupProvider(accountList[0]);
-          }
-        } catch (err) {
-          console.warn('Could not get accounts:', err);
-        }
-
-        // Listen for account changes safely
-        if (ethereum.on && typeof ethereum.on === 'function') {
-          ethereum.on('accountsChanged', handleAccountsChanged);
-          ethereum.on('chainChanged', handleChainChanged);
+        const connection = walletConnector.getConnection();
+        if (connection) {
+          setProvider(connection.provider);
+          setSigner(connection.signer);
+          setAccount(connection.account);
+          setChainId(connection.chainId);
+          setWalletType(connection.walletType);
         }
       } catch (err) {
         console.error('Failed to initialize wallet:', err);
@@ -181,15 +121,15 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     initializeWallet();
 
-    // Cleanup
+    // Setup event listeners
+    walletConnector.on('accountsChanged', handleAccountsChanged);
+    walletConnector.on('chainChanged', handleChainChanged);
+
     return () => {
-      const ethereum = getEthereumProvider();
-      if (ethereum && ethereum.off && typeof ethereum.off === 'function') {
-        ethereum.off('accountsChanged', handleAccountsChanged);
-        ethereum.off('chainChanged', handleChainChanged);
-      }
+      walletConnector.off('accountsChanged', handleAccountsChanged);
+      walletConnector.off('chainChanged', handleChainChanged);
     };
-  }, [getEthereumProvider, handleAccountsChanged, handleChainChanged, setupProvider]);
+  }, [handleAccountsChanged, handleChainChanged]);
 
   return (
     <WalletContext.Provider
@@ -198,10 +138,13 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         provider,
         signer,
         chainId,
+        walletType,
         isConnecting,
         error,
+        availableWallets,
         connectWallet,
         disconnectWallet,
+        switchChain,
       }}
     >
       {children}
