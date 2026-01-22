@@ -63,11 +63,13 @@ frontend/src/
 ## Key Features
 
 ### 1. **Wallet Detection**
+
 - Automatic detection of installed wallets
 - Show "Install" option for non-installed wallets
 - Smart provider detection for multi-wallet environments
 
 ### 2. **Connection Management**
+
 ```typescript
 import { useWallet } from '../context/WalletContext';
 import { WalletType } from '../types/wallet';
@@ -81,17 +83,19 @@ await connectWallet(WalletType.WALLET_CONNECT);
 ```
 
 ### 3. **Chain Switching**
+
 ```typescript
 const { switchChain } = useWallet();
 
 // Switch to different networks
-await switchChain(1);      // Ethereum Mainnet
-await switchChain(8453);   // Base Mainnet
-await switchChain(84532);  // Base Sepolia
-await switchChain(137);    // Polygon
+await switchChain(1); // Ethereum Mainnet
+await switchChain(8453); // Base Mainnet
+await switchChain(84532); // Base Sepolia
+await switchChain(137); // Polygon
 ```
 
 ### 4. **Supported Networks**
+
 - Ethereum Mainnet (Chain ID: 1)
 - Sepolia Testnet (Chain ID: 11155111)
 - Base Mainnet (Chain ID: 8453)
@@ -117,12 +121,12 @@ function MyComponent() {
       <button onClick={() => setShowModal(true)}>
         Connect Wallet
       </button>
-      
-      <WalletSelectionModal 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
+
+      <WalletSelectionModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
       />
-      
+
       {account && (
         <div>
           Connected: {account} via {walletType}
@@ -233,12 +237,12 @@ try {
 import { walletConnector } from '../services/multi-wallet-connector';
 
 // Listen for account changes
-walletConnector.on('accountsChanged', (accounts) => {
+walletConnector.on('accountsChanged', accounts => {
   console.log('Account changed:', accounts[0]);
 });
 
 // Listen for chain changes
-walletConnector.on('chainChanged', (chainId) => {
+walletConnector.on('chainChanged', chainId => {
   console.log('Chain changed:', chainId);
 });
 
@@ -316,6 +320,7 @@ if (!window.ethereum) {
 ## Support
 
 For issues or questions:
+
 - Check wallet provider documentation
 - Review browser console for errors
 - Test in incognito mode to rule out extensions

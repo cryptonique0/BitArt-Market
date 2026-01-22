@@ -45,13 +45,19 @@ export const Header: React.FC = () => {
 
   return (
     <>
+      {/* Wallet Selection Modal */}
+      <WalletSelectionModal 
+        isOpen={showWalletModal} 
+        onClose={() => setShowWalletModal(false)} 
+      />
+
       {/* Error Banners */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         {disconnectError && (
           <WalletDisconnectBanner
             error={disconnectError}
             onDismiss={clearDisconnectError}
-            onReconnect={() => connect(true)}
+            onReconnect={() => connectOld(true)}
             isLoading={loading}
           />
         )}
@@ -131,19 +137,26 @@ export const Header: React.FC = () => {
                 </span>
               )}
 
-              {isConnected ? (
+              {/* Wallet Type Badge */}
+              {walletType && connected && (
+                <span className="text-xs font-semibold px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full hidden sm:inline capitalize">
+                  {walletType}
+                </span>
+              )}
+
+              {connected ? (
                 <div className="flex items-center gap-3">
                   {/* Base Badge */}
                   <BaseNativeBadge />
                   <Link
-                    to={`/profile/${user.address}`}
+                    to={`/profile/${user?.address || account}`}
                     className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold hover:shadow-lg transition-shadow"
-                    title={user.address || ''}
+                    title={(user?.address || account) || ''}
                   >
-                    {user.address?.substring(0, 2).toUpperCase()}
+                    {(user?.address || account)?.substring(0, 2).toUpperCase()}
                   </Link>
                   <button
-                    onClick={() => disconnect()}
+                    onClick={handleDisconnect}
                     className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                   >
                     Disconnect
@@ -151,7 +164,7 @@ export const Header: React.FC = () => {
                 </div>
               ) : (
                 <button
-                  onClick={() => connect(true)}
+                  onClick={handleConnect}
                   disabled={loading}
                   className={`px-4 py-2 text-white rounded-lg font-medium hover:shadow-lg disabled:opacity-50 transition-all ${
                     isCoinbase
@@ -159,7 +172,7 @@ export const Header: React.FC = () => {
                       : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600'
                   }`}
                 >
-                  {loading ? 'Connecting...' : isCoinbase ? '💳 Connect' : 'Connect Wallet'}
+                  {loading ? 'Connecting...' : '🔗 Connect Wallet'}
                 </button>
               )}
               {error && <div className="text-xs text-red-600 dark:text-red-400">{error}</div>}
