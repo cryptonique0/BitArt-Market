@@ -7,10 +7,7 @@ interface WalletSelectionModalProps {
   onClose: () => void;
 }
 
-export const WalletSelectionModal: React.FC<WalletSelectionModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
+export const WalletSelectionModal: React.FC<WalletSelectionModalProps> = ({ isOpen, onClose }) => {
   const { availableWallets, connectWallet, isConnecting, error } = useWallet();
   const [selectedWallet, setSelectedWallet] = useState<WalletType | null>(null);
 
@@ -40,23 +37,16 @@ export const WalletSelectionModal: React.FC<WalletSelectionModalProps> = ({
     >
       <div
         className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Connect Wallet
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Connect Wallet</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -76,7 +66,7 @@ export const WalletSelectionModal: React.FC<WalletSelectionModalProps> = ({
 
         {/* Wallet List */}
         <div className="space-y-3">
-          {availableWallets.map((wallet) => (
+          {availableWallets.map(wallet => (
             <button
               key={wallet.type}
               onClick={() => handleWalletSelect(wallet.type, wallet)}
@@ -99,9 +89,7 @@ export const WalletSelectionModal: React.FC<WalletSelectionModalProps> = ({
               <div className="flex items-center space-x-4">
                 <div className="text-4xl">{wallet.icon}</div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {wallet.name}
-                  </h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{wallet.name}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {wallet.isInstalled ? wallet.description : 'Not installed'}
                   </p>
