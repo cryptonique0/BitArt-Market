@@ -46,10 +46,7 @@ export const Header: React.FC = () => {
   return (
     <>
       {/* Wallet Selection Modal */}
-      <WalletSelectionModal 
-        isOpen={showWalletModal} 
-        onClose={() => setShowWalletModal(false)} 
-      />
+      <WalletSelectionModal isOpen={showWalletModal} onClose={() => setShowWalletModal(false)} />
 
       {/* Error Banners */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
@@ -151,7 +148,7 @@ export const Header: React.FC = () => {
                   <Link
                     to={`/profile/${user?.address || account}`}
                     className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold hover:shadow-lg transition-shadow"
-                    title={(user?.address || account) || ''}
+                    title={user?.address || account || ''}
                   >
                     {(user?.address || account)?.substring(0, 2).toUpperCase()}
                   </Link>
