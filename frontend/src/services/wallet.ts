@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { config } from '../config/env';
+import { WalletType } from '../types/wallet';
+import { walletConnector } from './multi-wallet-connector';
 
 declare global {
   interface Window {
@@ -62,7 +64,9 @@ class WalletService {
   onAccountChange(callback: (accounts: string[]) => void): () => void {
     this.accountChangeListeners.push(callback);
     return () => {
-      this.accountChangeListeners = this.accountChangeListeners.filter((l: (accounts: string[]) => void) => l !== callback);
+      this.accountChangeListeners = this.accountChangeListeners.filter(
+        (l: (accounts: string[]) => void) => l !== callback
+      );
     };
   }
 
@@ -101,9 +105,9 @@ class WalletService {
 
     try {
       const networkConfig = getNetworkConfig(isTestnet);
-      
+
       // Get current chain ID
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
+      const chainId = (await window.ethereum.request({ method: 'eth_chainId' })) as string;
       const isOnCorrectChain = parseInt(chainId, 16) === networkConfig.chainId;
 
       if (!isOnCorrectChain) {
@@ -127,12 +131,12 @@ class WalletService {
     try {
       const networkConfig = getNetworkConfig(isTestnet);
       const chainIdHex = `0x${networkConfig.chainId.toString(16)}`;
-      
+
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: chainIdHex }]
+        params: [{ chainId: chainIdHex }],
       });
-      
+
       this.setNetworkPreference(isTestnet ? 'testnet' : 'mainnet');
       return true;
     } catch (switchError: any) {
@@ -141,22 +145,24 @@ class WalletService {
         try {
           const networkConfig = getNetworkConfig(isTestnet);
           const chainIdHex = `0x${networkConfig.chainId.toString(16)}`;
-          
+
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: chainIdHex,
-              chainName: networkConfig.chainName,
-              rpcUrls: [networkConfig.rpcUrl],
-              nativeCurrency: {
-                name: networkConfig.currency,
-                symbol: networkConfig.currency,
-                decimals: 18
+            params: [
+              {
+                chainId: chainIdHex,
+                chainName: networkConfig.chainName,
+                rpcUrls: [networkConfig.rpcUrl],
+                nativeCurrency: {
+                  name: networkConfig.currency,
+                  symbol: networkConfig.currency,
+                  decimals: 18,
+                },
+                blockExplorerUrls: [networkConfig.explorer],
               },
-              blockExplorerUrls: [networkConfig.explorer]
-            }]
+            ],
           });
-          
+
           this.setNetworkPreference(isTestnet ? 'testnet' : 'mainnet');
           return true;
         } catch (addError) {
@@ -180,14 +186,14 @@ class WalletService {
     if (!window.ethereum) return null;
 
     try {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
+      const chainId = (await window.ethereum.request({ method: 'eth_chainId' })) as string;
       const parsedChainId = parseInt(chainId, 16);
-      
+
       // Check if it's Base testnet (84532) or mainnet (8453)
       if (parsedChainId === 84532 || parsedChainId === 8453) {
         return 'base';
       }
-      
+
       return null; // Not on Base
     } catch (error) {
       console.error('Failed to get current chain:', error);
@@ -207,7 +213,9 @@ class WalletService {
    */
   async connectBaseWallet(isTestnet: boolean = true): Promise<string | null> {
     if (!window.ethereum) {
-      throw new Error('No Ethereum-compatible wallet found. Please install MetaMask or a Base-compatible wallet.');
+      throw new Error(
+        'No Ethereum-compatible wallet found. Please install MetaMask or a Base-compatible wallet.'
+      );
     }
 
     // Auto-detect and switch to Base
@@ -250,13 +258,13 @@ class WalletService {
 
     const balance = await this.getBaseBalance(address);
     const isTestnet = this.getNetworkPreference() === 'testnet';
-    
+
     return {
       address,
       username: null,
       chain: 'base' as const,
       balance,
-      network: isTestnet ? 'testnet' : 'mainnet'
+      network: isTestnet ? 'testnet' : 'mainnet',
     };
   }
 
@@ -265,7 +273,9 @@ class WalletService {
    */
   async connectWallet(isTestnet: boolean = true) {
     const address = await this.connectBaseWallet(isTestnet);
-    return address ? { address, chain: 'base' as const, network: isTestnet ? 'testnet' : 'mainnet' } : null;
+    return address
+      ? { address, chain: 'base' as const, network: isTestnet ? 'testnet' : 'mainnet' }
+      : null;
   }
 
   /**
@@ -275,15 +285,19 @@ class WalletService {
     try {
       const isTestnet = this.getNetworkPreference() === 'testnet';
       const networkConfig = getNetworkConfig(isTestnet);
-      
-      const response = await axios.post(networkConfig.rpcUrl, {
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_getBalance',
-        params: [address, 'latest']
-      }, {
-        headers: { 'Content-Type': 'application/json' }
-      });
+
+      const response = await axios.post(
+        networkConfig.rpcUrl,
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
 
       const balanceHex = response.data?.result;
       if (!balanceHex) return null;
