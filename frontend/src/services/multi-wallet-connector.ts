@@ -114,10 +114,7 @@ class MultiWalletConnector {
   /**
    * Connect to a specific wallet
    */
-  async connect(
-    walletType: WalletType,
-    options: ConnectOptions = {}
-  ): Promise<WalletConnection> {
+  async connect(walletType: WalletType, options: ConnectOptions = {}): Promise<WalletConnection> {
     try {
       options.onConnecting?.();
 
@@ -221,7 +218,9 @@ class MultiWalletConnector {
   private async connectWalletConnect(options: ConnectOptions): Promise<WalletConnection> {
     try {
       // This will work once @walletconnect/ethereum-provider is installed
-      throw new Error('WalletConnect initialization requires @walletconnect/ethereum-provider package');
+      throw new Error(
+        'WalletConnect initialization requires @walletconnect/ethereum-provider package'
+      );
     } catch (error) {
       throw new Error('WalletConnect is not available');
     }
@@ -468,10 +467,7 @@ class MultiWalletConnector {
    * Check if Coinbase is installed
    */
   private isCoinbaseInstalled(): boolean {
-    return !!(
-      window.ethereum?.isCoinbaseWallet ||
-      window.coinbaseWalletExtension
-    );
+    return !!(window.ethereum?.isCoinbaseWallet || window.coinbaseWalletExtension);
   }
 
   /**
@@ -485,14 +481,14 @@ class MultiWalletConnector {
    * Check if Rainbow is installed
    */
   private isRainbowInstalled(): boolean {
-    return !!(window.ethereum?.isRainbow);
+    return !!window.ethereum?.isRainbow;
   }
 
   /**
    * Check if Brave Wallet is installed
    */
   private isBraveInstalled(): boolean {
-    return !!(window.ethereum?.isBraveWallet);
+    return !!window.ethereum?.isBraveWallet;
   }
 
   /**
