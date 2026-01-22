@@ -1,25 +1,20 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { ethers } from 'ethers';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getWindowEthereum = () => (window as any).ethereum;
-
-interface EthereumProvider {
-  request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-  on?: (event: string, callback: (...args: unknown[]) => void) => void;
-  off?: (event: string, callback: (...args: unknown[]) => void) => void;
-  isMetaMask?: boolean;
-}
+import { walletConnector } from '../services/multi-wallet-connector';
+import { WalletType, WalletInfo, WalletConnection } from '../types/wallet';
 
 interface WalletContextType {
   account: string | null;
   provider: ethers.BrowserProvider | null;
   signer: ethers.Signer | null;
   chainId: number | null;
+  walletType: WalletType | null;
   isConnecting: boolean;
   error: string | null;
-  connectWallet: () => Promise<void>;
+  availableWallets: WalletInfo[];
+  connectWallet: (walletType?: WalletType) => Promise<void>;
   disconnectWallet: () => void;
+  switchChain: (chainId: number) => Promise<void>;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
