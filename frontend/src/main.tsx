@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
+import { WagmiProvider } from 'wagmi';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css';
 import App from './App.tsx';
 import './index.css';
 import { analyticsService } from './services/google-analytics.service';
@@ -9,6 +12,7 @@ import { initMonitoring } from './services/monitoring';
 import { startPerfMetrics } from './services/perf';
 import { featureFlags } from './services/featureFlags';
 import { WalletProvider } from './context/WalletContext';
+import { rainbowkitConfig } from './config/rainbowkit';
 
 // Handle Ethereum provider conflicts safely
 if (typeof window !== 'undefined') {
@@ -41,11 +45,15 @@ startPerfMetrics();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <WalletProvider>
-          <App />
-        </WalletProvider>
-      </QueryClientProvider>
+      <WagmiProvider config={rainbowkitConfig}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider>
+            <WalletProvider>
+              <App />
+            </WalletProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </HelmetProvider>
   </React.StrictMode>
 );
