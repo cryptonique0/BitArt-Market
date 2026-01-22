@@ -7,7 +7,11 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { BaseNativeBadge } from './Badge';
 import { WalletDisconnectBanner, WalletErrorBanner } from './WalletErrors';
 import { WalletSelectionModal } from './WalletSelectionModal';
+import { RainbowKitConnectButton } from './RainbowKitConnectButton';
 import { isCoinbaseWallet } from '../services/coinbase';
+
+// Feature flag to toggle RainbowKit
+const USE_RAINBOWKIT = import.meta.env.VITE_USE_RAINBOWKIT === 'true' || false;
 
 export const Header: React.FC = () => {
   const {
