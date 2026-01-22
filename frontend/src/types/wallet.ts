@@ -24,7 +24,7 @@ export interface WalletInfo {
 }
 
 export interface WalletConnection {
-  provider: ethers.BrowserProvider | any;
+  provider: ethers.BrowserProvider | unknown;
   signer: ethers.Signer | null;
   account: string;
   chainId: number;
@@ -53,7 +53,7 @@ export interface ChainConfig {
 export interface WalletError {
   code: number;
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export interface ConnectOptions {
@@ -65,10 +65,10 @@ export interface ConnectOptions {
 
 export type WalletEventType = 'accountsChanged' | 'chainChanged' | 'disconnect' | 'connect';
 
-export type WalletEventHandler = (data?: any) => void;
+export type WalletEventHandler = (data?: unknown) => void;
 
 export interface WalletProvider {
-  request: (args: { method: string; params?: any[] }) => Promise<any>;
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
   on: (event: string, handler: WalletEventHandler) => void;
   off: (event: string, handler: WalletEventHandler) => void;
   removeListener?: (event: string, handler: WalletEventHandler) => void;
