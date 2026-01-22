@@ -1,29 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useWallet } from '../hooks/useWallet';
+import { useWallet as useWalletHook } from '../hooks/useWallet';
+import { useWallet } from '../context/WalletContext';
 import { EnhancedThemeToggle } from './EnhancedThemeToggle';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { BaseNativeBadge } from './Badge';
 import { WalletDisconnectBanner, WalletErrorBanner } from './WalletErrors';
+import { WalletSelectionModal } from './WalletSelectionModal';
 import { isCoinbaseWallet } from '../services/coinbase';
 
 export const Header: React.FC = () => {
   const {
     user,
-    connect,
-    disconnect,
+    connect: connectOld,
+    disconnect: disconnectOld,
     isConnected,
-    error,
+    error: oldError,
     loading,
     disconnectError,
     clearDisconnectError,
-  } = useWallet();
+  } = useWalletHook();
+
+  const { account, disconnectWallet, error: walletError, walletType } = useWallet();
+
   const [isCoinbase, setIsCoinbase] = useState(false);
+  const [showWalletModal, setShowWalletModal] = useState(false);
 
   // Detect Coinbase Wallet
   useEffect(() => {
     setIsCoinbase(isCoinbaseWallet());
   }, []);
+
+  const handleConnect = () => {
+    setShowWalletModal(true);
+  };
+
+  const handleDisconnect = async () => {
+    await disconnectWallet();
+    disconnectOld();
+  };
+
+  const error = oldError || walletError;
+  const connected = isConnected || !!account;
 
   return (
     <>
