@@ -7,7 +7,7 @@
 export * from './blockchain';
 export { default as blockchainUtils } from './blockchain';
 
-// Wagmi utilities  
+// Wagmi utilities
 export * from './wagmi';
 export { default as wagmiUtils } from './wagmi';
 
@@ -17,7 +17,7 @@ export {
   validateAddress,
   shortenAddress,
   addressesEqual,
-  
+
   // Formatting utilities
   formatEther,
   formatGwei,
@@ -25,22 +25,22 @@ export {
   parseEther,
   parseGwei,
   parseTokenAmount,
-  
+
   // BigNumber utilities
   compareBigNumbers,
   isZero,
   isPositive,
   isNegative,
-  
+
   // Gas utilities
   calculateGasCost,
   estimateGasCostUSD,
-  
+
   // Currency utilities
   formatUSD,
   formatNumber,
   formatCompactNumber,
-  
+
   // Validation utilities
   isValidNumber,
   hasSufficientBalance,
@@ -53,27 +53,27 @@ export {
   getAccountAddress,
   isWalletConnected,
   getConnectorName,
-  
+
   // Balance utilities
   getNativeBalance,
   getTokenBalance,
   getFormattedBalance,
-  
+
   // Network utilities
   getCurrentNetwork,
   getCurrentChainId,
   getCurrentChainName,
   isOnChain,
   switchToChain,
-  
+
   // Chain utilities
   getChainName,
   isTestnet,
-  
+
   // Explorer utilities
   getExplorerUrl,
   openInExplorer,
-  
+
   // Constants
   CHAIN_IDS,
   CHAIN_NAMES,
