@@ -31,12 +31,12 @@ All required packages are already installed:
 
 ```typescript
 // Import from central index
-import { 
-  formatEther, 
-  shortenAddress, 
+import {
+  formatEther,
+  shortenAddress,
   calculateGasCost,
   getCurrentChainId,
-  isWalletConnected 
+  isWalletConnected,
 } from '@/utils';
 
 // Or import from specific modules
@@ -49,6 +49,7 @@ import { getCurrentChainId, isWalletConnected } from '@/utils/wagmi';
 ### Address Utilities
 
 #### `validateAddress(address: string): boolean`
+
 Validates an Ethereum address using ethers.js
 
 ```typescript
@@ -60,6 +61,7 @@ if (validateAddress('0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb')) {
 ```
 
 #### `shortenAddress(address: string, chars?: number): string`
+
 Formats address to shortened version (default: 4 chars)
 
 ```typescript
@@ -73,6 +75,7 @@ const shorter = shortenAddress('0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb', 3);
 ```
 
 #### `addressesEqual(address1: string, address2: string): boolean`
+
 Compare two addresses (case-insensitive)
 
 ```typescript
@@ -86,6 +89,7 @@ if (addressesEqual(userAddress, contractAddress)) {
 ### Number Formatting
 
 #### `formatEther(wei: string | bigint, decimals?: number): string`
+
 Format Wei to ETH
 
 ```typescript
@@ -96,6 +100,7 @@ const ethDecimals = formatEther('1500000000000000000', 4); // "1.5000"
 ```
 
 #### `formatGwei(wei: string | bigint, decimals?: number): string`
+
 Format Wei to Gwei
 
 ```typescript
@@ -105,6 +110,7 @@ const gwei = formatGwei('30000000000'); // "30.0"
 ```
 
 #### `formatTokenAmount(amount: string | bigint, decimals: number, displayDecimals?: number): string`
+
 Format token amount with custom decimals
 
 ```typescript
@@ -120,6 +126,7 @@ const dai = formatTokenAmount('1000000000000000000', 18); // "1.0"
 ### Number Parsing
 
 #### `parseEther(ether: string): bigint`
+
 Parse ETH to Wei
 
 ```typescript
@@ -129,6 +136,7 @@ const wei = parseEther('1.5'); // 1500000000000000000n
 ```
 
 #### `parseTokenAmount(amount: string, decimals: number): bigint`
+
 Parse token amount to smallest unit
 
 ```typescript
@@ -140,6 +148,7 @@ const usdcAmount = parseTokenAmount('100', 6); // 100000000n
 ### BigNumber Operations
 
 #### `compareBigNumbers(a: BigNumber, b: BigNumber): number`
+
 Compare two BigNumbers (-1, 0, 1)
 
 ```typescript
@@ -155,6 +164,7 @@ if (compareBigNumbers(a, b) < 0) {
 ```
 
 #### `isZero(value: BigNumber): boolean`
+
 Check if BigNumber is zero
 
 ```typescript
@@ -169,6 +179,7 @@ if (isZero(BigNumber.from(0))) {
 ### BN.js Operations
 
 #### `addBN(a: BN, b: BN): BN`
+
 Add two BN.js numbers
 
 ```typescript
@@ -179,6 +190,7 @@ const sum = addBN(new BN('100'), new BN('200')); // BN(300)
 ```
 
 #### `multiplyBN(a: BN, b: BN): BN`
+
 Multiply two BN.js numbers
 
 ```typescript
@@ -191,6 +203,7 @@ const product = multiplyBN(new BN('5'), new BN('10')); // BN(50)
 ### Decimal.js Operations
 
 #### `calculatePercentage(value: string | number, percentage: number): string`
+
 Calculate percentage with high precision
 
 ```typescript
@@ -201,6 +214,7 @@ const royalty = calculatePercentage('1000', 2.5); // "25"
 ```
 
 #### `calculatePriceImpact(oldPrice: string | number, newPrice: string | number): string`
+
 Calculate price impact percentage
 
 ```typescript
@@ -212,6 +226,7 @@ const impact = calculatePriceImpact('100', '95'); // "5" (5% decrease)
 ### Gas Utilities
 
 #### `calculateGasCost(gasUsed: string | bigint, gasPrice: string | bigint): string`
+
 Calculate total gas cost in ETH
 
 ```typescript
@@ -221,6 +236,7 @@ const cost = calculateGasCost('21000', '30000000000'); // ETH cost
 ```
 
 #### `estimateGasCostUSD(gasCostEth: string, ethPrice: number): string`
+
 Convert gas cost to USD
 
 ```typescript
@@ -232,6 +248,7 @@ const usdCost = estimateGasCostUSD('0.0063', 2000); // "$12.60"
 ### Currency Formatting
 
 #### `formatUSD(amount: string | number, decimals?: number): string`
+
 Format amount as USD
 
 ```typescript
@@ -242,6 +259,7 @@ const precise = formatUSD(0.123456, 4); // "$0.1235"
 ```
 
 #### `formatCompactNumber(value: string | number): string`
+
 Format large numbers compactly (K, M, B)
 
 ```typescript
@@ -255,6 +273,7 @@ console.log(formatCompactNumber(2500000000)); // "2.5B"
 ### Validation
 
 #### `isValidNumber(value: string): boolean`
+
 Check if string is valid number
 
 ```typescript
@@ -266,6 +285,7 @@ if (isValidNumber(userInput)) {
 ```
 
 #### `hasSufficientBalance(balance: string, amount: string): boolean`
+
 Check if balance is sufficient
 
 ```typescript
@@ -279,6 +299,7 @@ if (!hasSufficientBalance(userBalance, purchaseAmount)) {
 ### Conversion
 
 #### `hexToDecimal(hex: string): string`
+
 Convert hex to decimal
 
 ```typescript
@@ -288,6 +309,7 @@ const decimal = hexToDecimal('0x1a'); // "26"
 ```
 
 #### `weiToToken(wei: string, decimals: number): string`
+
 Convert Wei to token amount
 
 ```typescript
@@ -301,6 +323,7 @@ const tokens = weiToToken('1000000', 6); // "1" (for USDC)
 ### Account Utilities
 
 #### `getCurrentAccount()`
+
 Get current connected account
 
 ```typescript
@@ -311,6 +334,7 @@ console.log(account.address, account.isConnected);
 ```
 
 #### `getAccountAddress(): Address | undefined`
+
 Get current account address
 
 ```typescript
@@ -323,6 +347,7 @@ if (address) {
 ```
 
 #### `isWalletConnected(): boolean`
+
 Check if wallet is connected
 
 ```typescript
@@ -337,6 +362,7 @@ if (!isWalletConnected()) {
 ### Balance Utilities
 
 #### `getNativeBalance(address: Address)`
+
 Get ETH balance
 
 ```typescript
@@ -347,6 +373,7 @@ console.log(balance.formatted, balance.symbol);
 ```
 
 #### `getTokenBalance(address: Address, tokenAddress: Address)`
+
 Get ERC20 token balance
 
 ```typescript
@@ -358,6 +385,7 @@ console.log(balance.formatted);
 ```
 
 #### `getFormattedBalance(address: Address, tokenAddress?: Address): Promise<string>`
+
 Get formatted balance string
 
 ```typescript
@@ -370,6 +398,7 @@ const usdcBalance = await getFormattedBalance(userAddress, USDC_ADDRESS);
 ### Network Utilities
 
 #### `getCurrentChainId(): number | undefined`
+
 Get current chain ID
 
 ```typescript
@@ -382,6 +411,7 @@ if (chainId === CHAIN_IDS.ETHEREUM) {
 ```
 
 #### `isOnChain(chainId: number): boolean`
+
 Check if on specific chain
 
 ```typescript
@@ -393,6 +423,7 @@ if (!isOnChain(CHAIN_IDS.BASE)) {
 ```
 
 #### `switchToChain(chainId: number): Promise<boolean>`
+
 Switch to specific chain
 
 ```typescript
@@ -405,12 +436,13 @@ if (success) {
 ```
 
 #### `onNetworkChange(callback)`
+
 Watch for network changes
 
 ```typescript
 import { onNetworkChange } from '@/utils';
 
-const unwatch = onNetworkChange((network) => {
+const unwatch = onNetworkChange(network => {
   console.log('Chain changed:', network.chain?.id);
 });
 
@@ -421,6 +453,7 @@ unwatch();
 ### Chain Utilities
 
 #### `getChainName(chainId: number): string`
+
 Get chain name by ID
 
 ```typescript
@@ -431,6 +464,7 @@ console.log(getChainName(8453)); // "Base"
 ```
 
 #### `isTestnet(chainId: number): boolean`
+
 Check if chain is testnet
 
 ```typescript
@@ -444,6 +478,7 @@ if (isTestnet(currentChainId)) {
 ### Explorer Utilities
 
 #### `getExplorerUrl(chainId: number, address: string, type?: 'address' | 'tx'): string`
+
 Get block explorer URL
 
 ```typescript
@@ -454,6 +489,7 @@ const url = getExplorerUrl(1, '0x...', 'address');
 ```
 
 #### `openInExplorer(chainId: number, address: string, type?: 'address' | 'tx'): void`
+
 Open address/transaction in block explorer
 
 ```typescript
@@ -468,17 +504,17 @@ openInExplorer(currentChainId, txHash, 'tx');
 import { CHAIN_IDS, CHAIN_NAMES } from '@/utils';
 
 // Chain IDs
-CHAIN_IDS.ETHEREUM      // 1
-CHAIN_IDS.SEPOLIA       // 11155111
-CHAIN_IDS.BASE          // 8453
-CHAIN_IDS.BASE_SEPOLIA  // 84532
-CHAIN_IDS.POLYGON       // 137
-CHAIN_IDS.ARBITRUM      // 42161
-CHAIN_IDS.OPTIMISM      // 10
+CHAIN_IDS.ETHEREUM; // 1
+CHAIN_IDS.SEPOLIA; // 11155111
+CHAIN_IDS.BASE; // 8453
+CHAIN_IDS.BASE_SEPOLIA; // 84532
+CHAIN_IDS.POLYGON; // 137
+CHAIN_IDS.ARBITRUM; // 42161
+CHAIN_IDS.OPTIMISM; // 10
 
 // Chain Names
-CHAIN_NAMES[1]          // "Ethereum"
-CHAIN_NAMES[8453]       // "Base"
+CHAIN_NAMES[1]; // "Ethereum"
+CHAIN_NAMES[8453]; // "Base"
 ```
 
 ## Complete Examples
@@ -495,7 +531,7 @@ import {
   hasSufficientBalance,
   calculateGasCost,
   formatUSD,
-  CHAIN_IDS
+  CHAIN_IDS,
 } from '@/utils';
 
 async function purchaseNFT(price: string) {
@@ -519,7 +555,7 @@ async function purchaseNFT(price: string) {
   // Check balance
   const balance = await getNativeBalance(userAddress);
   const balanceEth = formatEther(balance.value.toString());
-  
+
   if (!hasSufficientBalance(balanceEth, price)) {
     alert('Insufficient balance');
     return;
@@ -528,9 +564,9 @@ async function purchaseNFT(price: string) {
   // Estimate gas
   const gasCost = calculateGasCost('150000', '1000000000');
   const totalCost = (parseFloat(price) + parseFloat(gasCost)).toFixed(4);
-  
+
   console.log(`Total cost: ${formatUSD(totalCost)}`);
-  
+
   // Proceed with purchase...
 }
 ```
@@ -667,6 +703,7 @@ When adding new utilities:
 ## Support
 
 For issues or questions:
+
 - Check this documentation
 - Review example usage
 - Check function JSDoc comments in source files
