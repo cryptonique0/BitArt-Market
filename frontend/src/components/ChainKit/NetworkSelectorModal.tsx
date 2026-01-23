@@ -169,7 +169,13 @@ export const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({
         {/* Footer Recommendation */}
         {optimization?.recommendedChain && (
           <div className="border-t border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/20 p-4">
-            <p className="text-sm text-green-800 dark:text-green-300">✨{optimization.reasoning}</p>
+            <p className="text-sm text-green-800 dark:text-green-300">
+              ✨ Recommended: {optimization.recommendedChain.chainName} ($
+              {optimization.recommendedChain.txCost[
+                operationType as keyof typeof optimization.recommendedChain.txCost
+              ].toFixed(4)}
+              )
+            </p>
           </div>
         )}
       </div>
