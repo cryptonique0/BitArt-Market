@@ -89,10 +89,10 @@ export const Header: React.FC = () => {
                 Discover
               </Link>
               <Link
-                to="/base"
+                to="/networks"
                 className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
-                Base
+                Networks
               </Link>
               <Link
                 to="/create"
