@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { RainbowKitConnectButton } from '../RainbowKitConnectButton';
 import { wagmiUtils, getExplorerUrl, getChainName } from '../../utils';
 import { shortenAddress, formatEther } from '../../utils/blockchain';
@@ -59,7 +59,8 @@ export default function ChainKitPanel({
 
         if (tokenAddress) {
           const token = await wagmiUtils.getTokenBalance(address as `0x${string}`, tokenAddress);
-          setTokenBalance(token.formatted);
+          const formattedToken = (token as { formatted?: string }).formatted ?? '0';
+          setTokenBalance(formattedToken);
         } else {
           setTokenBalance('—');
         }
