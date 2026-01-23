@@ -88,8 +88,7 @@ export async function estimateBridgeRoute(
   fromChain: number,
   toChain: number,
   tokenAddress: string,
-  amount: string,
-  selectedBridge?: string
+  amount: string
 ): Promise<BridgeRoute> {
   try {
     // In production, integrate with:
@@ -123,7 +122,7 @@ export async function estimateBridgeRoute(
     });
 
     // Sort by fee (best first)
-    routes.sort((a, b) => parseFloat(a.fee) - parseFloat(b.fee));
+    routes.sort((a, b) => (a.fee as number) - (b.fee as number));
 
     return {
       fromChain,
@@ -152,13 +151,13 @@ export async function getBridgeTxData(
 
     switch (route.id) {
       case 'across':
-        return getAcrossTxData(route, userAddress);
+        return getAcrossTxData(route);
       case 'stargate':
-        return getStargateTxData(route, userAddress);
+        return getStargateTxData(route);
       case 'celer':
-        return getCelerTxData(route, userAddress);
+        return getCelerTxData(route);
       case 'connext':
-        return getConnextTxData(route, userAddress);
+        return getConnextTxData(route);
       default:
         throw new Error(`Unknown bridge: ${route.id}`);
     }
@@ -169,11 +168,8 @@ export async function getBridgeTxData(
 }
 
 // Helper functions for each bridge protocol
-function getAcrossTxData(
-  route: BridgeOption,
-  userAddress: string
-): { to: string; data: string; value: string } {
-  // Mock implementation - integrate actual Across SDK
+function getAcrossTxData(route: BridgeOption): { to: string; data: string; value: string } {
+  void route;
   return {
     to: '0x5c7BCd6E7De5423a257D81b442095A1a6ced35C5', // Across SpokePool Base
     data: '0x',
