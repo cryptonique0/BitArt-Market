@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { getNetworkStats, NetworkStats, formatGasPrice } from '../../services/networkStats';
-import { findOptimalChain } from '../../services/gasOptimizer';
-import { getChainName } from '../../utils';
+import { useEffect, useState } from 'react';
+import {
+  getNetworkStats,
+  type NetworkStats,
+  formatGasPrice,
+  findOptimalChain,
+} from '../../services/networkStats';
 
 interface NetworkSelectorModalProps {
   isOpen: boolean;
@@ -21,8 +24,10 @@ export const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({
   operationType = 'nft',
 }) => {
   const [networks, setNetworks] = useState<NetworkStats[]>([]);
-  const [optimization, setOptimization] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [optimization, setOptimization] = useState<{
+    recommendedChain: NetworkStats | null;
+  } | null>(null);
   const [sortBy, setSortBy] = useState<'cost' | 'speed' | 'name'>('cost');
 
   useEffect(() => {
