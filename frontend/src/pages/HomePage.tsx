@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ActivityFeed } from '../components/ActivityFeed';
 import { useThemeStore } from '../store';
@@ -509,6 +510,57 @@ export const HomePage: React.FC = () => {
                   </p>
                   <p className="text-gray-600 dark:text-gray-400 mt-2">Total Sales</p>
                 </div>
+              </div>
+
+              {/* Base Network Promo Card */}
+              <div className="mt-10">
+                <Link
+                  to="/base"
+                  className="block p-6 rounded-2xl border-2 border-blue-500/30 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-xl transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+                        <span className="text-2xl">⚡</span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          Base Network Hub
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Manage your Base wallet, balances & more
+                        </p>
+                      </div>
+                    </div>
+                    <svg
+                      className="w-6 h-6 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Network</p>
+                      <p className="font-semibold text-blue-600 dark:text-blue-400">Base</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Wallet</p>
+                      <p className="font-semibold text-green-600 dark:text-green-400">Connected</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
+                      <p className="font-semibold text-purple-600 dark:text-purple-400">Active</p>
+                    </div>
+                  </div>
+                </Link>
               </div>
 
               {/* Base Network Status */}
