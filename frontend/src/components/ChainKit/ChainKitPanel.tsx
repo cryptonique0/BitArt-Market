@@ -102,224 +102,236 @@ export default function ChainKitPanel({
   return (
     <div className="group relative rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6 space-y-5 bg-white dark:bg-gray-800/90 shadow-xl hover:shadow-2xl transition-all duration-500 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 backdrop-blur-sm overflow-hidden">
       {/* Animated gradient overlay */}
-      <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 dark:group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br ${accentGradient} pointer-events-none`}></div>
-      
+      <div
+        className={`absolute inset-0 opacity-0 group-hover:opacity-5 dark:group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br ${accentGradient} pointer-events-none`}
+      ></div>
+
       {/* Content - relative positioning for layering */}
       <div className="relative z-10">
-      {/* Header */}
-      <div className="mb-5">
-        <div className="flex items-center gap-2 mb-2">
-          <span
-            className={`inline-flex items-center px-3 py-1.5 text-xs font-black rounded-lg text-white bg-gradient-to-r ${accentGradient} shadow-md transform transition-transform group-hover:scale-105`}
-          >
-            {badgeText}
-          </span>
-          {isOnTarget && (
-            <span className="relative inline-flex items-center px-2.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg border border-emerald-300 dark:border-emerald-700">
-              <span className="flex h-2 w-2 mr-1.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              Connected
+        {/* Header */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              className={`inline-flex items-center px-3 py-1.5 text-xs font-black rounded-lg text-white bg-gradient-to-r ${accentGradient} shadow-md transform transition-transform group-hover:scale-105`}
+            >
+              {badgeText}
             </span>
-          )}
-        </div>
-        <h3 className="text-xl font-black text-gray-900 dark:text-white mb-1.5 group-hover:text-gray-700 dark:group-hover:text-gray-100 transition-colors">{chainName}</h3>
-        {description && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
-            {description}
-          </p>
-        )}
-      </div>
-
-      {/* Connection & Switch Section */}
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex-shrink-0">
-          <RainbowKitConnectButton />
-        </div>
-        {!isOnTarget && address && (
-          <button
-            onClick={handleSwitch}
-            disabled={isSwitching}
-            className={`flex-1 inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white text-sm font-bold bg-gradient-to-r ${accentGradient} hover:opacity-90 disabled:opacity-60 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 disabled:transform-none`}
-          >
-            {isSwitching ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Switching...
-              </>
-            ) : (
-              `Switch to ${chainName}`
+            {isOnTarget && (
+              <span className="relative inline-flex items-center px-2.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg border border-emerald-300 dark:border-emerald-700">
+                <span className="flex h-2 w-2 mr-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                Connected
+              </span>
             )}
-          </button>
-        )}
-      </div>
-
-      {/* Network & Address Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-3 border border-gray-200 dark:border-gray-600">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Network</p>
-          <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">
-            {isOnTarget
-              ? `${chainName}`
-              : currentChainId
-                ? `${getChainName(currentChainId)}`
-                : 'Not connected'}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {isOnTarget ? `Chain ${chainId}` : currentChainId ? `Chain ${currentChainId}` : '—'}
-          </p>
-          {!isOnTarget && address && (
-            <p className="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Switch network to view balances
+          </div>
+          <h3 className="text-xl font-black text-gray-900 dark:text-white mb-1.5 group-hover:text-gray-700 dark:group-hover:text-gray-100 transition-colors">
+            {chainName}
+          </h3>
+          {description && (
+            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+              {description}
             </p>
           )}
         </div>
 
-        <div className="rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-3 border border-gray-200 dark:border-gray-600">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Address</p>
-          <div className="flex items-center justify-between gap-2">
+        {/* Connection & Switch Section */}
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div className="flex-shrink-0">
+            <RainbowKitConnectButton />
+          </div>
+          {!isOnTarget && address && (
+            <button
+              onClick={handleSwitch}
+              disabled={isSwitching}
+              className={`flex-1 inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white text-sm font-bold bg-gradient-to-r ${accentGradient} hover:opacity-90 disabled:opacity-60 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 disabled:transform-none`}
+            >
+              {isSwitching ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Switching...
+                </>
+              ) : (
+                `Switch to ${chainName}`
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Network & Address Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-3 border border-gray-200 dark:border-gray-600">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Network</p>
             <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">
-              {address ? shortenAddress(address) : '—'}
+              {isOnTarget
+                ? `${chainName}`
+                : currentChainId
+                  ? `${getChainName(currentChainId)}`
+                  : 'Not connected'}
             </p>
-            <div className="flex items-center gap-1">
-              {address && (
-                <button
-                  onClick={handleCopyAddress}
-                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1"
-                  title="Copy address"
-                >
-                  {copied ? (
-                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {isOnTarget ? `Chain ${chainId}` : currentChainId ? `Chain ${currentChainId}` : '—'}
+            </p>
+            {!isOnTarget && address && (
+              <p className="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Switch network to view balances
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-3 border border-gray-200 dark:border-gray-600">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Address</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                {address ? shortenAddress(address) : '—'}
+              </p>
+              <div className="flex items-center gap-1">
+                {address && (
+                  <button
+                    onClick={handleCopyAddress}
+                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1"
+                    title="Copy address"
+                  >
+                    {copied ? (
+                      <svg
+                        className="w-4 h-4 text-green-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                )}
+                {address && currentChainId && (
+                  <a
+                    href={getExplorerUrl(currentChainId, address, 'address')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium flex items-center gap-1 hover:underline"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                       />
                     </svg>
-                  )}
-                </button>
-              )}
-              {address && currentChainId && (
-                <a
-                  href={getExplorerUrl(currentChainId, address, 'address')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium flex items-center gap-1 hover:underline"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                  Explorer
-                </a>
-              )}
+                    Explorer
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Balances & Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="rounded-lg bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-3 border border-blue-200 dark:border-blue-800">
-          <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1 flex items-center gap-1">
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Native Balance
-          </p>
-          <p className="font-bold text-lg text-gray-900 dark:text-white truncate">
-            {isOnTarget ? nativeBalance : '—'}
-          </p>
-        </div>
-
-        <div className="rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-3 border border-purple-200 dark:border-purple-800">
-          <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1 flex items-center gap-1">
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {tokenDisplayLabel}
-          </p>
-          <p className="font-bold text-lg text-gray-900 dark:text-white truncate">
-            {isOnTarget ? tokenBalance : '—'}
-          </p>
-        </div>
-
-        <div className="rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 border border-green-200 dark:border-green-800">
-          <p className="text-xs font-medium text-green-700 dark:text-green-300 mb-1">
-            Onramp / Bridge
-          </p>
-          {buyUrl ? (
-            <a
-              href={buyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center w-full px-3 py-1.5 rounded-md bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-sm hover:shadow-md"
-            >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Balances & Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="rounded-lg bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-3 border border-blue-200 dark:border-blue-800">
+            <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+                  clipRule="evenodd"
                 />
               </svg>
-              Open
-            </a>
-          ) : (
-            <p className="font-medium text-gray-400">—</p>
-          )}
+              Native Balance
+            </p>
+            <p className="font-bold text-lg text-gray-900 dark:text-white truncate">
+              {isOnTarget ? nativeBalance : '—'}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-3 border border-purple-200 dark:border-purple-800">
+            <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {tokenDisplayLabel}
+            </p>
+            <p className="font-bold text-lg text-gray-900 dark:text-white truncate">
+              {isOnTarget ? tokenBalance : '—'}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 border border-green-200 dark:border-green-800">
+            <p className="text-xs font-medium text-green-700 dark:text-green-300 mb-1">
+              Onramp / Bridge
+            </p>
+            {buyUrl ? (
+              <a
+                href={buyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-full px-3 py-1.5 rounded-md bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-sm hover:shadow-md"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  />
+                </svg>
+                Open
+              </a>
+            ) : (
+              <p className="font-medium text-gray-400">—</p>
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
-}
 }
