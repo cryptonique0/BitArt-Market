@@ -72,6 +72,7 @@ function AppContent() {
           <Route path="/nft-display" element={<NFTDisplayShowcase />} />
           <Route path="/gamification" element={<GamificationDashboard />} />
           <Route path="/base" element={<BasePage />} />
+          <Route path="/networks" element={<BasePage />} />
           <Route path="/mint" element={<MintNFT />} />
           <Route path="/auctions" element={<AuctionSystem />} />
           <Route path="/transactions" element={<TransactionTracker />} />
