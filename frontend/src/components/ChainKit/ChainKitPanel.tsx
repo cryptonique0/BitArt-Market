@@ -318,6 +318,8 @@ export default function ChainKitPanel({
           )}
         </div>
       </div>
+      </div>
     </div>
   );
+}
 }
