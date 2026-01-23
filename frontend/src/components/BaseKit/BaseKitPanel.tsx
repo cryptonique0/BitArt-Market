@@ -41,7 +41,8 @@ export default function BaseKitPanel({ tokenAddress }: BaseKitPanelProps) {
 
         if (tokenAddress) {
           const token = await wagmiUtils.getTokenBalance(address as `0x${string}`, tokenAddress);
-          setTokenBalance(token.formatted);
+          const formattedToken = (token as { formatted?: string }).formatted ?? '0';
+          setTokenBalance(formattedToken);
         }
       } catch (err) {
         console.error('Error loading balances', err);
