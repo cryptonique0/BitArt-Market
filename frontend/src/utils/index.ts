@@ -59,7 +59,6 @@ export {
   getFormattedBalance,
 
   // Network utilities
-  getCurrentNetwork,
   getCurrentChainId,
   getCurrentChainName,
   isOnChain,
