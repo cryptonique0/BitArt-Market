@@ -136,23 +136,32 @@ export default function NetworksPage() {
               </button>
 
               {/* Network Count Badge */}
-              <span className="inline-flex items-center px-3 py-1.5 text-xs font-semibold bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-800 dark:text-indigo-200 rounded-full border border-indigo-200 dark:border-indigo-800">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+              <div className="relative inline-flex items-center px-4 py-2 text-sm font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl shadow-lg shadow-indigo-500/30">
+                <span className="relative flex h-3 w-3 mr-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                </span>
                 {activeKits.length} {showTestnets ? 'Testnets' : 'Networks'}
-              </span>
+              </div>
             </div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl">
+          <p className="text-base text-gray-600 dark:text-gray-300 max-w-3xl leading-relaxed">
             {showTestnets
-              ? 'Development and testing environments with free test tokens from faucets.'
-              : 'Connect, switch, and manage your assets across multiple EVM-compatible networks with real-time balances and one-click chain switching.'}
+              ? '🧪 Development and testing environments with free test tokens from faucets.'
+              : '⚡ Connect, switch, and manage your assets across multiple EVM-compatible networks with real-time balances and one-click chain switching.'}
           </p>
         </div>
 
         {/* Toolkits Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {activeKits.map(kit => (
-            <ChainKitPanel key={kit.chainId} {...kit} />
+          {activeKits.map((kit, index) => (
+            <div
+              key={kit.chainId}
+              className="transform transition-all duration-500"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <ChainKitPanel {...kit} />
+            </div>
           ))}
         </div>
 
