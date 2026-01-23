@@ -143,7 +143,7 @@ export async function estimateBridgeRoute(
  */
 export async function getBridgeTxData(
   route: BridgeOption,
-  userAddress: string
+  _userAddress: string
 ): Promise<{ to: string; data: string; value: string }> {
   try {
     // In production, this would use the respective bridge SDK
@@ -177,11 +177,8 @@ function getAcrossTxData(route: BridgeOption): { to: string; data: string; value
   };
 }
 
-function getStargateTxData(
-  route: BridgeOption,
-  userAddress: string
-): { to: string; data: string; value: string } {
-  // Mock implementation - integrate actual Stargate SDK
+function getStargateTxData(route: BridgeOption): { to: string; data: string; value: string } {
+  void route;
   return {
     to: '0x352d8275aae3109751518150335d0e7456603344', // Stargate Router
     data: '0x',
@@ -189,10 +186,8 @@ function getStargateTxData(
   };
 }
 
-function getCelerTxData(
-  route: BridgeOption,
-  userAddress: string
-): { to: string; data: string; value: string } {
+function getCelerTxData(route: BridgeOption): { to: string; data: string; value: string } {
+  void route;
   // Mock implementation - integrate actual Celer SDK
   return {
     to: '0xc77e9b50f549d40cac1000a8e690024949ff5e9e', // Celer cBridge
@@ -201,10 +196,8 @@ function getCelerTxData(
   };
 }
 
-function getConnextTxData(
-  route: BridgeOption,
-  userAddress: string
-): { to: string; data: string; value: string } {
+function getConnextTxData(route: BridgeOption): { to: string; data: string; value: string } {
+  void route;
   // Mock implementation - integrate actual Connext SDK
   return {
     to: '0xadbd1dac0900c4e11cc4b42b3e3fa18e3fec6b6b', // Connext Executor
@@ -217,10 +210,10 @@ function getConnextTxData(
  * Track bridge status
  */
 export async function getBridgeStatus(
-  bridgeId: string,
+  _bridgeId: string,
   txHash: string,
-  fromChain: number,
-  toChain: number
+  _fromChain: number,
+  _toChain: number
 ): Promise<{
   status: 'pending' | 'confirmed' | 'completed' | 'failed';
   progress: number;
@@ -230,6 +223,9 @@ export async function getBridgeStatus(
 }> {
   try {
     // In production, query bridge explorer or status API
+    void _bridgeId;
+    void _fromChain;
+    void _toChain;
     return {
       status: 'pending',
       progress: 25,
@@ -255,7 +251,8 @@ export function formatBridgeRoute(route: BridgeOption): {
 } {
   const bridge = Object.values(BRIDGE_CONFIGS).find(b => b.id === route.id);
   const timeStr = `${route.estimatedTime} min`;
-  const feeStr = `$${parseFloat(route.fee).toFixed(4)}`;
+  const feeNum = typeof route.fee === 'number' ? route.fee : parseFloat(String(route.fee));
+  const feeStr = `$${feeNum.toFixed(4)}`;
   const feePercStr = `${route.feePercentage.toFixed(2)}%`;
 
   return {
@@ -270,9 +267,10 @@ export function formatBridgeRoute(route: BridgeOption): {
 /**
  * Check if bridge is currently operational
  */
-export async function isBridgeOperational(bridgeId: string): Promise<boolean> {
+export async function isBridgeOperational(_bridgeId: string): Promise<boolean> {
   try {
     // In production, check status page or health endpoint
+    void _bridgeId;
     return true;
   } catch {
     return false;
