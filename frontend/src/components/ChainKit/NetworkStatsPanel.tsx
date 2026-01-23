@@ -1,20 +1,21 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   getNetworkStats,
-  NetworkStats,
+  type NetworkStats,
   findCheapestChain,
   getChainRecommendation,
   formatGasPrice,
 } from '../../services/networkStats';
-import { CHAIN_IDS } from '../../utils/rainbowkit';
 
 export const NetworkStatsPanel: React.FC<{ chainId?: number }> = ({ chainId }) => {
   const [allStats, setAllStats] = useState<NetworkStats[]>([]);
   const [currentStats, setCurrentStats] = useState<NetworkStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedMetric, setSelectedMetric] = useState<'gas' | 'cost' | 'tvl'>('gas');
 
-  const chainIds = useMemo(() => Object.values(CHAIN_IDS), []);
+  const chainIds = useMemo(
+    () => [1, 8453, 10, 42161, 137, 56, 43114, 11155111, 84532] as const,
+    []
+  );
 
   useEffect(() => {
     const loadStats = async () => {
