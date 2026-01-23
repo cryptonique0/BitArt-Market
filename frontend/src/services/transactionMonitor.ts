@@ -153,7 +153,7 @@ export async function waitForTransactionConfirmation(
 ): Promise<Transaction> {
   const startTime = Date.now();
 
-  return new Promise(async (resolve, reject) => {
+  return new Promise<Transaction>((resolve, reject) => {
     const checkTx = async () => {
       const tx = await getTransactionStatus(chainId, txHash);
 
@@ -195,6 +195,7 @@ export function calculateTransactionMetrics(transactions: Transaction[]): {
 } {
   const successful = transactions.filter(tx => tx.status === 'confirmed');
   const failed = transactions.filter(tx => tx.status === 'failed');
+  void failed; // Keep reference for potential future use
 
   const totalValue = transactions.reduce((sum, tx) => sum + parseFloat(tx.value), 0);
   const totalGasSpent = transactions.reduce((sum, tx) => sum + parseFloat(tx.gasPaid || '0'), 0);
