@@ -3,7 +3,7 @@
  * Demonstrates all components and services
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import {
   NetworkStatsPanel,
@@ -12,7 +12,6 @@ import {
   TransactionMonitor,
   NetworkSelectorModal,
 } from '../components/ChainKit';
-import { CHAIN_IDS } from '../utils/rainbowkit';
 
 export default function MultiChainDashboardExample() {
   const { address } = useAccount();
@@ -60,14 +59,15 @@ export default function MultiChainDashboardExample() {
     },
   ]);
 
-  const supportedChainIds = Object.values(CHAIN_IDS);
+  const supportedChainIds = [1, 8453, 10, 42161, 137, 56, 43114, 11155111, 84532];
 
-  const tabs = [
+  type TabId = 'overview' | 'bridge' | 'monitor' | 'stats';
+  const tabs: Array<{ id: TabId; label: string; icon: string }> = [
     { id: 'overview', label: '📊 Overview', icon: '📊' },
     { id: 'bridge', label: '🌉 Bridge', icon: '🌉' },
     { id: 'monitor', label: '📜 Transactions', icon: '📜' },
     { id: 'stats', label: '⚙️ Network Stats', icon: '⚙️' },
-  ] as const;
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-indigo-900/10 dark:to-gray-900 p-6">
@@ -94,7 +94,7 @@ export default function MultiChainDashboardExample() {
         {tabs.map(tab => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-semibold transition transform ${
               activeTab === tab.id
                 ? 'bg-indigo-600 text-white shadow-lg scale-105'
@@ -169,9 +169,9 @@ export default function MultiChainDashboardExample() {
                 {/* Chain Selection */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <p className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                       From Chain
-                    </label>
+                    </p>
                     <button
                       onClick={() => setShowNetworkSelector(true)}
                       className="w-full p-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition"
@@ -201,9 +201,9 @@ export default function MultiChainDashboardExample() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <p className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                       To Chain
-                    </label>
+                    </p>
                     <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold text-gray-900 dark:text-white">
                       {selectedToChain === 1
                         ? 'Ethereum'
@@ -223,7 +223,7 @@ export default function MultiChainDashboardExample() {
                     toChainId={selectedToChain}
                     tokenAddress="0x0000000000000000000000000000000000000000"
                     amount="1"
-                    onBridgeSelected={route => console.log('Selected bridge:', route)}
+                    onBridgeSelected={() => {}}
                   />
                 </div>
               </div>
@@ -243,7 +243,11 @@ export default function MultiChainDashboardExample() {
                 Connect your wallet to view transactions
               </div>
             ) : (
-              <TransactionMonitor userAddress={address} chainIds={supportedChainIds} limit={20} />
+              <TransactionMonitor
+                userAddress={address}
+                chainIds={supportedChainIds as number[]}
+                limit={20}
+              />
             )}
           </div>
         )}
