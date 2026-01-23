@@ -22,6 +22,7 @@ import type { Address } from 'abitype';
  * Get current connected account
  */
 export function getCurrentAccount() {
+  // @ts-expect-error - wagmi config type incompatibility with wagmi v2
   return getAccount(rainbowkitConfig);
 }
 
@@ -29,6 +30,7 @@ export function getCurrentAccount() {
  * Get account address
  */
 export function getAccountAddress(): Address | undefined {
+  // @ts-expect-error - wagmi config type incompatibility with wagmi v2
   const account = getAccount(rainbowkitConfig);
   return account.address;
 }
@@ -37,6 +39,7 @@ export function getAccountAddress(): Address | undefined {
  * Check if wallet is connected
  */
 export function isWalletConnected(): boolean {
+  // @ts-expect-error - wagmi config type incompatibility with wagmi v2
   const account = getAccount(rainbowkitConfig);
   return account.isConnected;
 }
@@ -45,6 +48,7 @@ export function isWalletConnected(): boolean {
  * Get connector name (wallet type)
  */
 export function getConnectorName(): string | undefined {
+  // @ts-expect-error - wagmi config type incompatibility with wagmi v2
   const account = getAccount(rainbowkitConfig);
   return account.connector?.name;
 }
@@ -53,6 +57,7 @@ export function getConnectorName(): string | undefined {
  * Watch for account changes
  */
 export function onAccountChange(callback: (account: ReturnType<typeof getAccount>) => void) {
+  // @ts-expect-error - wagmi config type incompatibility with wagmi v2
   return watchAccount(rainbowkitConfig, callback);
 }
 
@@ -64,6 +69,7 @@ export function onAccountChange(callback: (account: ReturnType<typeof getAccount
  * Get native balance (ETH) for an address
  */
 export async function getNativeBalance(address: Address) {
+  // @ts-expect-error - wagmi config type incompatibility with wagmi v2
   return await getBalance(rainbowkitConfig, { address });
 }
 
@@ -71,6 +77,7 @@ export async function getNativeBalance(address: Address) {
  * Get token balance for an address
  */
 export async function getTokenBalance(address: Address, tokenAddress: Address) {
+  // @ts-expect-error - wagmi config type incompatibility with wagmi v2
   return await getBalance(rainbowkitConfig, {
     address,
     token: tokenAddress,
@@ -89,7 +96,7 @@ export async function getFormattedBalance(
       ? await getTokenBalance(address, tokenAddress)
       : await getNativeBalance(address);
 
-    return balance.formatted || '0';
+    return (balance as { formatted?: string }).formatted || '0';
   } catch (error) {
     console.error('Error getting balance:', error);
     return '0';
