@@ -36,7 +36,7 @@ const priceCache: Map<string, { price: PriceFeed; timestamp: number }> = new Map
 const CACHE_TTL = 60 * 1000; // 1 minute
 
 // Standard token addresses across chains
-const TOKEN_ADDRESSES: Record<string, Record<number, string>> = {
+const TOKEN_ADDRESSES_REF: Record<string, Record<number, string>> = {
   ETH: {
     1: '0x0000000000000000000000000000000000000000',
     8453: '0x0000000000000000000000000000000000000000',
