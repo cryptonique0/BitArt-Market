@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  getNetworkStats,
-  type NetworkStats,
-  formatGasPrice,
-  findOptimalChain,
-} from '../../services/networkStats';
+import { getNetworkStats, type NetworkStats, formatGasPrice } from '../../services/networkStats';
 
 interface NetworkSelectorModalProps {
   isOpen: boolean;
@@ -42,8 +37,15 @@ export const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({
 
         setNetworks(stats);
 
-        const opt = await findOptimalChain(operationType, availableChainIds);
-        setOptimization(opt);
+        // Find cheapest chain for the operation type
+        const cheapestChain =
+          stats.reduce((prev, current) => {
+            const prevCost = prev.txCost[operationType as keyof typeof prev.txCost];
+            const currCost = current.txCost[operationType as keyof typeof current.txCost];
+            return currCost < prevCost ? current : prev;
+          }) || null;
+
+        setOptimization({ recommendedChain: cheapestChain });
       } catch (error) {
         console.error('Failed to load network data:', error);
       } finally {
