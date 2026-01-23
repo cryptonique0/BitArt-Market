@@ -93,16 +93,24 @@ export default function NetworksPage() {
   const activeKits = showTestnets ? TESTNET_KITS : MAINNET_KITS;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-950 dark:via-slate-900 dark:to-indigo-950">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Animated Background Gradient */}
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-200/20 via-purple-200/20 to-pink-200/20 dark:from-indigo-900/10 dark:via-purple-900/10 dark:to-pink-900/10 blur-3xl"></div>
+        </div>
+
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                Multi-chain EVM
-              </p>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"></div>
+                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest">
+                  Multi-chain EVM
+                </p>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Network Toolkits
               </h1>
             </div>
@@ -110,10 +118,10 @@ export default function NetworksPage() {
               {/* Testnet Toggle */}
               <button
                 onClick={() => setShowTestnets(!showTestnets)}
-                className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                className={`group inline-flex items-center px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                   showTestnets
-                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 text-white shadow-lg shadow-orange-500/50 dark:shadow-orange-500/30'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md'
                 }`}
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
