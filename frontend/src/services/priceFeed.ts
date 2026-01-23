@@ -57,6 +57,7 @@ const _TOKEN_ADDRESSES_REF: Record<string, Record<number, string>> = {
     42161: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
   },
 };
+void _TOKEN_ADDRESSES_REF;
 
 /**
  * Get current ETH/native asset price in USD
