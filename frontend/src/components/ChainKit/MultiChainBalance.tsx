@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   getNativeAssetPrice,
   getTokenPrice,
   formatPrice,
-  formatPriceChange,
-  PriceFeed,
+  type PriceFeed,
 } from '../../services/priceFeed';
 
 interface MultiChainBalanceProps {
