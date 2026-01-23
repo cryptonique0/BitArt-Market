@@ -158,6 +158,8 @@ export const CHAIN_IDS = {
   POLYGON: 137,
   ARBITRUM: 42161,
   OPTIMISM: 10,
+  BSC: 56,
+  AVALANCHE: 43114,
 } as const;
 
 export const CHAIN_NAMES = {
@@ -168,6 +170,8 @@ export const CHAIN_NAMES = {
   [CHAIN_IDS.POLYGON]: 'Polygon',
   [CHAIN_IDS.ARBITRUM]: 'Arbitrum',
   [CHAIN_IDS.OPTIMISM]: 'Optimism',
+  [CHAIN_IDS.BSC]: 'BNB Smart Chain',
+  [CHAIN_IDS.AVALANCHE]: 'Avalanche',
 } as const;
 
 /**
@@ -204,6 +208,8 @@ export function getExplorerUrl(
     [CHAIN_IDS.POLYGON]: 'https://polygonscan.com',
     [CHAIN_IDS.ARBITRUM]: 'https://arbiscan.io',
     [CHAIN_IDS.OPTIMISM]: 'https://optimistic.etherscan.io',
+    [CHAIN_IDS.BSC]: 'https://bscscan.com',
+    [CHAIN_IDS.AVALANCHE]: 'https://snowtrace.io',
   };
 
   const baseUrl = explorers[chainId] || 'https://etherscan.io';
