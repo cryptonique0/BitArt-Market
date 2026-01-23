@@ -22,7 +22,12 @@ export const TransactionMonitor: React.FC<TransactionMonitorProps> = ({
 }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [pending, setPending] = useState<Transaction[]>([]);
-  const [metrics, setMetrics] = useState<any>(null);
+  const [metrics, setMetrics] = useState<{
+    successRate: number;
+    totalValue: number;
+    totalGasSpent: number;
+    avgConfirmationTime: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'failed'>('all');
 
