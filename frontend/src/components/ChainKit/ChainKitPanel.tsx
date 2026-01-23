@@ -100,7 +100,12 @@ export default function ChainKitPanel({
   };
 
   return (
-    <div className="group rounded-2xl border border-gray-200 dark:border-gray-700 p-5 space-y-4 bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-gray-300 dark:hover:border-gray-600">
+    <div className="group relative rounded-2xl border-2 border-gray-200 dark:border-gray-700 p-6 space-y-5 bg-white dark:bg-gray-800/90 shadow-xl hover:shadow-2xl transition-all duration-500 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 backdrop-blur-sm overflow-hidden">
+      {/* Animated gradient overlay */}
+      <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 dark:group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br ${accentGradient} pointer-events-none`}></div>
+      
+      {/* Content */}
+      <div className="relative z-10 space-y-5">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
