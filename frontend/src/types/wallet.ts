@@ -137,4 +137,20 @@ export const SUPPORTED_CHAINS: { [key: number]: ChainConfig } = {
     rpcUrls: ['https://mainnet.optimism.io'],
     blockExplorerUrls: ['https://optimistic.etherscan.io'],
   },
+  // BNB Smart Chain
+  56: {
+    chainId: 56,
+    chainName: 'BNB Smart Chain',
+    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+    rpcUrls: ['https://bsc-dataseed.binance.org'],
+    blockExplorerUrls: ['https://bscscan.com'],
+  },
+  // Avalanche C-Chain
+  43114: {
+    chainId: 43114,
+    chainName: 'Avalanche',
+    nativeCurrency: { name: 'Avalanche', symbol: 'AVAX', decimals: 18 },
+    rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
+    blockExplorerUrls: ['https://snowtrace.io'],
+  },
 };
