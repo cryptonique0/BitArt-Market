@@ -104,34 +104,36 @@ export default function ChainKitPanel({
       {/* Animated gradient overlay */}
       <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 dark:group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br ${accentGradient} pointer-events-none`}></div>
       
-      {/* Content */}
-      <div className="relative z-10 space-y-5">
+      {/* Content - relative positioning for layering */}
+      <div className="relative z-10">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span
-              className={`inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-full text-white bg-gradient-to-r ${accentGradient} shadow-sm`}
-            >
-              {badgeText}
-            </span>
-            {isOnTarget && (
-              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 rounded-full">
-                Connected
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <span
+            className={`inline-flex items-center px-3 py-1.5 text-xs font-black rounded-lg text-white bg-gradient-to-r ${accentGradient} shadow-md transform transition-transform group-hover:scale-105`}
+          >
+            {badgeText}
+          </span>
+          {isOnTarget && (
+            <span className="relative inline-flex items-center px-2.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg border border-emerald-300 dark:border-emerald-700">
+              <span className="flex h-2 w-2 mr-1.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-            )}
-          </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{chainName}</h3>
-          {description && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-              {description}
-            </p>
+              Connected
+            </span>
           )}
         </div>
+        <h3 className="text-xl font-black text-gray-900 dark:text-white mb-1.5 group-hover:text-gray-700 dark:group-hover:text-gray-100 transition-colors">{chainName}</h3>
+        {description && (
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+            {description}
+          </p>
+        )}
       </div>
 
       {/* Connection & Switch Section */}
-      <div className="flex items-center justify-between gap-3 py-2">
+      <div className="mb-5 flex items-center justify-between gap-3">
         <div className="flex-shrink-0">
           <RainbowKitConnectButton />
         </div>
@@ -139,7 +141,7 @@ export default function ChainKitPanel({
           <button
             onClick={handleSwitch}
             disabled={isSwitching}
-            className={`flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg text-white text-sm font-medium bg-gradient-to-r ${accentGradient} hover:opacity-90 disabled:opacity-60 transition-all shadow-sm hover:shadow-md`}
+            className={`flex-1 inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white text-sm font-bold bg-gradient-to-r ${accentGradient} hover:opacity-90 disabled:opacity-60 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 disabled:transform-none`}
           >
             {isSwitching ? (
               <>
