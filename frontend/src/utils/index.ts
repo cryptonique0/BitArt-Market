@@ -30,7 +30,6 @@ export {
   compareBigNumbers,
   isZero,
   isPositive,
-  isNegative,
 
   // Gas utilities
   calculateGasCost,
