@@ -185,7 +185,11 @@ export const BridgeIntegration: React.FC<BridgeIntegrationProps> = ({
           <div className="flex justify-between">
             <span className="text-gray-600 dark:text-gray-400">Bridge Fee</span>
             <span className="font-semibold text-gray-900 dark:text-white">
-              ${parseFloat(selectedRoute.fee).toFixed(4)}
+              $
+              {(typeof selectedRoute.fee === 'number'
+                ? selectedRoute.fee
+                : parseFloat(String(selectedRoute.fee))
+              ).toFixed(4)}
             </span>
           </div>
           <div className="flex justify-between">
