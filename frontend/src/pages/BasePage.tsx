@@ -1,4 +1,3 @@
-import React from 'react';
 import { ChainKitPanel } from '../components/ChainKit';
 import { CHAIN_IDS } from '../utils';
 
@@ -67,21 +66,56 @@ const CHAIN_KITS = [
 
 export default function BasePage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-sm text-gray-500">Multi-chain</p>
-          <h1 className="text-2xl font-bold">EVM Network Toolkits</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                Multi-chain EVM
+              </p>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Network Toolkits
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center px-3 py-1.5 text-xs font-semibold bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-800 dark:text-indigo-200 rounded-full border border-indigo-200 dark:border-indigo-800">
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>6
+                Networks
+              </span>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-300 max-w-2xl">
+            Connect, switch, and manage your assets across multiple EVM-compatible networks with
+            real-time balances and one-click chain switching.
+          </p>
         </div>
-        <span className="text-xs font-semibold px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 rounded-full">
-          EVM
-        </span>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {CHAIN_KITS.map(kit => (
-          <ChainKitPanel key={kit.chainId} {...kit} />
-        ))}
+        {/* Toolkits Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {CHAIN_KITS.map(kit => (
+            <ChainKitPanel key={kit.chainId} {...kit} />
+          ))}
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+            <span className="flex items-center gap-1">
+              <span className="text-green-500">●</span> Real-time balances
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="text-blue-500">●</span> One-click switching
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="text-purple-500">●</span> Multi-wallet support
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="text-orange-500">●</span> Direct bridge access
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
