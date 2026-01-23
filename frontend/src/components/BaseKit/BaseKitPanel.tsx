@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { wagmiUtils, CHAIN_IDS, openInExplorer, getExplorerUrl } from '../../utils';
+import { useEffect, useState } from 'react';
+import { wagmiUtils, CHAIN_IDS, getExplorerUrl } from '../../utils';
 import { RainbowKitConnectButton } from '../RainbowKitConnectButton';
 import { shortenAddress, formatEther } from '../../utils/blockchain';
 
@@ -22,8 +22,8 @@ export default function BaseKitPanel({ tokenAddress }: BaseKitPanelProps) {
     const unwatchAccount = wagmiUtils.onAccountChange(account => {
       setAddress(account.address);
     });
-    const unwatchNetwork = wagmiUtils.onNetworkChange(network => {
-      setChainId(network.chain?.id);
+    const unwatchNetwork = wagmiUtils.onNetworkChange(nextChainId => {
+      setChainId(nextChainId);
     });
 
     return () => {
