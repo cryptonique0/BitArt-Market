@@ -29,11 +29,20 @@ export default function ChainKitPanel({
   const [nativeBalance, setNativeBalance] = useState<string>('0');
   const [tokenBalance, setTokenBalance] = useState<string>('0');
   const [isSwitching, setIsSwitching] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const chainName = useMemo(() => title || getChainName(chainId), [chainId, title]);
   const badgeText = badge || chainName;
   const tokenDisplayLabel = tokenLabel || 'Token Balance';
   const isOnTarget = currentChainId === chainId;
+
+  const handleCopyAddress = async () => {
+    if (address) {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   useEffect(() => {
     setAddress(wagmiUtils.getAccountAddress());
@@ -191,24 +200,52 @@ export default function ChainKitPanel({
             <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">
               {address ? shortenAddress(address) : '—'}
             </p>
-            {address && currentChainId && (
-              <a
-                href={getExplorerUrl(currentChainId, address, 'address')}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium flex items-center gap-1 hover:underline"
-              >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-                Explorer
-              </a>
-            )}
+            <div className="flex items-center gap-1">
+              {address && (
+                <button
+                  onClick={handleCopyAddress}
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1"
+                  title="Copy address"
+                >
+                  {copied ? (
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                  )}
+                </button>
+              )}
+              {address && currentChainId && (
+                <a
+                  href={getExplorerUrl(currentChainId, address, 'address')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium flex items-center gap-1 hover:underline"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                  Explorer
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>
